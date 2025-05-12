@@ -37,6 +37,9 @@ class SongLibraryVM @Inject constructor(
         loadViewModel()
     }
 
+    /**
+     * metodo que se encarga de cambiar como se ordena la lista
+     */
     fun sortList(sortOption: SortOption){
         _songList.value = _songList.value!!.sortByOption(sortOption)
         _selectedSortOption.value = sortOption
