@@ -1,0 +1,20 @@
+package com.example.dam_proyecto_pablo_carbonero.lib.repositories
+
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
+
+interface TuningRepository {
+    suspend fun getAllTunings():List<Tuning>
+
+    suspend fun getTuningById(id: Long): Tuning
+
+    suspend fun insertTuning(tuning: Tuning): Long
+
+    suspend fun deleteAllTunings(): Int
+
+    suspend fun deleteTuningById(id: Long): Int
+
+    suspend fun updateTuningName(tuningId: Long, newName: String)
+}
