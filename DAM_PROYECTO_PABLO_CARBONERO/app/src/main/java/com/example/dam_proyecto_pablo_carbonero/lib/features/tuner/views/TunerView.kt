@@ -32,16 +32,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,16 +59,21 @@ import java.net.URLEncoder
 
 @Composable
 fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
-    val tunings by vm.tunings.observeAsState();
+    val tunings by vm.tunings.collectAsState();
 
 
-    if (tunings == null){
+    if (tunings.isEmpty()){
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
     }
     else{
-        val selectedTunings by vm.selectedTuning.observeAsState(tunings!![0]);
+        val selectedTuning by vm.selectedTuning.collectAsState();
+
+        if (tunings.isNotEmpty() && selectedTuning == null) {
+            vm.setSelectedTuning(tunings[0])
+        }
+
         val vm = vm
 
         Scaffold(
@@ -84,7 +87,18 @@ fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
                 horizontalAlignment = Alignment.CenterHorizontally,
                 // = Arrangement.Center
             ) {
-                MainContent(vm = vm, afinacionInicial = selectedTunings, navController)
+                if (selectedTuning == null){
+                    CircularProgressIndicator()
+                }
+                else{
+                    MainContent(vm = vm, startingTuning = selectedTuning!!, navController)
+                }
+                /*selectedTuning?.let { tuning ->
+                    MainContent(vm = vm, startingTuning = tuning, navController)
+                } ?: run {
+                    // Show loading until selection is ready
+                    CircularProgressIndicator()
+                }*/
             }
         }
 
@@ -95,7 +109,7 @@ fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
 }
 
 @Composable
-fun MainContent(vm: TunerVM, afinacionInicial: TuningWithNotesModel, navController: NavHostController){
+fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController: NavHostController){
     val mainColor = MaterialTheme.colorScheme.primary
     var expanded by remember { mutableStateOf(false) }
 
@@ -103,14 +117,14 @@ fun MainContent(vm: TunerVM, afinacionInicial: TuningWithNotesModel, navControll
 
     val activity = LocalActivity.current
 
-    val isRecording by vm.isRecording.observeAsState(initial = false)
-    val freq by vm.freqFound.observeAsState(initial = 0.0)
+    val isRecording by vm.isRecording.collectAsState(initial = false)
+    val freq by vm.freqFound.collectAsState(initial = 0.0)
     //val noteList by vm.noteList.observeAsState()
-    val selectedNote by vm.selectedNote.observeAsState();
-    val guidetext by vm.guideText.observeAsState(initial = "");
-    val tunings by vm.tunings.observeAsState();
-    val selectedTuning by vm.selectedTuning.observeAsState(initial = afinacionInicial);
-    val latinNotes by vm.latinNotes.observeAsState()
+    val selectedNote by vm.selectedNote.collectAsState();
+    val guidetext by vm.guideText.collectAsState(initial = "");
+    val tunings by vm.tunings.collectAsState();
+    val selectedTuning by vm.selectedTuning.collectAsState(initial = startingTuning);
+    val latinNotes by vm.latinNotes.collectAsState()
 
 
     Row(Modifier.fillMaxWidth()) {
@@ -127,7 +141,7 @@ fun MainContent(vm: TunerVM, afinacionInicial: TuningWithNotesModel, navControll
                 Column() {
                     Text(selectedTuning?.tuning!!.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     Row() {
-                        selectedTuning.noteList.forEach { note ->
+                        selectedTuning?.noteList?.forEach { note ->
                             Text(text = if (latinNotes == true) note.latinName + " " else note.englishName + " ",
                                 fontSize = 15.sp, color = MaterialTheme.colorScheme.onBackground)
                         }
@@ -151,7 +165,7 @@ fun MainContent(vm: TunerVM, afinacionInicial: TuningWithNotesModel, navControll
             }
         }
 
-        if(selectedTuning.tuning.name != "Standard Tuning"){
+        if(selectedTuning?.tuning?.name != "Standard Tuning"){
             IconButton(onClick = {
                 val serializedTuning = URLEncoder.encode(Gson().toJson(selectedTuning), "UTF-8")
                 navController.navigate("EditTuning/${serializedTuning}")

@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.models.TuningWithNotesModel
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.MusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningMusicNoteRepository
@@ -17,6 +18,9 @@ import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepositor
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,29 +36,29 @@ class TunerVM @Inject constructor(
     private lateinit var audioRecord: AudioRecord
 
 
-    private val _isRecording = MutableLiveData(false)
-    val isRecording: LiveData<Boolean> = _isRecording
+    private val _isRecording = MutableStateFlow<Boolean>(false)
+    val isRecording: StateFlow<Boolean> = _isRecording
 
-    private val _freqFound = MutableLiveData<Double>()
-    val freqFound: LiveData<Double> = _freqFound
+    private val _freqFound = MutableStateFlow<Double>(0.0)
+    val freqFound: StateFlow<Double> = _freqFound
 
-    private val _noteList = MutableLiveData<List<MusicNote>>()
-    val noteList: LiveData<List<MusicNote>> = _noteList
+    private val _noteList = MutableStateFlow<List<MusicNote>>(emptyList())
+    val noteList: StateFlow<List<MusicNote>> = _noteList
 
-    private val _selectedNote = MutableLiveData<MusicNote>()
-    val selectedNote: LiveData<MusicNote> = _selectedNote
+    private val _selectedNote = MutableStateFlow<MusicNote?>(null)
+    val selectedNote: StateFlow<MusicNote?> = _selectedNote
 
-    private  val _guideText = MutableLiveData<String>()
-    val guideText: LiveData<String> = _guideText
+    private  val _guideText = MutableStateFlow<String>("")
+    val guideText: StateFlow<String> = _guideText
 
-    private val _tunings = MutableLiveData<List<TuningWithNotesModel>>()
-    val tunings: LiveData<List<TuningWithNotesModel>> = _tunings
+    private val _tunings = MutableStateFlow<List<TuningWithNotesModel>>(emptyList())
+    val tunings: StateFlow<List<TuningWithNotesModel>> = _tunings
 
-    private val _selectedTuning = MutableLiveData<TuningWithNotesModel>()
-    val selectedTuning: LiveData<TuningWithNotesModel> = _selectedTuning
+    private val _selectedTuning = MutableStateFlow<TuningWithNotesModel?>(null)
+    val selectedTuning: StateFlow<TuningWithNotesModel?> = _selectedTuning
 
-    private val _latinNotes = MutableLiveData<Boolean>()
-    val latinNotes: LiveData<Boolean> = _latinNotes
+    private val _latinNotes = MutableStateFlow<Boolean>(false)
+    val latinNotes: StateFlow<Boolean> = _latinNotes
 
 
     //SETTERS
@@ -77,7 +81,7 @@ class TunerVM @Inject constructor(
         var list: List<MusicNote>
         viewModelScope.launch(Dispatchers.IO) {
             list = notesRepo.getAllNotes()
-            _noteList.postValue(list)
+            _noteList.value = list
 
             // obtenemos las tunings hasta el momento
             var tunings = tuningRepo.getAllTunings()
@@ -97,8 +101,8 @@ class TunerVM @Inject constructor(
                 var tuningToInsert = TuningWithNotesModel(tuning = tuning, noteList = noteList)
                 tuningList.add(tuningToInsert)
             }
-            _tunings.postValue(tuningList)
-            _latinNotes.postValue(preferencesRepo.getNotationPreference())
+            _tunings.value = tuningList
+            _latinNotes.value = preferencesRepo.getNotationPreference()
         }
     }
 
@@ -122,7 +126,7 @@ class TunerVM @Inject constructor(
             while (_isRecording.value == true){
                 var txt = ""
                 val freq = processYIN(audioRecord, bufferSize, sampleRate)
-                _freqFound.postValue(freq)
+                _freqFound.value = freq
 
                 if(selectedNote.value != null && _freqFound.value != null){
                     if (_freqFound.value!! > _selectedNote.value!!.minHz && _freqFound.value!! < _selectedNote.value!!.maxHz){
@@ -134,12 +138,12 @@ class TunerVM @Inject constructor(
                     else if( _freqFound.value!! < _selectedNote.value!!.minHz ){
                         txt = "Tighten the string"
                     }
-                    _guideText.postValue(txt)
+                    _guideText.value = txt
                 }
 
             }
             audioRecord.stop()
-            _guideText.postValue("")
+            _guideText.value = ""
         }
     }
 
