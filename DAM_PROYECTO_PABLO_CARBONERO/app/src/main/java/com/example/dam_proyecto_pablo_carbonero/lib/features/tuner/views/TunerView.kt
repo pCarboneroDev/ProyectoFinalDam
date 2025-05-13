@@ -32,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.BottomNavBar
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.models.TuningWithNotesModel
@@ -60,6 +62,10 @@ import java.net.URLEncoder
 @Composable
 fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
     val tunings by vm.tunings.collectAsState();
+
+    LaunchedEffect(Unit) { // Runs every time composable enters composition
+        vm.loadPreferences()
+    }
 
 
     if (tunings.isEmpty()){
@@ -122,7 +128,7 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
     //val noteList by vm.noteList.observeAsState()
     val selectedNote by vm.selectedNote.collectAsState();
     val guidetext by vm.guideText.collectAsState(initial = "");
-    val tunings by vm.tunings.collectAsState();
+    val tunings by vm.tunings.collectAsStateWithLifecycle();
     val selectedTuning by vm.selectedTuning.collectAsState(initial = startingTuning);
     val latinNotes by vm.latinNotes.collectAsState()
 

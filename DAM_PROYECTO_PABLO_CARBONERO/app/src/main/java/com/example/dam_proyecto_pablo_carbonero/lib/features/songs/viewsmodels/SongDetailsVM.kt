@@ -12,6 +12,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.repositories.MusicNoteReposi
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.SongRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningMusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.repositories.UserPreferencesRepository
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,7 @@ class SongDetailsVM @Inject constructor(
     private val tuningMusicNoteRepository: TuningMusicNoteRepository,
     private val musicNoteRepository: MusicNoteRepository,
     private val savedStateHandle: SavedStateHandle,
+    private val userPreferencesRepository: UserPreferencesRepository
 ): ViewModel(){
     //val songSerialized = savedStateHandle.get<String>("selectedSong") ?: ""
     val songId = savedStateHandle.get<String>("songId") ?: ""
@@ -37,6 +39,9 @@ class SongDetailsVM @Inject constructor(
 
     private val _songName = MutableStateFlow<String>("")
     val songName: StateFlow<String> = _songName
+
+    private val _latinNotes = MutableStateFlow<Boolean>(false)
+    val latinNotes: StateFlow<Boolean> = _latinNotes
 
     init {
         //_selectedSong.value = Gson().fromJson(songSerialized, SongWithTuning::class.java)
@@ -55,6 +60,8 @@ class SongDetailsVM @Inject constructor(
 
             val songTuning = SongWithTuning(tuning, song, noteList)
             _selectedSong.value = songTuning
+
+            _latinNotes.value = userPreferencesRepository.getNotationPreference()
         }
     }
 }

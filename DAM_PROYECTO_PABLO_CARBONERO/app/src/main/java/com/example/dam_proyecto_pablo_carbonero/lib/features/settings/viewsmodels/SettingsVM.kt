@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.repositories_impl.UserPreferencesRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,20 +17,20 @@ class SettingsVM @Inject constructor(
     private val prefRepo: UserPreferencesRepositoryImpl
 ): ViewModel() {
 
-    private val _latinNotes = MutableLiveData<Boolean>()
-    val latinNotes: LiveData<Boolean> = _latinNotes
+    private val _latinNotes = MutableStateFlow<Boolean>(false)
+    val latinNotes: StateFlow<Boolean> = _latinNotes
 
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            _latinNotes.postValue(prefRepo.getNotationPreference())
+            _latinNotes.value = prefRepo.getNotationPreference()
         }
     }
 
 
     // MÉTODOS
     fun setNotationValue(value: Boolean){
-        _latinNotes.postValue(value)
+        _latinNotes.value = value
         viewModelScope.launch(Dispatchers.IO) {
             prefRepo.setNotationPreference(value)
         }

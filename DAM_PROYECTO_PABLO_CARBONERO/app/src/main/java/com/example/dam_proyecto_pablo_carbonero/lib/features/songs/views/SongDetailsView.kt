@@ -38,6 +38,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewsmodels.S
 @Composable
 fun SongDetailsView(navController: NavHostController, vm: SongDetailsVM = hiltViewModel()){
     val selectedSong by vm.selectedSong.collectAsState()
+    val latinNotes by vm.latinNotes.collectAsState()
 
     Column(Modifier
         .fillMaxSize()
@@ -55,7 +56,7 @@ fun SongDetailsView(navController: NavHostController, vm: SongDetailsVM = hiltVi
         Text(selectedSong?.tuning?.name ?: "")
         Row {
             selectedSong?.noteList?.forEach { note ->
-                Text("${note.englishName} ")
+                Text(text = if (latinNotes == true) note.latinName + " " else note.englishName + " ")
             }
         }
     }

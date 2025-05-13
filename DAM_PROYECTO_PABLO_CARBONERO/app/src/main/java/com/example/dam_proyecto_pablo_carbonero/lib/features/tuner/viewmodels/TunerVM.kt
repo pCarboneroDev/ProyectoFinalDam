@@ -102,8 +102,12 @@ class TunerVM @Inject constructor(
                 tuningList.add(tuningToInsert)
             }
             _tunings.value = tuningList
-            _latinNotes.value = preferencesRepo.getNotationPreference()
+            loadPreferences()
         }
+    }
+
+    suspend fun loadPreferences(){
+        _latinNotes.value = preferencesRepo.getNotationPreference()
     }
 
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
