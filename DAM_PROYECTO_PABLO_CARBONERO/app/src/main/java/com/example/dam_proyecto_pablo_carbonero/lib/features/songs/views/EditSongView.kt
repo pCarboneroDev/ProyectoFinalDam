@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -45,18 +46,18 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewModel()){
-    val song by vm.selectedSong.observeAsState()
+    val song by vm.selectedSong.collectAsState()
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val maxChars = 25
 
-    val tuningList by vm.tuningList.observeAsState()
-    val selectedTuning by vm.selectedTuning.observeAsState()
-    val songName by vm.songName.observeAsState("")
-    val bandName by vm.bandName.observeAsState("")
-    val bmp by vm.bpm.observeAsState("")
-    val key by vm.key.observeAsState("")
-    val formValid by vm.formValid.observeAsState(false)
+    val tuningList by vm.tuningList.collectAsState()
+    val selectedTuning by vm.selectedTuning.collectAsState()
+    val songName by vm.songName.collectAsState("")
+    val bandName by vm.bandName.collectAsState("")
+    val bmp by vm.bpm.collectAsState("")
+    val key by vm.key.collectAsState("")
+    val formValid by vm.formValid.collectAsState(false)
 
 
     Column(Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 10.dp)) {

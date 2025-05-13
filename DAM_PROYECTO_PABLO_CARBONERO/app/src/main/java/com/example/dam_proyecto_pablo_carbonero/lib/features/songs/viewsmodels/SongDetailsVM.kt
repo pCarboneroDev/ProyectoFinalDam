@@ -15,6 +15,8 @@ import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepositor
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,11 +32,11 @@ class SongDetailsVM @Inject constructor(
     val songId = savedStateHandle.get<String>("songId") ?: ""
     val tuningId = savedStateHandle.get<String>("tuningId") ?: ""
 
-    private val _selectedSong = MutableLiveData<SongWithTuning>()
-    val selectedSong: LiveData<SongWithTuning> = _selectedSong
+    private val _selectedSong = MutableStateFlow<SongWithTuning?>(null)
+    val selectedSong: StateFlow<SongWithTuning?> = _selectedSong
 
-    private val _songName = MutableLiveData<String>()
-    val songName: LiveData<String> = _songName
+    private val _songName = MutableStateFlow<String>("")
+    val songName: StateFlow<String> = _songName
 
     init {
         //_selectedSong.value = Gson().fromJson(songSerialized, SongWithTuning::class.java)
@@ -52,7 +54,7 @@ class SongDetailsVM @Inject constructor(
             noteList.sort()
 
             val songTuning = SongWithTuning(tuning, song, noteList)
-            _selectedSong.postValue(songTuning)
+            _selectedSong.value = songTuning
         }
     }
 }

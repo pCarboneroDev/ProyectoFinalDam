@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -36,7 +37,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewsmodels.S
 
 @Composable
 fun SongDetailsView(navController: NavHostController, vm: SongDetailsVM = hiltViewModel()){
-    val selectedSong by vm.selectedSong.observeAsState()
+    val selectedSong by vm.selectedSong.collectAsState()
 
     Column(Modifier
         .fillMaxSize()

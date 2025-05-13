@@ -10,6 +10,8 @@ import com.example.dam_proyecto_pablo_carbonero.lib.repositories.SongRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,26 +20,26 @@ class CreateSongVM @Inject constructor(
     private val tuningRepo: TuningRepository,
     private val songRepo: SongRepository
 ): ViewModel() {
-    private val _tuningList = MutableLiveData<List<Tuning>>()
-    val tuningList: LiveData<List<Tuning>> = _tuningList
+    private val _tuningList = MutableStateFlow<List<Tuning>>(emptyList())
+    val tuningList: StateFlow<List<Tuning>> = _tuningList
 
-    private val _selectedTuning = MutableLiveData<Tuning>()
-    val selectedTuning: LiveData<Tuning> = _selectedTuning
+    private val _selectedTuning = MutableStateFlow<Tuning?>(null)
+    val selectedTuning: StateFlow<Tuning?> = _selectedTuning
 
-    private val _songName = MutableLiveData<String>()
-    val songName: LiveData<String> = _songName
+    private val _songName = MutableStateFlow<String>("")
+    val songName: StateFlow<String> = _songName
 
-    private val _bandName = MutableLiveData<String>()
-    val bandName: LiveData<String> = _bandName
+    private val _bandName = MutableStateFlow<String>("")
+    val bandName: StateFlow<String> = _bandName
 
-    private val _bpm = MutableLiveData<String>()
-    val bpm: LiveData<String> = _bpm
+    private val _bpm = MutableStateFlow<String>("")
+    val bpm: StateFlow<String> = _bpm
 
-    private val _key = MutableLiveData<String>()
-    val key: LiveData<String> = _key
+    private val _key = MutableStateFlow<String>("")
+    val key: StateFlow<String> = _key
 
-    private val _formValid = MutableLiveData<Boolean>()
-    val formValid: LiveData<Boolean> = _formValid
+    private val _formValid = MutableStateFlow<Boolean>(false)
+    val formValid: StateFlow<Boolean> = _formValid
 
     private lateinit var _finalSong: Song
 
@@ -45,7 +47,7 @@ class CreateSongVM @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             val t = tuningRepo.getAllTunings()
-            _tuningList.postValue(t)
+            _tuningList.value = t
         }
     }
 

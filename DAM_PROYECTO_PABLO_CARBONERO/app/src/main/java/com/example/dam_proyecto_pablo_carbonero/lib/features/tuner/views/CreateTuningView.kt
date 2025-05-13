@@ -17,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -39,10 +40,10 @@ import kotlinx.coroutines.launch
 fun CreateTuningView(navController: NavHostController, vm: CreateTuningVM = hiltViewModel()){
     val context = LocalContext.current
 
-    val noteList by vm.noteList.observeAsState()
-    val tuningName by vm.tuningName.observeAsState(initial = "")
-    val selectedNotes by vm.selectedNotes.observeAsState()
-    val latinNotes by vm.latinNotes.observeAsState()
+    val noteList by vm.noteList.collectAsState()
+    val tuningName by vm.tuningName.collectAsState(initial = "")
+    val selectedNotes by vm.selectedNotes.collectAsState()
+    val latinNotes by vm.latinNotes.collectAsState()
 
     var isValid by remember {mutableStateOf(false)}
 

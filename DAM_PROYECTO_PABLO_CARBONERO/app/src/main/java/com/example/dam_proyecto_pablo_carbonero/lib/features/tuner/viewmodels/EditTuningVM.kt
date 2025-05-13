@@ -17,6 +17,8 @@ import com.example.dam_proyecto_pablo_carbonero.lib.repositories.UserPreferences
 import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,19 +35,19 @@ class EditTuningVM @Inject constructor(
 
     private lateinit var tuningModel: TuningWithNotesModel
 
-    private val _tuningName = MutableLiveData<String>()
-    val tuningName: LiveData<String> = _tuningName
+    private val _tuningName = MutableStateFlow<String>("")
+    val tuningName: StateFlow<String> = _tuningName
 
-    private val _finalTuning = MutableLiveData<Tuning>()
+    private val _finalTuning = MutableStateFlow<Tuning?>(null)
 
-    private val _noteList = MutableLiveData<List<MusicNote>>()
-    val noteList: LiveData<List<MusicNote>> = _noteList
+    private val _noteList = MutableStateFlow<List<MusicNote>>(emptyList())
+    val noteList: StateFlow<List<MusicNote>> = _noteList
 
-    private val _selectedNotes: MutableLiveData<Array<MusicNote>> = MutableLiveData(Array(6) { MusicNote() })
-    val selectedNotes: LiveData<Array<MusicNote>> = _selectedNotes
+    private val _selectedNotes: MutableStateFlow<Array<MusicNote>> = MutableStateFlow(Array(6) { MusicNote() })
+    val selectedNotes: StateFlow<Array<MusicNote>> = _selectedNotes
 
-    private val _latinNotes = MutableLiveData<Boolean>()
-    val latinNotes: LiveData<Boolean> = _latinNotes
+    private val _latinNotes = MutableStateFlow<Boolean>(false)
+    val latinNotes: StateFlow<Boolean> = _latinNotes
 
 
     init {
@@ -57,9 +59,9 @@ class EditTuningVM @Inject constructor(
             try{
                 list = notesRepo.getAllNotes() as MutableList<MusicNote>;
                 list.sort()
-                _noteList.postValue(list);
+                _noteList.value = list
 
-                _latinNotes.postValue(preferencesRepo.getNotationPreference())
+                _latinNotes.value = preferencesRepo.getNotationPreference()
             }
             catch (e: Exception){
                 //TODO Gestionar la posible excepcion
@@ -67,9 +69,9 @@ class EditTuningVM @Inject constructor(
             }
         }
 
-        var i = _selectedNotes.value!!.size - 1
+        var i = _selectedNotes.value.size - 1
         for (note in tuningModel.noteList){
-            _selectedNotes.value!![i] = note
+            _selectedNotes.value[i] = note
             i--
         }
     }
