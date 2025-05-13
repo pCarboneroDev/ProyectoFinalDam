@@ -8,6 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.TuningMusicNote
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.params.TuningParams
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAllNotesUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.InsertTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.MusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningMusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
@@ -16,20 +20,19 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.Array
 
 @HiltViewModel
 class CreateTuningVM @Inject constructor(
-    private val notesRepo: MusicNoteRepository,
-    private val tuningRepo: TuningRepository,
-    private val tuningMusicNoteRepo: TuningMusicNoteRepository,
+    private val getAllNotesUseCase: GetAllNotesUseCase,
+    private val insertTuningUseCase: InsertTuningUseCase,
     private val preferencesRepo: UserPreferencesRepository
 ): ViewModel() {
     private val _tuningName = MutableStateFlow<String>("")
     val tuningName: StateFlow<String> = _tuningName
-
-    private val _finalTuning = MutableStateFlow<Tuning?>(null)
 
     private val _noteList = MutableStateFlow<List<MusicNote>>(emptyList())
     val noteList: StateFlow<List<MusicNote>> = _noteList
@@ -40,88 +43,44 @@ class CreateTuningVM @Inject constructor(
     private val _latinNotes = MutableStateFlow<Boolean>(false)
     val latinNotes: StateFlow<Boolean> = _latinNotes
 
+    private val _finalTuning = MutableStateFlow<Tuning?>(null)
+
 
     init {
         var list: MutableList<MusicNote>
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                list = notesRepo.getAllNotes() as MutableList<MusicNote>;
+                list = getAllNotesUseCase.call(Unit).toMutableList();
                 list.sort()
-                _noteList.value = list;
-
-                _latinNotes.value = preferencesRepo.getNotationPreference()
-            }
-            catch (e: Exception){
+                _noteList.value = list
+            }catch (e: Exception){
                 //TODO Gestionar la posible excepcion
                 Log.d("Error al obtener las notas", "Habrá que hacer algo")
             }
+            _latinNotes.value = preferencesRepo.getNotationPreference()
         }
     }
-
 
     // SETTERS
     fun setTuningName(value: String){
         _tuningName.value = value
     }
 
-
     // METODOS
     fun saveNewTuning(): Boolean{
         var saved = true
 
         try{
-            var list = selectedNotes.value!!.toList() as MutableList<MusicNote>
-            list.sort();
-
-            _finalTuning.value = Tuning(name = _tuningName.value.toString())
-
+            _finalTuning.value = Tuning(name = _tuningName.value)
+            val list = _selectedNotes.value.toMutableList()
+            list.sort()
             viewModelScope.launch(Dispatchers.IO) {
-                var newId = saveTuningInBbDd()
-                saveTuningNotesInBbDd(newId, list)
+                insertTuningUseCase.call(TuningParams(_finalTuning.value!!, list))
             }
+
         }catch (e: Exception){
             saved = false
         }
-
         return saved
-    }
-
-    suspend fun saveTuningInBbDd(): Long{
-        var newId: Long = 0
-        try{
-            newId = tuningRepo.insertTuning(_finalTuning.value!!)
-        }
-        catch (e: Exception){
-            throw e;
-        }
-        return newId
-    }
-
-    suspend fun saveTuningNotesInBbDd(id: Long, notes: List<MusicNote>){
-        try {
-            for (note in notes) {
-                val insert = TuningMusicNote(tuningId = id, noteId = note.id)
-                tuningMusicNoteRepo.insertTuningMusicNote(insert)
-            }
-
-            /*var lista = mutableListOf<MusicNote>()
-
-            for (nota in notes) {
-                val noteFound = notes.find { it.englishName == nota.englishName }
-                if (noteFound != null) {
-                    lista.add(noteFound)
-                } else {
-                    println("Nota ${nota.englishName} no encontrada en la lista de notas")
-                }
-            }
-
-            for (note in lista){
-                var insert = TuningMusicNote(tuningId = id, noteId = note.id)
-                tuningMusicNoteRepo.insertTuningMusicNote(insert)
-            }*/
-        }catch (e: Exception){
-            tuningRepo.deleteTuningById(id)
-            throw e;
-        }
     }
 }

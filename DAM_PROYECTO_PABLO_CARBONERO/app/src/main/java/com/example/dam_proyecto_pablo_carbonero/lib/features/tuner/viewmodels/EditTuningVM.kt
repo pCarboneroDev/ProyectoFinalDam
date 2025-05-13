@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.TuningMusicNote
-import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.models.TuningWithNotesModel
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.MusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningMusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository

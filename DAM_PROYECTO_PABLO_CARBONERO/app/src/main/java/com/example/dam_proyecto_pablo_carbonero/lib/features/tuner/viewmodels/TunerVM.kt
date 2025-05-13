@@ -11,7 +11,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
-import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.models.TuningWithNotesModel
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetAllTuningWithNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.MusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningMusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
@@ -26,15 +27,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TunerVM @Inject constructor(
-    private val notesRepo: MusicNoteRepository,
-    private val tuningRepo: TuningRepository,
-    private val tuningMusicNoteRepo: TuningMusicNoteRepository,
+    private val getAllTuningWithNotesUseCase: GetAllTuningWithNotesUseCase,
     private val preferencesRepo: UserPreferencesRepository
 ): ViewModel() {
-    private val sampleRate = 44100
-    private val bufferSize = 16384
-    private lateinit var audioRecord: AudioRecord
 
+    private val _tunings = MutableStateFlow<List<TuningWithNotesModel>>(emptyList())
+    val tunings: StateFlow<List<TuningWithNotesModel>> = _tunings
+
+    private val _selectedTuning = MutableStateFlow<TuningWithNotesModel?>(null)
+    val selectedTuning: StateFlow<TuningWithNotesModel?> = _selectedTuning
+
+    private val _selectedNote = MutableStateFlow<MusicNote?>(null)
+    val selectedNote: StateFlow<MusicNote?> = _selectedNote
 
     private val _isRecording = MutableStateFlow<Boolean>(false)
     val isRecording: StateFlow<Boolean> = _isRecording
@@ -42,20 +46,12 @@ class TunerVM @Inject constructor(
     private val _freqFound = MutableStateFlow<Double>(0.0)
     val freqFound: StateFlow<Double> = _freqFound
 
-    private val _noteList = MutableStateFlow<List<MusicNote>>(emptyList())
-    val noteList: StateFlow<List<MusicNote>> = _noteList
-
-    private val _selectedNote = MutableStateFlow<MusicNote?>(null)
-    val selectedNote: StateFlow<MusicNote?> = _selectedNote
-
     private  val _guideText = MutableStateFlow<String>("")
     val guideText: StateFlow<String> = _guideText
 
-    private val _tunings = MutableStateFlow<List<TuningWithNotesModel>>(emptyList())
-    val tunings: StateFlow<List<TuningWithNotesModel>> = _tunings
-
-    private val _selectedTuning = MutableStateFlow<TuningWithNotesModel?>(null)
-    val selectedTuning: StateFlow<TuningWithNotesModel?> = _selectedTuning
+    private val sampleRate = 44100
+    private val bufferSize = 16384
+    private lateinit var audioRecord: AudioRecord
 
     private val _latinNotes = MutableStateFlow<Boolean>(false)
     val latinNotes: StateFlow<Boolean> = _latinNotes
@@ -78,30 +74,8 @@ class TunerVM @Inject constructor(
 
     // ALGO ASI COMO EL CONSTRUCTOR
     init {
-        var list: List<MusicNote>
         viewModelScope.launch(Dispatchers.IO) {
-            list = notesRepo.getAllNotes()
-            _noteList.value = list
-
-            // obtenemos las tunings hasta el momento
-            var tunings = tuningRepo.getAllTunings()
-            val tuningList = mutableListOf<TuningWithNotesModel>()
-
-            for (tuning in tunings){ //accesoBD.obtenerIdNotasPorIdAfinacion(tuning.id)
-                var notesIdList = tuningMusicNoteRepo.getNotesIdFromTuningId(tuning.id)
-                var noteList = mutableListOf<MusicNote>()
-
-                for(noteId in notesIdList ){ //accesoBD.obtenerNotaPorId(noteId)
-                    var note = notesRepo.getMusicNoteById(noteId)
-                    noteList.add(note)
-                }
-
-                noteList.sort()
-
-                var tuningToInsert = TuningWithNotesModel(tuning = tuning, noteList = noteList)
-                tuningList.add(tuningToInsert)
-            }
-            _tunings.value = tuningList
+            _tunings.value = getAllTuningWithNotesUseCase.call(Unit)
             loadPreferences()
         }
     }
@@ -218,14 +192,4 @@ class TunerVM @Inject constructor(
 
         return f
     }
-
-
-    // PREFERENCIAS
-    /*fun obtenerPreferencias(){
-        // ver preferencias usuario
-        viewModelScope.launch(Dispatchers.IO) {
-            preferencesRepo.getNotationPreference()
-        }
-
-    }*/
 }

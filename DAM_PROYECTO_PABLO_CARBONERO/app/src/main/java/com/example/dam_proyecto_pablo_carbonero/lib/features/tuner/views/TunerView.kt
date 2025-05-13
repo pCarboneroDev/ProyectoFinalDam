@@ -49,7 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.BottomNavBar
-import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.models.TuningWithNotesModel
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.viewmodels.TunerVM
 //import com.example.dam_proyecto_pablo_carbonero.lib.repositories.repositories_impl.UserPreferencesRepositoryImpl
 import com.google.gson.Gson
@@ -63,7 +63,7 @@ import java.net.URLEncoder
 fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
     val tunings by vm.tunings.collectAsState();
 
-    LaunchedEffect(Unit) { // Runs every time composable enters composition
+    LaunchedEffect(Unit) {
         vm.loadPreferences()
     }
 
@@ -76,8 +76,9 @@ fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
     else{
         val selectedTuning by vm.selectedTuning.collectAsState();
 
-        if (tunings.isNotEmpty() && selectedTuning == null) {
-            vm.setSelectedTuning(tunings[0])
+        if (selectedTuning == null) {
+            vm.setSelectedTuning(tunings.find { it.tuning.id == 1.toLong() } ?: tunings[0])
+            // todo poner objeto vacío o algo si no se cumple
         }
 
         val vm = vm
@@ -91,7 +92,6 @@ fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
                 Modifier.fillMaxSize()
                     .padding(innerPadding).systemBarsPadding(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                // = Arrangement.Center
             ) {
                 if (selectedTuning == null){
                     CircularProgressIndicator()
@@ -99,18 +99,8 @@ fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
                 else{
                     MainContent(vm = vm, startingTuning = selectedTuning!!, navController)
                 }
-                /*selectedTuning?.let { tuning ->
-                    MainContent(vm = vm, startingTuning = tuning, navController)
-                } ?: run {
-                    // Show loading until selection is ready
-                    CircularProgressIndicator()
-                }*/
             }
         }
-
-        /*LaunchedEffect(Unit) {
-            vm.obtenerPreferencias()
-        }*/
     }
 }
 
