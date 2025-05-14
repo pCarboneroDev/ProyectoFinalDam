@@ -1,5 +1,6 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewsmodels
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,7 +9,8 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
 import com.example.dam_proyecto_pablo_carbonero.lib.extensions.sortByOption
-import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.models.SongWithTuning
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetAllSongsUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.SongRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
 import com.google.gson.Gson
@@ -22,8 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SongLibraryVM @Inject constructor(
-    private val songRepo: SongRepository,
-    private val tuningRepo: TuningRepository
+    private val getAllSongsUseCase: GetAllSongsUseCase
 ): ViewModel() {
 
     private val _songList = MutableStateFlow<List<SongWithTuning>>(emptyList())
@@ -41,22 +42,19 @@ class SongLibraryVM @Inject constructor(
      * metodo que se encarga de cambiar como se ordena la lista
      */
     fun sortList(sortOption: SortOption){
-        _songList.value = _songList.value!!.sortByOption(sortOption)
+        _songList.value = _songList.value.sortByOption(sortOption)
         _selectedSortOption.value = sortOption
     }
 
     fun loadViewModel(){
         viewModelScope.launch(Dispatchers.IO) {
-            var list = songRepo.getAllSongs()
-
-            var songModelList = mutableListOf<SongWithTuning>()
-
-            for (song in list){
-                var t = tuningRepo.getTuningById(song.tuningId)
-                songModelList.add(SongWithTuning(t, song))
+            try {
+                _songList.value = getAllSongsUseCase.call(Unit)
             }
-
-            _songList.value = songModelList
+            catch (e: Exception){
+                //TODO gestionar excepcion
+                Log.d("AA", e.message.toString())
+            }
         }
     }
 

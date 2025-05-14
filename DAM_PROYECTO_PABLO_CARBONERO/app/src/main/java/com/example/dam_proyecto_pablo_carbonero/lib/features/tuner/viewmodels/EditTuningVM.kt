@@ -1,20 +1,17 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.viewmodels
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
-import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.TuningMusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.MusicNoteRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningMusicNoteRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAllNotesUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.DeleteTuningUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetTuningByIdUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.UpdateTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.UserPreferencesRepository
-import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,14 +21,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditTuningVM @Inject constructor(
-    private val notesRepo: MusicNoteRepository,
-    private val tuningRepo: TuningRepository,
-    private val tuningMusicNoteRepo: TuningMusicNoteRepository,
-    //selectedTuning: String?,
+    private val getAllNotesUseCase: GetAllNotesUseCase,
+    private val getTuningByIdUseCase: GetTuningByIdUseCase,
+    private val updateTuningUseCase: UpdateTuningUseCase,
+    private val deleteTuningUseCase: DeleteTuningUseCase,
     private val savedStateHandle: SavedStateHandle,
     private val preferencesRepo: UserPreferencesRepository
 ): ViewModel() {
-    val selectedTuning = savedStateHandle.get<String>("selectedTuning") ?: ""
+    val selectedTuningId = savedStateHandle.get<String>("selectedTuningId") ?: ""
 
     private lateinit var tuningModel: TuningWithNotesModel
 
@@ -51,29 +48,31 @@ class EditTuningVM @Inject constructor(
 
 
     init {
-        var list: List<MusicNote>;
-        tuningModel = Gson().fromJson(selectedTuning, TuningWithNotesModel::class.java)
-        _tuningName.value = tuningModel.tuning.name
-
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                list = notesRepo.getAllNotes() as MutableList<MusicNote>;
-                list.sort()
-                _noteList.value = list
+                var list: List<MusicNote>;
+                //tuningModel = Gson().fromJson(selectedTuningId, TuningWithNotesModel::class.java)
+                tuningModel = getTuningByIdUseCase.call(selectedTuningId.toLong())
+                _tuningName.value = tuningModel.tuning.name
 
+                list = getAllNotesUseCase.call(Unit);
+
+                _noteList.value = list
                 _latinNotes.value = preferencesRepo.getNotationPreference()
             }
             catch (e: Exception){
                 //TODO Gestionar la posible excepcion
-                Log.d("Error al obtener las notas", "Habrá que hacer algo")
+            }
+            var i = _selectedNotes.value.size - 1
+            for (note in tuningModel.noteList){
+                _selectedNotes.value[i] = note
+                i--
             }
         }
+    }
 
-        var i = _selectedNotes.value.size - 1
-        for (note in tuningModel.noteList){
-            _selectedNotes.value[i] = note
-            i--
-        }
+    suspend fun getData(){
+
     }
 
 
@@ -84,29 +83,25 @@ class EditTuningVM @Inject constructor(
 
 
     // METODOS
-    fun saveNewTuning(): Boolean{
+    suspend fun updateTuning(): Boolean{
         var saved = true
-
         try{
             var list = selectedNotes.value!!.toList() as MutableList<MusicNote>
-            list.sort();
+            //list.sort();
 
-            _finalTuning.value = Tuning(name = _tuningName.value.toString())
+            _finalTuning.value = Tuning( id = selectedTuningId.toLong() ,name = _tuningName.value.toString())
 
-            viewModelScope.launch(Dispatchers.IO) {
-                saveTuningInBbDd()
-                saveTuningNotesInBbDd(list)
-            }
+            saved = updateTuningUseCase.call(TuningWithNotesModel(_finalTuning.value!!, list))
         }catch (e: Exception){
+            Log.d("ERROU", e.message.toString())
             saved = false
         }
-
         return saved
     }
 
-    suspend fun saveTuningInBbDd() {
+    /*suspend fun saveTuningInBbDd() {
         try{
-            tuningRepo.updateTuningName(tuningModel.tuning.id, _tuningName.value!!)
+            //tuningRepo.updateTuningName(tuningModel.tuning.id, _tuningName.value!!)
         }
         catch (e: Exception){
             throw e;
@@ -134,12 +129,15 @@ class EditTuningVM @Inject constructor(
             //TODO Gestionar esto
             throw e;
         }
-    }
+    }*/
 
     fun borrarAfinacion(){
         viewModelScope.launch(Dispatchers.IO) {
-            tuningMusicNoteRepo.deleteNoteByTuningId(tuningModel.tuning.id)
-            tuningRepo.deleteTuningById(tuningModel.tuning.id)
+            var list = _selectedNotes.value.toMutableList()
+            list.sort()
+            deleteTuningUseCase.call(TuningWithNotesModel(tuningModel.tuning, list))
+            /*tuningMusicNoteRepo.deleteNoteByTuningId(tuningModel.tuning.id)
+            tuningRepo.deleteTuningById(tuningModel.tuning.id)*/
         }
     }
 

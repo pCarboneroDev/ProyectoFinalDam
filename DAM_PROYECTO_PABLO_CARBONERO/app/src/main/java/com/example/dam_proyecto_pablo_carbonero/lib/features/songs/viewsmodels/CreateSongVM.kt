@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.InsertSongUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.GetAllTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.SongRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,8 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreateSongVM @Inject constructor(
-    private val tuningRepo: TuningRepository,
-    private val songRepo: SongRepository
+    private val getAllTuningUseCase: GetAllTuningUseCase,
+    private val insertSongUseCase: InsertSongUseCase
 ): ViewModel() {
     private val _tuningList = MutableStateFlow<List<Tuning>>(emptyList())
     val tuningList: StateFlow<List<Tuning>> = _tuningList
@@ -41,12 +44,12 @@ class CreateSongVM @Inject constructor(
     private val _formValid = MutableStateFlow<Boolean>(false)
     val formValid: StateFlow<Boolean> = _formValid
 
-    private lateinit var _finalSong: Song
+    private lateinit var _finalSong: SongWithTuning
 
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            val t = tuningRepo.getAllTunings()
+            val t = getAllTuningUseCase.call(Unit)
             _tuningList.value = t
         }
     }
@@ -89,21 +92,22 @@ class CreateSongVM @Inject constructor(
      * Metodo para guardar una canción en la bbdd
      * return: true si se ha guaradado, false si hubo un error.
      */
-    fun saveSong(): Boolean{
+    suspend fun saveSong(): Boolean{
         var saved = true
 
         try{
-            _finalSong = Song(
-                name = _songName.value!!,
-                bandName = _bandName.value!!,
+            val song = Song(
+                name = _songName.value,
+                bandName = _bandName.value,
                 tuningId = _selectedTuning.value!!.id,
-                bpm = _bpm.value!! + " bpm",
-                key = _key.value!!
+                bpm = _bpm.value + " bpm",
+                key = _key.value
             )
+            _finalSong = SongWithTuning(song = song, tuning = _selectedTuning.value!!)
 
-            viewModelScope.launch(Dispatchers.IO) {
-                insertSongDdBb(_finalSong)
-            }
+
+            insertSongUseCase.call(_finalSong)
+
         }catch (e: Exception){
             saved = false;
         }
@@ -111,27 +115,18 @@ class CreateSongVM @Inject constructor(
         return saved;
     }
 
-    /**
-     * Metodo que se encarga de realizar la inserción de la nueva canción en la bbdd
-     */
-    suspend fun insertSongDdBb(song: Song){
-        try{
-            var id = songRepo.insertSong(song)
-        }catch (e: Exception){
-            throw e
-        }
-    }
+
 
     fun isSongNameValid(): Boolean {
-        return _songName.value.isNullOrEmpty()
+        return _songName.value.isEmpty()
     }
 
     fun isBandNameValid(): Boolean {
-        return _bandName.value.isNullOrEmpty()
+        return _bandName.value.isEmpty()
     }
 
     fun isBpmValid(): Boolean {
-        return _bpm.value.isNullOrEmpty()
+        return _bpm.value.isEmpty()
     }
 
     fun isNumeric(numericText: String): Boolean{
@@ -139,6 +134,6 @@ class CreateSongVM @Inject constructor(
     }
 
     fun isFormValid() {
-        _formValid.value = (!isSongNameValid() || !isBandNameValid() || !isBpmValid() || _selectedTuning.value == null)
+        _formValid.value = (!isSongNameValid() || !isBandNameValid() || !isBpmValid() || _selectedTuning.value != null)
     }
 }

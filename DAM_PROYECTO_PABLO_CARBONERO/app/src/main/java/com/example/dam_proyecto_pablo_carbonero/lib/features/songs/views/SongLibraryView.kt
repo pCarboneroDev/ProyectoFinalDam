@@ -60,7 +60,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.BottomNavBar
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.SortSelectorModal
-import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.models.SongWithTuning
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewsmodels.SongLibraryVM
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -70,6 +70,7 @@ import kotlinx.coroutines.coroutineScope
 fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltViewModel()){
     val lifecycleOwner = LocalLifecycleOwner.current
 
+    // TODO probar cambiar esto por launched effect
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {

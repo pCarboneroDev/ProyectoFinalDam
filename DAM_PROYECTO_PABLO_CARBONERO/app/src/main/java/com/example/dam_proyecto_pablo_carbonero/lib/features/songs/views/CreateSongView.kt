@@ -33,6 +33,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewsmodels.CreateSongVM
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltViewModel()){
@@ -59,17 +62,19 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
         CreateHeader(
             title = "Create new song",
             saveMethod = {
-                var result = vm.saveSong()
-                if (result == true && formValid){
-                    navController.navigate("SongTuning"){
-                        popUpTo("CreateSong") { inclusive = true }
+                CoroutineScope(Dispatchers.Main).launch {
+                    var result = vm.saveSong()
+                    if (result == true && formValid){
+                        navController.navigate("SongTuning"){
+                            popUpTo("CreateSong") { inclusive = true }
+                        }
                     }
-                }
-                else if (!formValid){
-                    Toast.makeText(context,"Complete all fields",Toast.LENGTH_SHORT).show()
-                }
-                else{
-                    Toast.makeText(context,"ERROR",Toast.LENGTH_SHORT).show()
+                    else if (!formValid){
+                        Toast.makeText(context,"Complete all fields",Toast.LENGTH_SHORT).show()
+                    }
+                    else{
+                        Toast.makeText(context,"ERROR",Toast.LENGTH_SHORT).show()
+                    }
                 }
             },
             navController = navController

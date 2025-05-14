@@ -163,8 +163,8 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
 
         if(selectedTuning?.tuning?.name != "Standard Tuning"){
             IconButton(onClick = {
-                val serializedTuning = URLEncoder.encode(Gson().toJson(selectedTuning), "UTF-8")
-                navController.navigate("EditTuning/${serializedTuning}")
+                //val serializedTuning = URLEncoder.encode(Gson().toJson(selectedTuningId), "UTF-8")
+                navController.navigate("EditTuning/${selectedTuning!!.tuning.id}")
             }) {
                 Icon(Icons.Default.Create, contentDescription = "edit tunning", tint = Color.LightGray)
             }

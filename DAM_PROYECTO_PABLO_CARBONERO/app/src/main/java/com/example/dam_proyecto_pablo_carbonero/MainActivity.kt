@@ -108,8 +108,8 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(
-                            route = "EditTuning/{selectedTuning}",
-                            arguments = listOf(navArgument("selectedTuning") { type = NavType.StringType }
+                            route = "EditTuning/{selectedTuningId}",
+                            arguments = listOf(navArgument("selectedTuningId") { type = NavType.StringType }
                             )) { backStackEntry ->
                                 EditTuningView(
                                     navController = navController
