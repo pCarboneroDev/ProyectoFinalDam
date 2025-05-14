@@ -8,6 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongByIdUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.UpdateSongUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.GetAllTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.SongRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,8 +22,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditSongVM @Inject constructor(
-    private val songRepository: SongRepository,
-    private val tuningRepository: TuningRepository,
+    private val getSongByIdUseCase: GetSongByIdUseCase,
+    private val getAllTuning: GetAllTuningUseCase,
+    private val updateSongUseCase: UpdateSongUseCase,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
     val songId = savedStateHandle.get<String>("songId") ?: ""
@@ -52,25 +56,20 @@ class EditSongVM @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                val song = getSongFromDdBb(songId.toLong())
-                _selectedSong.value = song
-                val tuning = getTuningFromDdBb(song.tuningId)
+                _selectedSong.value = getSongByIdUseCase.call(songId.toLong())
+                _tuningList.value = getAllTuning.call(Unit)
+
+                val tuning = _tuningList.value.find { it.id == _selectedSong.value!!.tuningId }
                 _selectedTuning.value = tuning
-                loadData(song)
-                _tuningList.value = tuningRepository.getAllTunings()
+
+                loadData(_selectedSong.value!!)
             }catch (e: Exception){
                 // todo gestionar excepción
             }
         }
     }
 
-    suspend fun getSongFromDdBb(id: Long): Song {
-        return songRepository.getSongById(id)
-    }
 
-    suspend fun getTuningFromDdBb(id: Long): Tuning{
-        return tuningRepository.getTuningById(id)
-    }
 
     suspend fun loadData(song: Song) {
         _songName.value = song.name
@@ -125,11 +124,11 @@ class EditSongVM @Inject constructor(
         try{
             var s = Song(
                 id = _selectedSong.value!!.id,
-                name = _songName.value!!,
-                bandName = _bandName.value!!,
+                name = _songName.value,
+                bandName = _bandName.value,
                 tuningId = _selectedTuning.value!!.id,
-                bpm = _bpm.value!! + " bpm",
-                key = _key.value!!
+                bpm = _bpm.value + " bpm",
+                key = _key.value
             )
 
 
@@ -146,7 +145,7 @@ class EditSongVM @Inject constructor(
      */
     suspend fun updateSong(song: Song){
         try{
-            var rowsAffected = songRepository.updateSong(song)
+            var rowsAffected = updateSongUseCase.call(song)//songRepository.updateSong(song)
         }catch (e: Exception){
             throw e
         }

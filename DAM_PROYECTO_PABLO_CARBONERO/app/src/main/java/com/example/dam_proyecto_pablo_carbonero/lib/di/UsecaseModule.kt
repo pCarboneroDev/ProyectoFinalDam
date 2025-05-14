@@ -2,7 +2,9 @@ package com.example.dam_proyecto_pablo_carbonero.lib.di
 
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAllNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetAllSongsUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongByIdUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.InsertSongUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.UpdateSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.GetAllTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.DeleteTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.InsertTuningUseCase
@@ -125,6 +127,26 @@ object UsecaseModule {
     ): GetAllTuningUseCase{
         return GetAllTuningUseCase(
             tuningRepository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetSongById(
+        songRepository: SongRepository
+    ): GetSongByIdUseCase{
+        return GetSongByIdUseCase(
+            songRepository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideUpdateSong(
+        songRepository: SongRepository
+    ): UpdateSongUseCase{
+        return UpdateSongUseCase(
+            songRepository
         )
     }
 }
