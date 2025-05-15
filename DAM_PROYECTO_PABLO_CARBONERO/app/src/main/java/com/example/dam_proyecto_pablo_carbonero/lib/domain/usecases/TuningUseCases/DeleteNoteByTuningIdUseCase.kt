@@ -1,7 +1,7 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases
 
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.UseCase
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningMusicNoteRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
 
 class DeleteNoteByTuningIdUseCase(
     private val repo: TuningMusicNoteRepository

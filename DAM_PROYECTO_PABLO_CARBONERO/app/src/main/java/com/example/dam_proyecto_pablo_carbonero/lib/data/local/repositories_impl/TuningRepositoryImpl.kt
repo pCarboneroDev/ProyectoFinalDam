@@ -1,8 +1,8 @@
-package com.example.dam_proyecto_pablo_carbonero.lib.repositories.repositories_impl
+package com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl
 
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
 import javax.inject.Inject
 
 class TuningRepositoryImpl @Inject constructor(

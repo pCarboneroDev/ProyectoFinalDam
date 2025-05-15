@@ -2,7 +2,7 @@ package com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCa
 
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.UseCase
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
 
 class GetAllTuningUseCase(
     private val repo: TuningRepository

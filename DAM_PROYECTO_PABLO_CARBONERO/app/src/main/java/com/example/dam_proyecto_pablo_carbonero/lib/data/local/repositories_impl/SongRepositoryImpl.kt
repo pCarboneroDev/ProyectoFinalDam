@@ -1,8 +1,8 @@
-package com.example.dam_proyecto_pablo_carbonero.lib.repositories.repositories_impl
+package com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl
 
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.SongDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.SongRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
 import javax.inject.Inject
 
 class SongRepositoryImpl @Inject constructor(

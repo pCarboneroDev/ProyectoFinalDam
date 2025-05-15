@@ -1,8 +1,5 @@
-package com.example.dam_proyecto_pablo_carbonero.lib.repositories
+package com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories
 
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.TuningMusicNote
 
 interface TuningMusicNoteRepository {

@@ -1,26 +1,24 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.di
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.MusicNoteDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.SongDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningMusicNoteDao
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.MusicNoteRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.SongRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningMusicNoteRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.UserPreferencesRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.repositories_impl.MusicNoteRepositoryImpl
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.repositories_impl.SongRepositoryImpl
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.repositories_impl.TuningMusicNoteRepositoryImpl
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.repositories_impl.TuningRepositoryImpl
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.repositories_impl.UserPreferencesRepositoryImpl
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.MusicNoteRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.MusicNoteRepositoryImpl
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.SongRepositoryImpl
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.TuningMusicNoteRepositoryImpl
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.TuningRepositoryImpl
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.UserPreferencesRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 

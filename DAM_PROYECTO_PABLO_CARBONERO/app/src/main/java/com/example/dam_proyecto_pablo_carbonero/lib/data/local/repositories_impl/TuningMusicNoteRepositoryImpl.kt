@@ -1,9 +1,8 @@
-package com.example.dam_proyecto_pablo_carbonero.lib.repositories.repositories_impl
+package com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl
 
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningMusicNoteDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.TuningMusicNote
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningMusicNoteRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
 import javax.inject.Inject
 
 class TuningMusicNoteRepositoryImpl @Inject constructor(

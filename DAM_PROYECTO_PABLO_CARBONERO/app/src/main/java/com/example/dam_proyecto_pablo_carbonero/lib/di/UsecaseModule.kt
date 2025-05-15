@@ -11,10 +11,10 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNo
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetAllTuningWithNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetTuningByIdUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.UpdateTuningUseCase
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.MusicNoteRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.SongRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningMusicNoteRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.MusicNoteRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

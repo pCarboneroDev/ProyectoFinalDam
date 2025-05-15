@@ -1,19 +1,15 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewsmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
-import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.MusicNoteRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.SongRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningMusicNoteRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.UserPreferencesRepository
-import com.google.gson.Gson
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.MusicNoteRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

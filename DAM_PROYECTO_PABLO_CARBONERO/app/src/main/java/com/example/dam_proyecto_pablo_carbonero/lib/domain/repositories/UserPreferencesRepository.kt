@@ -1,4 +1,4 @@
-package com.example.dam_proyecto_pablo_carbonero.lib.repositories
+package com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories
 
 interface UserPreferencesRepository {
     suspend fun getNotationPreference(): Boolean

@@ -2,8 +2,8 @@ package com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCase
 
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.UseCase
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.SongRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
 import javax.inject.Inject
 
 class GetAllSongsUseCase @Inject constructor(

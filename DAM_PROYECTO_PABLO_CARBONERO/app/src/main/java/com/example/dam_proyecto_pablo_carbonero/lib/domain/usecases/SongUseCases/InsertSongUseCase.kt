@@ -1,10 +1,8 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases
 
-import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.UseCase
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.SongRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
 import javax.inject.Inject
 
 
