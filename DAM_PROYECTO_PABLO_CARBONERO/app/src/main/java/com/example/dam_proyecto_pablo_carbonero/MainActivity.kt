@@ -16,7 +16,7 @@ import androidx.navigation.navArgument
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.views.SettingsView
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.views.CreateTuningView
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.views.EditTuningView
-import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.views.LoadingScreen
+import com.example.dam_proyecto_pablo_carbonero.lib.features.loadingScreen.views.LoadingScreen
 //import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.views.SettingsView
 //import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels.SettingsVM
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.views.CreateSongView

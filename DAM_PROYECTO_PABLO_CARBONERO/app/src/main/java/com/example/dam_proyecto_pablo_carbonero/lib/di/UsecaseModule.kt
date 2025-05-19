@@ -15,6 +15,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.MusicNot
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.InsertAllMusicNotesUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -46,6 +47,16 @@ object UsecaseModule {
         return GetAllNotesUseCase(
             notesRepository
         ) // Your implementation
+    }
+
+    @Provides
+    @Singleton
+    fun provideInsertAllMusicNotes(
+        notesRepository: MusicNoteRepository
+    ): InsertAllMusicNotesUseCase {
+        return InsertAllMusicNotesUseCase(
+            notesRepository
+        )
     }
 
     @Provides

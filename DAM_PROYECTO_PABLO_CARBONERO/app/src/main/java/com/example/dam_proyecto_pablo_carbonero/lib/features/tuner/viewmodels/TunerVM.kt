@@ -100,7 +100,7 @@ class TunerVM @Inject constructor(
                 _freqFound.value = freq
 
                 if(selectedNote.value != null && _freqFound.value != null){
-                    if (_freqFound.value!! > _selectedNote.value!!.minHz && _freqFound.value!! < _selectedNote.value!!.maxHz){
+                    if (_freqFound.value >= _selectedNote.value!!.minHz && _freqFound.value <= _selectedNote.value!!.maxHz){
                         txt = "Note in tune"
                     }
                     else if( _freqFound.value!! > _selectedNote.value!!.maxHz ){

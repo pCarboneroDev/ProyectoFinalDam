@@ -1,17 +1,22 @@
-package com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.viewmodels
+package com.example.dam_proyecto_pablo_carbonero.lib.features.loadingScreen.viewsmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.TuningMusicNote
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.MusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAllNotesUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.InsertAllMusicNotesUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.GetAllTuningUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.InsertTuningUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.pow
@@ -20,22 +25,27 @@ import kotlin.math.pow
 class LoadingVM @Inject constructor (
     private val notesRepo: MusicNoteRepository,
     private val tuningRepo: TuningRepository,
-    private val tuningMusicNoteRepo: TuningMusicNoteRepository
+    private val tuningMusicNoteRepo: TuningMusicNoteRepository,
+
+    private val getAllNotesUseCase: GetAllNotesUseCase,
+    private val getAllTuning: GetAllTuningUseCase,
+    private val insertAllMusicNotesUseCase: InsertAllMusicNotesUseCase,
+    private val insertTuningUseCase: InsertTuningUseCase
 ): ViewModel() {
 
-    private val _loadComplete = MutableLiveData(false)
-    val loadComplete: LiveData<Boolean> = _loadComplete
+    private val _loadComplete = MutableStateFlow(false)
+    val loadComplete: StateFlow<Boolean> = _loadComplete
 
 
-    private val _txtPlaceholder = MutableLiveData<String>()
-    val txtPlaceholder: LiveData<String> = _txtPlaceholder
+    private val _txtPlaceholder = MutableStateFlow<String>("")
+    val txtPlaceholder: StateFlow<String> = _txtPlaceholder
 
     // esto se ejecuta al instanciar el viewModel
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                var notes = notesRepo.getAllNotes()
-                val tunings = tuningRepo.getAllTunings()
+                var notes = getAllNotesUseCase.call(Unit) //notesRepo.getAllNotes()
+                val tunings = getAllTuning.call(Unit) //tuningRepo.getAllTunings()
 
                 if (notes.isEmpty()) {
                     notes = generateMusicNotes()
@@ -43,7 +53,7 @@ class LoadingVM @Inject constructor (
                 if(tunings.isEmpty()){
                     generateStandardTuning(notes)
                 }
-                _loadComplete.postValue(true)
+                _loadComplete.value = true
             }catch (e: Exception){
                 //TODO gestionar excepción
             }
@@ -56,8 +66,9 @@ class LoadingVM @Inject constructor (
     private suspend fun generateMusicNotes(): List<MusicNote>{
         val notesListToInsert = getFreqAccordingOnA4();
 
-        notesRepo.insertAllMusicNotes(notesListToInsert)
-        return notesRepo.getAllNotes()
+        //notesRepo.insertAllMusicNotes(notesListToInsert)
+        insertAllMusicNotesUseCase.call(notesListToInsert)
+        return getAllNotesUseCase.call(Unit) // notesRepo.getAllNotes()
     }
 
     private suspend fun generateStandardTuning(notes: List<MusicNote>){
@@ -75,14 +86,16 @@ class LoadingVM @Inject constructor (
             }
         }
 
-        var standardTunning = Tuning(name = "Standard Tuning");
+        var standardTunning = Tuning(name = "Standard Tuning")
 
-        var standardId = tuningRepo.insertTuning(standardTunning)
+        val tuningwithNotes = TuningWithNotesModel(tuning = standardTunning, noteList = list)
 
-        for (nota in list){
+        var standardId = insertTuningUseCase.call(tuningwithNotes)//tuningRepo.insertTuning(standardTunning)
+
+        /*for (nota in list){
             var insert = TuningMusicNote(tuningId = standardId, noteId = nota.id)
             tuningMusicNoteRepo.insertTuningMusicNote(insert)
-        }
+        }*/
     }
 
 
@@ -95,38 +108,41 @@ class LoadingVM @Inject constructor (
 
 
         var englishNames = listOf<String>("A", "B", "C", "D", "E", "F", "G")
-        var LatinNames = listOf<String>("La", "Si", "Do", "Re", "Mi", "Fa", "Sol")
+        var latinNames = listOf<String>("La", "Si", "Do", "Re", "Mi", "Fa", "Sol")
+
+        val sharpToFlatMap = mapOf(
+            "C#" to "Db",
+            "D#" to "Eb",
+            "F#" to "Gb",
+            "G#" to "Ab",
+            "A#" to "Bb"
+        )
 
         var musicNoteList = mutableListOf<MusicNote>();
-
 
         for (note in noteList){
             for (i in 1..4){
                 var octave = i;
-
                 var semitone = calculateSemitone(octave, noteList.indexOf(note))
                 var freqWanted = calculateFreq(freqRef, semitone);
-
                 var indexN = englishNames.indexOf(note[0].toString())
-                var sost: String?;
-                var bem: String?;
 
-                if(note.contains('#')){
-                    sost = "#"
-                    bem = "b"
-                }
-                else{
-                    sost = null
-                    bem = null
-                }
+                val sharp = if (note.contains("#")) "#" else null
+                val bemol = sharpToFlatMap[note] + i
 
 
-                var nota = MusicNote(latinNotation = LatinNames[indexN], englishNotation = englishNames[indexN],
-                    octave = octave, maxHz = freqWanted+0.5, minHz = freqWanted-0.5,
-                    sharpIndicator = sost, alternativeName = bem)
+                val cents = 10
+                val marginRatio = 2.0.pow(cents / 1200.0)
 
-
-
+                var nota = MusicNote(
+                    latinNotation = latinNames[indexN],
+                    englishNotation = englishNames[indexN],
+                    octave = octave,
+                    maxHz = freqWanted * marginRatio,
+                    minHz = freqWanted / marginRatio,
+                    sharpIndicator = sharp,
+                    alternativeName = bemol
+                )
                 musicNoteList.add(nota);
             }
             index++
