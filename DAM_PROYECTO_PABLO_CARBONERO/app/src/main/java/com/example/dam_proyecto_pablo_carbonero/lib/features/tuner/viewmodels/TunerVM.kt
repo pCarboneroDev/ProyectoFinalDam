@@ -5,6 +5,7 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import androidx.annotation.RequiresPermission
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
@@ -17,6 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.exp
+import kotlin.math.pow
 
 @HiltViewModel
 class TunerVM @Inject constructor(
@@ -48,6 +51,13 @@ class TunerVM @Inject constructor(
 
     private val _latinNotes = MutableStateFlow<Boolean>(false)
     val latinNotes: StateFlow<Boolean> = _latinNotes
+
+    private val _graphValue = MutableStateFlow<Double>(0.5)
+    val graphValue: StateFlow<Double> = _graphValue
+
+    private val _colorGraph = MutableStateFlow<Color>(Color.White)
+    val colorGraph: StateFlow<Color> = _colorGraph
+
 
 
     //SETTERS
@@ -90,6 +100,7 @@ class TunerVM @Inject constructor(
 
     /**
      * Metodo que se encarga de capturar el audio y pasarlo a otros metodos que se encargan de realizar el análisis del audio
+     *  f(x)=1/(1+e−k(x−objetivo))
      */
     fun startRecordingAudio(){
         viewModelScope.launch(Dispatchers.IO) {
@@ -99,15 +110,22 @@ class TunerVM @Inject constructor(
                 val freq = processYIN(audioRecord, bufferSize, sampleRate)
                 _freqFound.value = freq
 
-                if(selectedNote.value != null && _freqFound.value != null){
+                _graphValue.value = sigmoidNormalizedBetween(freq,
+                    selectedNote.value!!.minHz, _selectedNote.value!!.maxHz)
+               // 1.0 / (1.0 + exp(-0.01 * (freq - center)))
+
+                if(selectedNote.value != null /*&& _freqFound.value != 0.0*/){
                     if (_freqFound.value >= _selectedNote.value!!.minHz && _freqFound.value <= _selectedNote.value!!.maxHz){
                         txt = "Note in tune"
+                        _colorGraph.value = Color.Green
                     }
-                    else if( _freqFound.value!! > _selectedNote.value!!.maxHz ){
+                    else if( _freqFound.value > _selectedNote.value!!.maxHz ){
                         txt = "Loosen the string"
+                        _colorGraph.value = Color.Red
                     }
-                    else if( _freqFound.value!! < _selectedNote.value!!.minHz ){
+                    else if( _freqFound.value < _selectedNote.value!!.minHz ){
                         txt = "Tighten the string"
+                        _colorGraph.value = Color.Red
                     }
                     _guideText.value = txt
                 }
@@ -115,7 +133,18 @@ class TunerVM @Inject constructor(
             }
             audioRecord.stop()
             _guideText.value = ""
+            _graphValue.value = 0.5
+            _colorGraph.value = Color.White
         }
+    }
+
+    fun sigmoidNormalizedBetween(freq: Double, minHz: Double, maxHz: Double, kFactor: Double = 0.07): Double {
+        if (freq == 0.0) return 0.5
+
+        val center = (minHz + maxHz) / 2.0
+        val rangeWidth = maxHz - minHz
+        val k = kFactor / rangeWidth
+        return 1.0 / (1.0 + exp(-k * (freq - center)))
     }
 
     /**
