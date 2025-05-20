@@ -50,7 +50,7 @@ class EditTuningVM @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                var list: List<MusicNote>;
+                var list: List<MusicNote>
                 //tuningModel = Gson().fromJson(selectedTuningId, TuningWithNotesModel::class.java)
                 tuningModel = getTuningByIdUseCase.call(selectedTuningId.toLong())
                 _tuningName.value = tuningModel.tuning.name
@@ -71,9 +71,6 @@ class EditTuningVM @Inject constructor(
         }
     }
 
-    suspend fun getData(){
-
-    }
 
 
     // SETTERS
@@ -86,8 +83,7 @@ class EditTuningVM @Inject constructor(
     suspend fun updateTuning(): Boolean{
         var saved = true
         try{
-            var list = selectedNotes.value!!.toList() as MutableList<MusicNote>
-            //list.sort();
+            var list = selectedNotes.value.toList() as MutableList<MusicNote>
 
             _finalTuning.value = Tuning( id = selectedTuningId.toLong() ,name = _tuningName.value.toString())
 
@@ -136,8 +132,7 @@ class EditTuningVM @Inject constructor(
             var list = _selectedNotes.value.toMutableList()
             list.sort()
             deleteTuningUseCase.call(TuningWithNotesModel(tuningModel.tuning, list))
-            /*tuningMusicNoteRepo.deleteNoteByTuningId(tuningModel.tuning.id)
-            tuningRepo.deleteTuningById(tuningModel.tuning.id)*/
+
         }
     }
 
