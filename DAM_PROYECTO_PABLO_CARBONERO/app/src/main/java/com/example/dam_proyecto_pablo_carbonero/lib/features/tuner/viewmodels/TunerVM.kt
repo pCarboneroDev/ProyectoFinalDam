@@ -5,6 +5,7 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import androidx.annotation.RequiresPermission
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -55,7 +56,7 @@ class TunerVM @Inject constructor(
     private val _graphValue = MutableStateFlow<Double>(0.5)
     val graphValue: StateFlow<Double> = _graphValue
 
-    private val _colorGraph = MutableStateFlow<Color>(Color.White)
+    private val _colorGraph = MutableStateFlow<Color>(Color(0xFF18120C))
     val colorGraph: StateFlow<Color> = _colorGraph
 
 
@@ -66,7 +67,7 @@ class TunerVM @Inject constructor(
         _isRecording.value = value
     }
 
-    fun setSelectedNote(value: MusicNote){
+    fun setSelectedNote(value: MusicNote?){
         _selectedNote.value = value
     }
 
@@ -110,12 +111,17 @@ class TunerVM @Inject constructor(
                 val freq = processYIN(audioRecord, bufferSize, sampleRate)
                 _freqFound.value = freq
 
-                _graphValue.value = sigmoidNormalizedBetween(freq,
-                    selectedNote.value!!.minHz, _selectedNote.value!!.maxHz)
                // 1.0 / (1.0 + exp(-0.01 * (freq - center)))
 
                 if(selectedNote.value != null /*&& _freqFound.value != 0.0*/){
-                    if (_freqFound.value >= _selectedNote.value!!.minHz && _freqFound.value <= _selectedNote.value!!.maxHz){
+                    _graphValue.value = sigmoidNormalizedBetween(freq,
+                        selectedNote.value!!.minHz, _selectedNote.value!!.maxHz)
+
+                    if (_freqFound.value == 0.0){
+                        txt = ""
+                        _colorGraph.value = Color(0xFF18120C)
+                    }
+                    else if (_freqFound.value >= _selectedNote.value!!.minHz && _freqFound.value <= _selectedNote.value!!.maxHz){
                         txt = "Note in tune"
                         _colorGraph.value = Color.Green
                     }
@@ -134,7 +140,7 @@ class TunerVM @Inject constructor(
             audioRecord.stop()
             _guideText.value = ""
             _graphValue.value = 0.5
-            _colorGraph.value = Color.White
+            _colorGraph.value = Color(0xFF18120C)
         }
     }
 

@@ -2,17 +2,12 @@ package com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.views
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.transition.Slide
 import androidx.activity.compose.LocalActivity
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
-
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.SnapPosition.Center
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,12 +15,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -54,30 +49,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.BottomNavBar
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.viewmodels.TunerVM
-//import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.UserPreferencesRepositoryImpl
-import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.net.URLEncoder
-import kotlin.math.abs
-import kotlin.math.cos
-import kotlin.math.roundToInt
-import kotlin.math.sin
+import kotlin.math.exp
 
 
 @Composable
@@ -145,99 +134,25 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
 
     val graphValue by vm.graphValue.collectAsState()
     val colorGraph by vm.colorGraph.collectAsState()
-    var sliderPosition by remember { mutableFloatStateOf(0f) }
 
 
     Row(Modifier.fillMaxWidth()) {
-        Box(
-            Modifier
-                .height(60.dp)
-                .width(270.dp)
-                .clickable(
-                    onClick = {expanded = !expanded}
-                ),
-            contentAlignment = Alignment.Center,
-        ){
-            Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.Center) {
-                Column() {
-                    Text(selectedTuning?.tuning!!.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    Row() {
-                        selectedTuning?.noteList?.forEach { note ->
-                            Text(text = if (latinNotes == true) note.latinName + " " else note.englishName + " ",
-                                fontSize = 15.sp, color = MaterialTheme.colorScheme.onBackground)
-                        }
-                    }
-                }
-                Icon(Icons.Default.ArrowDropDown, contentDescription = "More options", tint = MaterialTheme.colorScheme.primary)
-            }
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                Modifier.background(color = MaterialTheme.colorScheme.secondary)
-            ) {
-                tunings.forEach { tuning ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(tuning.tuning.name)
-                        },
-                        onClick = { vm.setSelectedTuning(tuning) }
-                    )
-                }
-            }
-        }
-
-        if(selectedTuning?.tuning?.name != "Standard Tuning"){
-            IconButton(onClick = {
-                //val serializedTuning = URLEncoder.encode(Gson().toJson(selectedTuningId), "UTF-8")
-                navController.navigate("EditTuning/${selectedTuning!!.tuning.id}")
-            }) {
-                Icon(Icons.Default.Create, contentDescription = "edit tunning", tint = Color.LightGray)
-            }
-        }
-
-
-        IconButton(onClick = {
-            navController.navigate("CreateTuning")
-        }) {
-            Icon(Icons.Default.Add, contentDescription = "add tunning", tint = Color.LightGray)
-        }
+        // composable que contiene el header para seleccionar la afinación
+        TuningSelector(
+            selectedTuning = selectedTuning,
+            tunings = tunings,
+            latinNotes = latinNotes,
+            onTuningSelected = { vm.setSelectedTuning(it); vm.setSelectedNote(null) },
+            navController
+        )
     }
 
     HorizontalDivider()
 
-    Slider(
-        value = graphValue.toFloat(),
-        onValueChange = { sliderPosition = it },
-        thumb = {
-            Box(
-                modifier = Modifier
-                    .size(50.dp)  // Thumb size
-                    .background(
-                        color = Color.Transparent,
-                        shape = CircleShape  // Makes it circular
-                    )
-                    .border(2.dp, colorGraph, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "Thumb",
-                    tint = Color.White,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        },
-        colors = SliderDefaults.colors(
-            activeTrackColor = Color.Transparent, // Hide active track
-            inactiveTrackColor = Color.Transparent
-        )
-    )
 
     Text("$graphValue")
 
-    //TuningNeedleIndicator(graphValue)
-    //TuningBarIndicator(graphValue)
-    CircularTopFillIndicator(graphValue)
+    TuningAnimation(graphValue.toFloat(), Modifier, colorGraph)
 
     Row() {
         selectedTuning?.noteList?.forEachIndexed { index, note ->
@@ -299,163 +214,133 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
     )
 }
 
-@Composable
-fun TuningNeedleIndicator(normalizedValue: Double) {
-    // Animación suave con Animatable
-    val animatedValue = remember { Animatable(0.5f) }
-
-    // Lanzar animación cuando cambia normalizedValue
-    LaunchedEffect(normalizedValue) {
-        // Limita entre 0f y 1f
-        val target = normalizedValue.coerceIn(0.0, 1.0).toFloat()
-        animatedValue.animateTo(
-            target,
-            animationSpec = tween(durationMillis = 300, easing = LinearOutSlowInEasing)
-        )
-    }
-
-    Canvas(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp)
-            .padding(16.dp)
-    ) {
-        val centerX = size.width / 2
-        val centerY = size.height * 0.9f
-        val radius = size.height * 0.6f
-
-        // Fondo con guía central
-        drawLine(
-            color = Color.LightGray,
-            start = Offset(centerX, centerY),
-            end = Offset(centerX, centerY - radius),
-            strokeWidth = 4f
-        )
-
-        // Calcula ángulo de la aguja según el valor animado
-        val offsetFromCenter = (animatedValue.value - 0.5f) * 2f // -1 to 1
-        val maxAngle = 45f  // grados
-        val angleRad = Math.toRadians((offsetFromCenter * maxAngle).toDouble()).toFloat()
-
-        val needleX = centerX + radius * sin(angleRad)
-        val needleY = centerY - radius * cos(angleRad)
-
-        // Aguja
-        drawLine(
-            color = Color.Red,
-            start = Offset(centerX, centerY),
-            end = Offset(needleX, needleY),
-            strokeWidth = 6f,
-            cap = StrokeCap.Round
-        )
-    }
-}
 
 @Composable
-fun TuningBarIndicator(
-    normalizedValue: Double,
-    totalBars: Int = 11
+fun TuningAnimation(
+    graphValue: Float,  // Value from 0 (too low) to 1 (too high), 0.5 is centered
+    modifier: Modifier = Modifier,
+    color: Color
 ) {
-    val animatedValue = remember { Animatable(0.5f) }
+    val animatedValue by animateFloatAsState(
+        targetValue = graphValue,
+        animationSpec = spring(dampingRatio = 0.5f, stiffness = 100f),
+        label = "tuningAnimation"
+    )
 
-    LaunchedEffect(normalizedValue) {
-        val target = normalizedValue.coerceIn(0.0, 1.0).toFloat()
-        animatedValue.animateTo(
-            target,
-            animationSpec = tween(durationMillis = 200)
-        )
-    }
+    //if (min == null) min = 0f
 
-    val filledBars = ((animatedValue.value - 0.5f) * (totalBars / 2)).roundToInt()
+    var containerWidth by remember { mutableStateOf(0) }
 
-    Row(
-        modifier = Modifier
+    Box(
+        modifier = modifier
             .fillMaxWidth()
-            .height(100.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.Bottom
+            .height(100.dp)
     ) {
-        for (i in -(totalBars / 2)..(totalBars / 2)) {
-            val isFilled = if (filledBars > 0) i in 0..filledBars else i in filledBars..0
-            val color = when {
-                i == 0 -> Color.Green
-                isFilled -> if (abs(i) < 3) Color.Yellow else Color.Red
-                else -> Color.LightGray
-            }
-
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .onSizeChanged { containerWidth = it.width },
+                //.background(Color.LightGray.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            // Center line
             Box(
                 modifier = Modifier
-                    .padding(horizontal = 2.dp)
-                    .width(6.dp)
-                    .height((40 + 20 * (1 - abs(i).toFloat() / (totalBars / 2))).dp)
-                    .background(color, shape = RoundedCornerShape(2.dp))
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Color.Gray)
+            )
+
+            // Range indicator
+            Box(
+                modifier = Modifier
+                    .width(80.dp)
+                    .height(4.dp)
+                    .background(Color.Green.copy(alpha = 0.5f))
+            )
+
+            // Moving sphere
+            Box(
+                modifier = Modifier
+                    .offset {
+                        IntOffset(
+                            x = ((animatedValue - 0.5f) * containerWidth * 0.8f).toInt(), //Function invocation 'size(...)' expected. // Function invocation 'width(...)' expected.
+                            y = 0
+                        )
+                    }
+                    .size(40.dp)
+                    .background(
+                        color = when {
+                            animatedValue in 0.45f..0.55f -> color
+                            animatedValue < 0.45f -> color
+                            else -> color
+                        },
+                        shape = CircleShape
+                    )
+                    .border(2.dp, Color.White, CircleShape)
             )
         }
     }
 }
 
 @Composable
-fun CircularTopFillIndicator(
-    normalizedValue: Double,
-    totalLines: Int = 41  // impar para tener línea central
-) {
-    val animatedValue = remember { Animatable(0.5f) }
-
-    LaunchedEffect(normalizedValue) {
-        animatedValue.animateTo(
-            normalizedValue.coerceIn(0.0, 1.0).toFloat(),
-            animationSpec = tween(durationMillis = 300)
-        )
-    }
-
-    Canvas(
-        modifier = Modifier
-            .size(250.dp)
-            .padding(16.dp)
-    ) {
-        val center = size.center
-        val radius = size.minDimension / 2.5f
-        val barLength = 30f
-
-        val halfLines = totalLines / 2
-        val targetIndex = ((animatedValue.value - 0.5f) * totalLines).roundToInt()
-
-        for (i in -halfLines..halfLines) {
-            val angleDeg = -90f + (i * (180f / totalLines))
-            val angleRad = Math.toRadians(angleDeg.toDouble()).toFloat()
-
-            val isFilled = if (targetIndex == 0) {
-                i == 0
-            } else if (targetIndex > 0) {
-                i in 0..targetIndex
-            } else {
-                i in targetIndex..0
+fun TuningSelector(
+    selectedTuning: TuningWithNotesModel?,
+    tunings: List<TuningWithNotesModel>,
+    latinNotes: Boolean,
+    onTuningSelected: (TuningWithNotesModel) -> Unit,
+    navController: NavHostController,
+){
+    var expanded by remember { mutableStateOf(false) }
+    Box(
+        Modifier
+            .height(60.dp)
+            .width(270.dp)
+            .clickable(
+                onClick = {expanded = !expanded}
+            ),
+        contentAlignment = Alignment.CenterStart,
+    ){
+        Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.Center) {
+            Column() {
+                Text(selectedTuning?.tuning!!.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Row() {
+                    selectedTuning?.noteList?.forEach { note ->
+                        Text(text = if (latinNotes == true) note.latinName + " " else note.englishName + " ",
+                            fontSize = 15.sp, color = MaterialTheme.colorScheme.onBackground)
+                    }
+                }
             }
-
-            val color = when {
-                i == 0 -> Color.Green
-                isFilled && abs(i) < 3 -> Color.Yellow
-                isFilled -> Color.Red
-                else -> Color.LightGray
+            Icon(Icons.Default.ArrowDropDown, contentDescription = "More options", tint = MaterialTheme.colorScheme.primary)
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            Modifier.background(color = MaterialTheme.colorScheme.secondary)
+        ) {
+            tunings.forEach { tuning ->
+                DropdownMenuItem(
+                    text = {
+                        Text(tuning.tuning.name)
+                    },
+                    onClick = { onTuningSelected(tuning); expanded = false }
+                )
             }
-
-            val start = Offset(
-                x = center.x + cos(angleRad) * (radius - barLength),
-                y = center.y + sin(angleRad) * (radius - barLength)
-            )
-            val end = Offset(
-                x = center.x + cos(angleRad) * radius,
-                y = center.y + sin(angleRad) * radius
-            )
-
-            drawLine(
-                color = color,
-                start = start,
-                end = end,
-                strokeWidth = 4f,
-                cap = StrokeCap.Round
-            )
         }
     }
-}
 
+    if(selectedTuning?.tuning?.name != "Standard Tuning"){
+        IconButton(onClick = {
+            navController.navigate("EditTuning/${selectedTuning!!.tuning.id}")
+        }) {
+            Icon(Icons.Default.Create, contentDescription = "edit tunning", tint = Color.LightGray)
+        }
+    }
+
+    IconButton(onClick = {
+        navController.navigate("CreateTuning")
+    }) {
+        Icon(Icons.Default.Add, contentDescription = "add tunning", tint = Color.LightGray)
+    }
+}
