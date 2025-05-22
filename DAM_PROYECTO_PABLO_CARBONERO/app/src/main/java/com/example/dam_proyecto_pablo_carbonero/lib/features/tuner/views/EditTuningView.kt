@@ -184,7 +184,14 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
         Spacer(modifier = Modifier.weight(1f))
 
         if (modal) ConfirmDelete(
-            dismissFunction = {modal = false}, onDeletePressed = {}
+            dismissFunction = {modal = false}, onDeletePressed = {
+                CoroutineScope(Dispatchers.Main).launch {
+                    vm.borrarAfinacion()
+                }
+                navController.navigate("Tuner"){
+                    popUpTo("EditTuning") { inclusive = true }
+                }
+            }
         )
 
         Button(

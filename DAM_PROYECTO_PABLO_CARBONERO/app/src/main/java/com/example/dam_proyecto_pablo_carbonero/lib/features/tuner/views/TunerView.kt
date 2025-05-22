@@ -15,12 +15,14 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
@@ -99,7 +101,7 @@ fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
         { innerPadding ->
             Column(
                 Modifier.fillMaxSize()
-                    .padding(innerPadding).systemBarsPadding(),
+                    .padding(innerPadding).systemBarsPadding().padding(horizontal = 12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 if (selectedTuning == null){
@@ -131,25 +133,26 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
     val colorGraph by vm.colorGraph.collectAsState()
 
 
-    Row(Modifier.fillMaxWidth()) {
-        // composable que contiene el header para seleccionar la afinación
-        TuningSelector(
-            selectedTuning = selectedTuning,
-            tunings = tunings,
-            latinNotes = latinNotes,
-            onTuningSelected = { vm.setSelectedTuning(it); vm.setSelectedNote(null) },
-            navController
-        )
-    }
+
+    // composable que contiene el header para seleccionar la afinación
+    TuningSelector(
+        selectedTuning = selectedTuning,
+        tunings = tunings,
+        latinNotes = latinNotes,
+        onTuningSelected = { vm.setSelectedTuning(it); vm.setSelectedNote(null) },
+        navController
+    )
 
     HorizontalDivider()
 
+    // TEXTOS DE INFORMACION
+    Text(text = if (isRecording) "$freq Hz" else "", color = mainColor)
 
-    Text("$graphValue")
+    Text(
+        text = guidetext, color = mainColor
+    )
 
     TuningAnimation(graphValue.toFloat(), Modifier, colorGraph)
-
-
 
     Text(
         text = if (selectedNote != null)
@@ -157,16 +160,6 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
         else "",
         color = mainColor
     )
-
-    // TEXTOS DE INFORMACION
-    Text(text = "Frequency: $freq Hz", color = mainColor)
-
-
-    Text(
-        text = guidetext, color = mainColor
-    )
-
-    // Switch
 
 
     TuningNotesSelector(
@@ -203,19 +196,20 @@ fun TuningNotesSelector(
     latinNotes: Boolean
 ){
     var i by remember { mutableStateOf(-1) }
-    Row() {
+    Row(Modifier.fillMaxWidth()) {
         selectedTuning?.noteList?.forEachIndexed { index, note ->
             val isSelected = index == i
 
             Box(
                 modifier = Modifier
-                    .padding(4.dp)
+                    .weight(1f)
+                    .aspectRatio(1f)//.size(60.dp) // Tamaño circular fijo
                     .background(
                         color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                         shape = CircleShape
                     )
-                    .clickable() { onNoteSelected(note); i = index }
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .clickable { onNoteSelected(note); i = index },
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = if (latinNotes == true) note.latinName else note.englishName,
