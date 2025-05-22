@@ -36,7 +36,7 @@ fun SortSelectorModal(
         },
         text = {
             Column {
-                SortOption.values().forEach { option ->
+                SortOption.entries.forEach { option ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

@@ -50,12 +50,11 @@ class EditTuningVM @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                var list: List<MusicNote>
                 //tuningModel = Gson().fromJson(selectedTuningId, TuningWithNotesModel::class.java)
                 tuningModel = getTuningByIdUseCase.call(selectedTuningId.toLong())
                 _tuningName.value = tuningModel.tuning.name
 
-                list = getAllNotesUseCase.call(Unit);
+                var list: List<MusicNote> = getAllNotesUseCase.call(Unit);
 
                 _noteList.value = list
                 _latinNotes.value = preferencesRepo.getNotationPreference()
@@ -84,6 +83,7 @@ class EditTuningVM @Inject constructor(
         var saved = true
         try{
             var list = selectedNotes.value.toList() as MutableList<MusicNote>
+            list.sort()
 
             _finalTuning.value = Tuning( id = selectedTuningId.toLong() ,name = _tuningName.value.toString())
 
@@ -95,37 +95,6 @@ class EditTuningVM @Inject constructor(
         return saved
     }
 
-    /*suspend fun saveTuningInBbDd() {
-        try{
-            //tuningRepo.updateTuningName(tuningModel.tuning.id, _tuningName.value!!)
-        }
-        catch (e: Exception){
-            throw e;
-        }
-    }
-
-    suspend fun saveTuningNotesInBbDd(notes: List<MusicNote>){
-        try {
-            var list = mutableListOf<MusicNote>()
-
-            for (note in notes) {
-                val noteFound = notes.find { it.englishName == note.englishName }
-                if (noteFound != null) {
-                    list.add(noteFound)
-                } else {
-                    println("Nota ${note.englishName} no encontrada en la lista de notas")
-                }
-            }
-            tuningMusicNoteRepo.deleteNoteByTuningId(tuningModel.tuning.id) //accesoBD.eliminarNotasAfinacion(tuningModel.tuning.id)
-            for (note in list){
-                var insert = TuningMusicNote(tuningId = tuningModel.tuning.id, noteId = note.id)
-                tuningMusicNoteRepo.insertTuningMusicNote(insert) //accesoBD.insertarNotaAfinacion(insert)
-            }
-        }catch (e: Exception){
-            //TODO Gestionar esto
-            throw e;
-        }
-    }*/
 
     fun borrarAfinacion(){
         viewModelScope.launch(Dispatchers.IO) {

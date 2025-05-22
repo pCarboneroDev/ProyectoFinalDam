@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
@@ -122,7 +123,7 @@ fun CreateTuningView(navController: NavHostController, vm: CreateTuningVM = hilt
                     modifier = Modifier
                         .weight(2f)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray.copy(alpha = 0.3f))
+                        .background(if (selectedNotes[i].englishName == "0") Color.LightGray.copy(alpha = 0.3f) else MaterialTheme.colorScheme.primary)
                         .clickable { expanded = true }
                         .padding(12.dp)
                 ) {

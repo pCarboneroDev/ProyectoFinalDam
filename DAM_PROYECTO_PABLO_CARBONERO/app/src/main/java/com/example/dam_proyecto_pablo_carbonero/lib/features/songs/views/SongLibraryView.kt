@@ -107,7 +107,7 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
         ) {
             if (openAlertDialog){
                 SortSelectorModal(
-                    currentSortOption = currentSortOption ?: SortOption.DATE_ASCENDING,
+                    currentSortOption = currentSortOption,
                     dismissFunction = {openAlertDialog = false},
                     sortOptionSelected = vm::sortList
                 )
@@ -119,7 +119,7 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                     }
                 }
                 Text("Song library", fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                Text( text = "${songList?.size} songs" ?: "0 songs", fontSize = 13.sp)
+                Text( text = "${songList.size} songs", fontSize = 13.sp)
                 HorizontalDivider(thickness = 5.dp)
 
                 Column(Modifier.fillMaxSize(),
@@ -148,9 +148,9 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                             CreateSongRow(navController)
                             //HorizontalDivider(Modifier.padding(top = 12.dp))
                         }
-                        if (!songList.isNullOrEmpty()){
-                            items(songList!!.size) { index ->
-                                SongRow(songList!![index], navController)
+                        if (songList.isNotEmpty()){
+                            items(songList.size) { index ->
+                                SongRow(songList[index], navController)
                             }
                         }
 

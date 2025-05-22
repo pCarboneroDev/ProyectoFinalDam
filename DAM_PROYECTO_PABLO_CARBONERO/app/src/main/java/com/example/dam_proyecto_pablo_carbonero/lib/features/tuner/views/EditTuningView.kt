@@ -16,7 +16,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -26,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
+import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.viewmodels.CreateTuningVM
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.viewmodels.EditTuningVM
@@ -63,12 +67,15 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
     notes += selectedNotes.map { note -> "${note.englishName} " }
     var isValid by remember {mutableStateOf(false)}
 
+    var modal by remember {mutableStateOf(false)}
+
 
 
     Column(
         Modifier
             .fillMaxSize()
-            .systemBarsPadding().padding(horizontal = 10.dp),
+            .systemBarsPadding()
+            .padding(horizontal = 10.dp),
         //horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -126,7 +133,11 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
                     modifier = Modifier
                         .weight(2f)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray.copy(alpha = 0.3f))
+                        .background(
+                            if (selectedNotes[i].englishName == "0") Color.LightGray.copy(
+                                alpha = 0.3f
+                            ) else MaterialTheme.colorScheme.primary
+                        )
                         .clickable { expanded = true }
                         .padding(12.dp)
                 ) {
@@ -170,17 +181,25 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
             color = if (selectedNotes.any { it.englishName == "0" }) Color.Red else MaterialTheme.colorScheme.onSurface
         )
 
+        Spacer(modifier = Modifier.weight(1f))
+
+        if (modal) ConfirmDelete(
+            dismissFunction = {modal = false}, onDeletePressed = {}
+        )
+
         Button(
+            modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.error
             ),
             onClick = {
-                CoroutineScope(Dispatchers.Main).launch {
+                modal = true
+                /*CoroutineScope(Dispatchers.Main).launch {
                     vm.borrarAfinacion()
                 }
                 navController.navigate("Tuner"){
                     popUpTo("EditTuning") { inclusive = true }
-                }
+                }*/
             }
         ) {
             Text("Delete")
@@ -203,129 +222,29 @@ private fun isFormValid(tuningName: String, selectedNotes: Array<MusicNote>?): B
     return isValid;
 }
 
-
-
-
-/*
 @Composable
-fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltViewModel()){
-    val context = LocalContext.current
-    val noteList by vm.noteList.collectAsState()
-    val tuningName by vm.tuningName.collectAsState(initial = "")
-    val selectedNotes by vm.selectedNotes.collectAsState()
-    val latinNotes by vm.latinNotes.collectAsState()
+fun ConfirmDelete(
+    dismissFunction: (() -> Unit),
+    onDeletePressed: (() -> Unit)
+){
 
-    var isValid by remember {mutableStateOf(true)}
-
-
-    Column(
-        Modifier.fillMaxSize().padding(top = 50.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        IconButton(onClick = {
-            CoroutineScope(Dispatchers.Main).launch {
-                vm.borrarAfinacion()
-            }
-            navController.navigate("Tuner"){
-                popUpTo("Tuner") { inclusive = true }
-            }
-        }) {
-            Icon(Icons.Default.Delete, contentDescription = "delete tunning", tint = Color.Red)
-        }
-
-        OutlinedTextField(
-            value = tuningName,
-            onValueChange = {
-                vm.setTuningName(it)
-                isValid = isFormValid(tuningName, selectedNotes)
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
-            )
-        )
-
-        for (i in 0..5){
-            var expanded by remember { mutableStateOf(false) }
-            Row {
-                Text(text = "Cuerda ${i+1}: ")
-
-                Box(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .background(
-                            color = Color.LightGray,
-                            shape = CircleShape
-                        )
-                        .clickable() { expanded = true }.padding(15.dp)
-                ) {
-                    Text(
-                        text = if (selectedNotes!![i].englishName == "0"){
-                            ""
-                        }
-                        else{
-                            if (latinNotes == true) (selectedNotes!![i].latinName)
-                            else (selectedNotes!![i].englishName)
-                        },
-                        //color = MaterialTheme.colorScheme.onSecondary
-                    )
+    AlertDialog(
+        title = { Text("DELETE") },
+        text = { Text("Deleting an element may delete other ones in the app if they depend of it") },
+        onDismissRequest = { dismissFunction() },
+        confirmButton = {
+            TextButton(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                ),
+                onClick = {
+                    onDeletePressed()
+                    dismissFunction()
                 }
-
-                //DropDown para las notas
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    Modifier.background(color = MaterialTheme.colorScheme.secondary)
-                ) {
-                    noteList?.forEach { note ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(if (latinNotes == true) note.latinName else note.englishName)
-                            },
-                            onClick = {
-                                selectedNotes!![i] = note
-                                isValid = isFormValid(tuningName, selectedNotes)
-                            }
-                        )
-                    }
-                }
+            ) {
+                Text("Delete", color = Color.White)
             }
         }
+    )
 
-        Button(
-            onClick = {
-                CoroutineScope(Dispatchers.Main).launch {
-                    var result = vm.updateTuning()
-                    if (result == true){
-                        navController.navigate("Tuner"){
-                            popUpTo("Tuner") { inclusive = true }
-                        }
-                    }
-                    else{
-                        Toast.makeText(context,"ERROR",Toast.LENGTH_SHORT).show()
-                    }
-                }
-            },
-            enabled = isValid
-        )
-        {
-            Text(text = "Guardar")
-        }
-
-    }
 }
-
-private fun isFormValid(tuningName: String, selectedNote: Array<MusicNote>?): Boolean{
-    var isValid = true;
-
-    if (tuningName.isEmpty()){
-        isValid = false
-    }
-
-    for(note in selectedNote!!){
-        if(note.englishName == "0"){
-            isValid = false;
-        }
-    }
-    return isValid;
-}*/
