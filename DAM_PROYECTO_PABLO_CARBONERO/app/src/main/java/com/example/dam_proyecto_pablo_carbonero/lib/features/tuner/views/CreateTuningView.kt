@@ -105,7 +105,8 @@ fun CreateTuningView(navController: NavHostController, vm: CreateTuningVM = hilt
                 isValid = isFormValid(tuningName, selectedNotes)
             },
             label = { Text("Tuning name") },
-            singleLine = true
+            singleLine = true,
+            maxLines = 15
         )
 
         Spacer(Modifier.height(24.dp))
