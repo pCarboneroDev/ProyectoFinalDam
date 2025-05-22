@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -161,13 +163,6 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
         color = mainColor
     )
 
-
-    TuningNotesSelector(
-        selectedTuning = selectedTuning,
-        onNoteSelected = { vm.setSelectedNote(it) },
-        latinNotes = latinNotes
-    )
-
     Switch(
         checked = isRecording,
         onCheckedChange = {
@@ -187,6 +182,12 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
             }
         }
     )
+
+    TuningNotesSelector(
+        selectedTuning = selectedTuning,
+        onNoteSelected = { vm.setSelectedNote(it) },
+        latinNotes = latinNotes
+    )
 }
 
 @Composable
@@ -199,21 +200,34 @@ fun TuningNotesSelector(
     Row(Modifier.fillMaxWidth()) {
         selectedTuning?.noteList?.forEachIndexed { index, note ->
             val isSelected = index == i
+            val cuerda = (5 - index * 0.5).toInt()
 
-            Box(
+            Column(
                 modifier = Modifier
-                    .weight(1f)
-                    .aspectRatio(1f)//.size(60.dp) // Tamaño circular fijo
-                    .background(
-                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                        shape = CircleShape
-                    )
-                    .clickable { onNoteSelected(note); i = index },
-                contentAlignment = Alignment.Center
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = if (latinNotes == true) note.latinName else note.englishName,
-                    color = MaterialTheme.colorScheme.onSecondary
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .aspectRatio(1f)//.size(60.dp) // Tamaño circular fijo
+                        .background(
+                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                            shape = CircleShape
+                        )
+                        .clickable { onNoteSelected(note); i = index },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (latinNotes == true) note.latinName else note.englishName,
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .width(cuerda.dp)
+                        .height(300.dp)
+                        .background(Color.Gray)
                 )
             }
         }
