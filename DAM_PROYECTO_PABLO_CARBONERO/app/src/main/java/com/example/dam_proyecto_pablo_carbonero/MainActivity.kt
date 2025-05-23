@@ -4,6 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -77,7 +81,16 @@ class MainActivity : ComponentActivity() {
                             LoadingScreen(navController)
                         }
 
-                        composable("Tuner") {
+                        composable(
+                            "Tuner?selectedTuningId={selectedTuningId}",
+                            arguments = listOf(
+                                navArgument("selectedTuningId") {
+                                    nullable = true
+                                    type = NavType.StringType
+                                    defaultValue = null
+                                }
+                            )
+                        ) { backStackEntry ->
                             TunerView(navController)
                         }
 

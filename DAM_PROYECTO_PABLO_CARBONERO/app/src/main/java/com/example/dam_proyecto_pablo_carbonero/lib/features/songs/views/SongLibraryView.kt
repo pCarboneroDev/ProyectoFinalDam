@@ -207,7 +207,11 @@ fun SongRow(song: SongWithTuning, navController: NavHostController){
                 ) {
                     DropdownMenuItem(
                         text = {DropdownMenuItem(icon = Icons.Default.Tune, text = "Load in tuner")},// {Row { Icon(Icons.Default.Tune, ""); Text(text = "Load in tuner") }},
-                        onClick = {}
+                        onClick = {
+                            navController.navigate("Tuner?selectedTuningId=${song.tuning.id}")/*{
+                                popUpTo("Tuner") { inclusive = true }
+                            }*/
+                        }
                     )
                     DropdownMenuItem(
                         text = {DropdownMenuItem(icon = Icons.Default.MusicNote, text = "Edit")}, //{Row { Icon(Icons.Default.MusicNote, ""); Text(text = "Edit") }},

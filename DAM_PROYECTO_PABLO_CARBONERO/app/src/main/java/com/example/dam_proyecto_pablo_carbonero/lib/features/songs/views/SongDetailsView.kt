@@ -51,7 +51,11 @@ fun SongDetailsView(navController: NavHostController, vm: SongDetailsVM = hiltVi
             editMethod = { navController.navigate("EditSong/${selectedSong!!.song.id}") }
         )
 
-        Button(onClick = {}) { Text("Load in tuner") }
+        Button(onClick = {
+            navController.navigate("Tuner?selectedTuningId=${selectedSong?.tuning?.id}")/*{
+                popUpTo("Tuner") { inclusive = true }
+            }*/
+        }) { Text("Load in tuner") }
 
         Text(selectedSong?.tuning?.name ?: "")
         Row {

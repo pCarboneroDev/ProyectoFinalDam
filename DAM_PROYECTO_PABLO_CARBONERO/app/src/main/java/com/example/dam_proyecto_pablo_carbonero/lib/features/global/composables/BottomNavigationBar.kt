@@ -17,7 +17,7 @@ fun BottomNavBar(navController: NavHostController) {
         BottomNavItem.Settings
     )
 
-    val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
+    val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route?.substringBefore("?")
 
     NavigationBar {
         items.forEach { item ->

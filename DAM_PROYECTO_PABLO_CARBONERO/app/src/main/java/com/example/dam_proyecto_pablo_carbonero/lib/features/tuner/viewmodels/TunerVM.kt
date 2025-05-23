@@ -7,6 +7,7 @@ import android.media.MediaRecorder
 import androidx.annotation.RequiresPermission
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
@@ -25,8 +26,10 @@ import kotlin.math.pow
 @HiltViewModel
 class TunerVM @Inject constructor(
     private val getAllTuningWithNotesUseCase: GetAllTuningWithNotesUseCase,
+    private val savedStateHandle: SavedStateHandle,
     private val preferencesRepo: UserPreferencesRepository
 ): ViewModel() {
+    private val startingTuning: String? = savedStateHandle["selectedTuningId"]
 
     private val _tunings = MutableStateFlow<List<TuningWithNotesModel>>(emptyList())
     val tunings: StateFlow<List<TuningWithNotesModel>> = _tunings
@@ -81,6 +84,14 @@ class TunerVM @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _tunings.value = getAllTuningWithNotesUseCase.call(Unit)
             loadPreferences()
+
+            try {
+                if(!startingTuning.isNullOrEmpty()){
+                    _selectedTuning.value = _tunings.value.find { (x) -> x.id == startingTuning.toLong() }
+                }
+            }catch (e: Exception){
+                //todo gestionar :(
+            }
         }
     }
 
