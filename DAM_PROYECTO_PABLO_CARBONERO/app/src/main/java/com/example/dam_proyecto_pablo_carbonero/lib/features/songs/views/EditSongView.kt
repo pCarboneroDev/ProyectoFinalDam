@@ -40,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.DeleteModal
+import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.TransparentTextField
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewsmodels.EditSongVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -91,7 +92,8 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
         )
         // Botón para seleccionar la afinación de la canción
         OutlinedButton(
-            onClick = {expanded = !expanded}
+            onClick = {expanded = !expanded},
+            Modifier.fillMaxWidth()
         ) {
             Column {
                 Row() {
@@ -122,9 +124,10 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
         }
 
 
-        OutlinedTextField(
+        TransparentTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = songName,
-            label = {Text("Song name")},
+            label = "Song name",
             trailingIcon = {Text("${song?.name?.length}/$maxChars")},
 
             onValueChange = { vm.setSongName(it); vm.isFormValid() },
@@ -132,9 +135,10 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             isError = vm.isSongNameValid()
         )
 
-        OutlinedTextField(
+        TransparentTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = bandName,
-            label = {Text("Band name")},
+            label = "Band name",
             trailingIcon = {Text("${bandName.length}/$maxChars")},
 
             onValueChange = { vm.setBandName(it); vm.isFormValid() },
@@ -143,9 +147,10 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
         )
 
 
-        OutlinedTextField(
+        TransparentTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = bmp,
-            label = {Text("BPM")},
+            label = "BPM",
 
             onValueChange = { vm.setBpm(it); vm.isFormValid() },
 
@@ -154,9 +159,10 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             isError = vm.isBpmValid()
         )
 
-        OutlinedTextField(
+        TransparentTextField(
+            modifier = Modifier.fillMaxWidth(),
             value = key,
-            label = {Text("Key")},
+            label = "Key",
 
             onValueChange = { vm.setKey(it) }
         )

@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -39,19 +41,23 @@ fun SortSelectorModal(
                 SortOption.entries.forEach { option ->
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
                             //.clickable { selectedOption = option }
-                            .padding(16.dp),
+                            //.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
                         RadioButton(
                             selected = option == selectedOption,
-                            onClick = { selectedOption = option }
+                            onClick = { selectedOption = option },
+                            colors = RadioButtonDefaults.colors(
+                                unselectedColor = MaterialTheme.colorScheme.onSurface
+                            )
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = option.getName(),
+                            color = MaterialTheme.colorScheme.onSurface
                             //modifier = Modifier.weight(1f)
                         )
                     }

@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
+import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.TransparentTextField
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewsmodels.CreateSongVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -86,7 +87,8 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
 
         // Botón para seleccionar la afinación de la canción
         OutlinedButton(
-            onClick = {expanded = !expanded}
+            onClick = {expanded = !expanded},
+            Modifier.fillMaxWidth()
         ) {
             Column {
                 Row() {
@@ -154,31 +156,5 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
     }
 }
 
-@Composable
-fun TransparentTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    isError: Boolean = false,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
-    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier,
-        label = { Text(label) },
-        trailingIcon = trailingIcon,
-        isError = isError,
-        keyboardOptions = keyboardOptions,
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-            errorContainerColor = Color.Transparent
-        )
-    )
-}
 
 

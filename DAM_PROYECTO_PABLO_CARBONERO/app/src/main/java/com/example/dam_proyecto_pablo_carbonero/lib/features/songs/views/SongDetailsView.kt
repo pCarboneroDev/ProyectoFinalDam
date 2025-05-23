@@ -52,9 +52,9 @@ fun SongDetailsView(navController: NavHostController, vm: SongDetailsVM = hiltVi
         )
 
         Button(onClick = {
-            navController.navigate("Tuner?selectedTuningId=${selectedSong?.tuning?.id}")/*{
+            navController.navigate("Tuner?selectedTuningId=${selectedSong?.tuning?.id}"){
                 popUpTo("Tuner") { inclusive = true }
-            }*/
+            }
         }) { Text("Load in tuner") }
 
         Text(selectedSong?.tuning?.name ?: "")
