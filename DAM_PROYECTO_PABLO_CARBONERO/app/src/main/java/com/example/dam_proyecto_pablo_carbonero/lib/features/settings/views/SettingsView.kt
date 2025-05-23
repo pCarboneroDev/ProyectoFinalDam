@@ -1,36 +1,40 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.settings.views
 
-import android.Manifest
-import android.content.pm.PackageManager
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.app.ActivityCompat
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.BottomNavBar
+import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels.SettingsVM
 //import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels.SettingsVM
 //import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.UserPreferencesRepositoryImpl
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewModel()){
@@ -44,26 +48,73 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
     )
     { innerPadding ->
         Column(
-            Modifier.fillMaxSize()
-                .padding(innerPadding).systemBarsPadding(),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
+                .padding(horizontal = 10.dp),
             // = Arrangement.Center
         ) {
             Column(
-                Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                Modifier.fillMaxSize()
             ) {
-                Text("SETTINGS")
+                Text("Settings", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                HorizontalDivider(thickness = 5.dp)
 
-                Text("${latinNotes}")
+                /*Text("${latinNotes}")
 
-                Switch(
+                val sw = Switch(
                     checked = latinNotes ?: false,
                     onCheckedChange = {
                         vm.setNotationValue(it)
                     }
-                )
+                )*/
+
+                LazyColumn(Modifier.fillMaxSize()) {
+                    item {
+                        SettingsRow(
+                            "Notation system",
+                            {Switch(
+                                checked = latinNotes,
+                                onCheckedChange = {
+                                    vm.setNotationValue(it)
+                                }
+                            )}
+                        )
+                    }
+
+                    items(20){ i->
+                        SettingsRow(
+                            "Notation system",
+                            {Switch(
+                                checked = latinNotes,
+                                onCheckedChange = {
+                                    vm.setNotationValue(it)
+                                }
+                            )}
+                        )
+                    }
+                }
+
+
+
             }
         }
+    }
+}
+
+@Composable
+fun SettingsRow(title: String, composable: @Composable () -> Unit){
+    Column(Modifier.padding(top = 12.dp)) {
+        Row(
+            Modifier.fillMaxWidth()
+                .clickable(onClick = {}),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(title)
+            Spacer(Modifier.weight(1f))
+            composable()
+        }
+        HorizontalDivider(Modifier.padding(top = 12.dp))
     }
 }
