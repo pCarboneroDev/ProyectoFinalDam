@@ -23,4 +23,10 @@ class SongRepositoryImpl @Inject constructor(
     override suspend fun updateSong(song: Song): Int {
         return songDao.updateSong(song)
     }
+
+    override suspend fun deleteSong(id: Long): Int {
+        return songDao.deleteSong(id)
+    }
+
+
 }

@@ -12,23 +12,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,9 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
-import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
+import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.DeleteModal
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
-import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.viewmodels.CreateTuningVM
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.viewmodels.EditTuningVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -183,7 +173,7 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
 
         Spacer(modifier = Modifier.weight(1f))
 
-        if (modal) ConfirmDelete(
+        if (modal) DeleteModal(
             dismissFunction = {modal = false}, onDeletePressed = {
                 CoroutineScope(Dispatchers.Main).launch {
                     vm.borrarAfinacion()
@@ -229,29 +219,3 @@ private fun isFormValid(tuningName: String, selectedNotes: Array<MusicNote>?): B
     return isValid;
 }
 
-@Composable
-fun ConfirmDelete(
-    dismissFunction: (() -> Unit),
-    onDeletePressed: (() -> Unit)
-){
-
-    AlertDialog(
-        title = { Text("DELETE") },
-        text = { Text("Deleting an element may delete other ones in the app if they depend of it") },
-        onDismissRequest = { dismissFunction() },
-        confirmButton = {
-            TextButton(
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                ),
-                onClick = {
-                    onDeletePressed()
-                    dismissFunction()
-                }
-            ) {
-                Text("Delete", color = Color.White)
-            }
-        }
-    )
-
-}

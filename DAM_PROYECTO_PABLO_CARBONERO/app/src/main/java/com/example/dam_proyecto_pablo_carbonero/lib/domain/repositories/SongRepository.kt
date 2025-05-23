@@ -7,4 +7,5 @@ interface SongRepository {
     suspend fun getSongById(id: Long): Song
     suspend fun insertSong(song: Song): Long
     suspend fun updateSong(song: Song): Int
+    suspend fun deleteSong(id: Long): Int
 }

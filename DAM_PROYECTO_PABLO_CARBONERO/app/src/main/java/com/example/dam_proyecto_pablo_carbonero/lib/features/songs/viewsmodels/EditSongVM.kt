@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.DeleteSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongByIdUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.UpdateSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.GetAllTuningUseCase
@@ -21,6 +22,7 @@ class EditSongVM @Inject constructor(
     private val getSongByIdUseCase: GetSongByIdUseCase,
     private val getAllTuning: GetAllTuningUseCase,
     private val updateSongUseCase: UpdateSongUseCase,
+    private val deleteSongUseCase: DeleteSongUseCase,
     savedStateHandle: SavedStateHandle
 ): ViewModel() {
     val songId = savedStateHandle.get<String>("songId") ?: ""
@@ -144,6 +146,14 @@ class EditSongVM @Inject constructor(
             var rowsAffected = updateSongUseCase.call(song)//songRepository.updateSong(song)
         }catch (e: Exception){
             throw e
+        }
+    }
+
+    suspend fun deleteSong(){
+        try{
+            deleteSongUseCase.call(songId.toLong())
+        }catch (e: Exception){
+            //todo gestionar excepcion
         }
     }
 

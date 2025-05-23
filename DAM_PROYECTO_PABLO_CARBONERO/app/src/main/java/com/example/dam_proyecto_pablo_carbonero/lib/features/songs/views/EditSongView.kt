@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.systemGesturesPadding
@@ -14,6 +15,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -36,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
+import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.DeleteModal
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewsmodels.EditSongVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +62,8 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
     val bmp by vm.bpm.collectAsState("")
     val key by vm.key.collectAsState("")
     val formValid by vm.formValid.collectAsState(false)
+
+    var modal by remember { mutableStateOf(false) }
 
 
     Column(Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = 10.dp)) {
@@ -154,5 +160,28 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
 
             onValueChange = { vm.setKey(it) }
         )
+
+        if (modal) DeleteModal(
+            dismissFunction = {modal = false}, onDeletePressed = {
+                CoroutineScope(Dispatchers.Main).launch {
+                    vm.deleteSong()
+                }
+                navController.navigate("Tuner"){
+                    popUpTo("SongTuning") { inclusive = false }
+                }
+            }
+        )
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.error
+            ),
+            onClick = {
+                modal = true
+            }
+        ) {
+            Text("Delete")
+        }
     }
 }

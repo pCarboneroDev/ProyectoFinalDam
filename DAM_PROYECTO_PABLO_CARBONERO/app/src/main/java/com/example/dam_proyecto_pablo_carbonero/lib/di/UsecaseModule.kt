@@ -16,6 +16,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepo
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.InsertAllMusicNotesUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.DeleteSongUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -157,6 +158,16 @@ object UsecaseModule {
         songRepository: SongRepository
     ): UpdateSongUseCase{
         return UpdateSongUseCase(
+            songRepository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideDeleteDong(
+        songRepository: SongRepository
+    ): DeleteSongUseCase{
+        return DeleteSongUseCase(
             songRepository
         )
     }

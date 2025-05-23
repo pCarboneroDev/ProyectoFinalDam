@@ -1,6 +1,7 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -20,6 +21,9 @@ interface SongDao {
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateSong(song: Song): Int
+
+    @Query("DELETE FROM Songs WHERE id = :id")
+    suspend fun deleteSong(id: Long): Int
 
     /*@Query("UPDATE Songs SET name = :name, bandName = :name WHERE id = :id")
     suspend fun updateSong(id: Long, name:String, song: Song)*/
