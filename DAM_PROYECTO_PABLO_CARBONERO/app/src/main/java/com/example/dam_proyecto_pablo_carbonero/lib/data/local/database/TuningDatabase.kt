@@ -11,7 +11,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.TuningMusicNote
 
-@Database(entities = [MusicNote::class, Tuning::class, TuningMusicNote::class, Song::class], version = 4)
+@Database(entities = [MusicNote::class, Tuning::class, TuningMusicNote::class, Song::class], version = 5)
 abstract class TuningDatabase: RoomDatabase(){
     abstract fun musicNoteDao(): MusicNoteDao
     abstract fun tuningDao(): TuningDao

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -59,7 +60,7 @@ fun TuningSelector(
                 .height(60.dp)
                 .weight(1f)
                 .clickable(
-                    onClick = {expanded = !expanded}
+                    onClick = { expanded = !expanded }
                 ),
             contentAlignment = Alignment.CenterStart,
         ){
@@ -89,12 +90,17 @@ fun TuningSelector(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                Modifier.background(color = MaterialTheme.colorScheme.secondary)
+                //Modifier.background(color = MaterialTheme.colorScheme.secondary)
             ) {
                 tunings.forEach { tuning ->
                     DropdownMenuItem(
                         text = {
                             Text(tuning.tuning.name)
+                        },
+                        trailingIcon = {
+                            if (tuning.tuning.favourite) {
+                                Icon(Icons.Default.Favorite, contentDescription = "fav", tint = MaterialTheme.colorScheme.error)
+                            }
                         },
                         onClick = { onTuningSelected(tuning); expanded = false }
                     )

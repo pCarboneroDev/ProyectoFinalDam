@@ -25,7 +25,9 @@ object DatabaseModule {
             context,
             TuningDatabase::class.java,
             "tuning-database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

@@ -80,6 +80,7 @@ fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
     val tunings by vm.tunings.collectAsState();
 
     LaunchedEffect(Unit) {
+        vm.loadTunings()
         vm.loadPreferences()
     }
 

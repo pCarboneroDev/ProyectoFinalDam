@@ -17,6 +17,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMu
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.InsertAllMusicNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.DeleteSongUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.UpdateFavouriteUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,19 +27,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object UsecaseModule {
-    @Provides
-    @Singleton
-    fun provideGetAllTuningWithNotes(
-        tuningRepository: TuningRepository,
-        noteRepository: MusicNoteRepository,
-        tuningMusicNoteRepository: TuningMusicNoteRepository
-    ): GetAllTuningWithNotesUseCase {
-        return GetAllTuningWithNotesUseCase(
-            tuningRepository,
-            noteRepository,
-            tuningMusicNoteRepository
-        ) // Your implementation
-    }
 
     @Provides
     @Singleton
@@ -58,6 +46,20 @@ object UsecaseModule {
         return InsertAllMusicNotesUseCase(
             notesRepository
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetAllTuningWithNotes(
+        tuningRepository: TuningRepository,
+        noteRepository: MusicNoteRepository,
+        tuningMusicNoteRepository: TuningMusicNoteRepository
+    ): GetAllTuningWithNotesUseCase {
+        return GetAllTuningWithNotesUseCase(
+            tuningRepository,
+            noteRepository,
+            tuningMusicNoteRepository
+        ) // Your implementation
     }
 
     @Provides
@@ -112,6 +114,27 @@ object UsecaseModule {
 
     @Provides
     @Singleton
+    fun provideGetAllTunings(
+        tuningRepository: TuningRepository
+    ): GetAllTuningUseCase{
+        return GetAllTuningUseCase(
+            tuningRepository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideUpdateFavouriteUseCase(
+        tuningRepository: TuningRepository
+    ): UpdateFavouriteUseCase {
+        return UpdateFavouriteUseCase(
+            tuningRepository
+        ) // Your implementation
+    }
+
+
+    @Provides
+    @Singleton
     fun provideGetAllSongs(
         songRepository: SongRepository,
         tuningRepository: TuningRepository
@@ -129,16 +152,6 @@ object UsecaseModule {
     ): InsertSongUseCase{
         return InsertSongUseCase(
             songRepository
-        )
-    }
-
-    @Provides
-    @Singleton
-    fun provideGetAllTunings(
-        tuningRepository: TuningRepository
-    ): GetAllTuningUseCase{
-        return GetAllTuningUseCase(
-            tuningRepository
         )
     }
 
@@ -171,4 +184,6 @@ object UsecaseModule {
             songRepository
         )
     }
+
+
 }

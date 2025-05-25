@@ -30,4 +30,8 @@ class TuningRepositoryImpl @Inject constructor(
     override suspend fun updateTuningName(tuningId: Long, newName: String) {
         return tuningDao.updateTuningName(tuningId, newName)
     }
+
+    override suspend fun updateTuningFavourite(tuningId: Long, favourite: Boolean) {
+        return tuningDao.updateTuningFavourite(tuningId, favourite)
+    }
 }

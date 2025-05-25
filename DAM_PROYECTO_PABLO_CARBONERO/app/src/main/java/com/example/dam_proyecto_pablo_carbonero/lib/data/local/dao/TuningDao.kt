@@ -25,4 +25,7 @@ interface TuningDao {
 
     @Query("UPDATE Tunings Set name = :newName WHERE id = :tuningId")
     suspend fun updateTuningName(tuningId: Long, newName: String)
+
+    @Query("UPDATE Tunings SET favourite = :favourite WHERE id = :tuningId")
+    suspend fun updateTuningFavourite(tuningId: Long, favourite: Boolean)
 }

@@ -95,7 +95,7 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                         SettingsRow(
                             "My tunings",
                             { Icon(imageVector = Icons.Default.Tune, contentDescription = "") },
-                            {}
+                            { navController.navigate("UserTunings") }
                         )
                     }
 
@@ -124,7 +124,7 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
 
 @Composable
 fun SettingsRow(title: String, composable: @Composable () -> Unit, onClick: () -> Unit){
-    Column(Modifier.clickable(onClick = {})) {
+    Column(Modifier.clickable(onClick = onClick)) {
         Row(
             Modifier.fillMaxWidth().padding(top = 12.dp),
             verticalAlignment = Alignment.CenterVertically,

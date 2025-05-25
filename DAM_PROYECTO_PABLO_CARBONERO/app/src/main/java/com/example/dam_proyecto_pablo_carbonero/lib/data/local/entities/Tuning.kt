@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class Tuning(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
-    val name: String
+    val name: String,
+    val favourite: Boolean = false
 )

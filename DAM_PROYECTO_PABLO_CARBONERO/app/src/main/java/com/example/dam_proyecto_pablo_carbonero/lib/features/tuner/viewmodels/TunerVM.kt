@@ -14,6 +14,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNot
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetAllTuningWithNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetAmountTuningsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +28,8 @@ import kotlin.math.pow
 class TunerVM @Inject constructor(
     private val getAllTuningWithNotesUseCase: GetAllTuningWithNotesUseCase,
     private val savedStateHandle: SavedStateHandle,
-    private val preferencesRepo: UserPreferencesRepository
+    private val preferencesRepo: UserPreferencesRepository,
+    private val getAmountTuningsUseCase: GetAmountTuningsUseCase
 ): ViewModel() {
     private val startingTuning: String? = savedStateHandle["selectedTuningId"]
 
@@ -82,7 +84,7 @@ class TunerVM @Inject constructor(
     // ALGO ASI COMO EL CONSTRUCTOR
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            _tunings.value = getAllTuningWithNotesUseCase.call(Unit)
+            loadTunings()
             loadPreferences()
 
             try {
@@ -93,6 +95,9 @@ class TunerVM @Inject constructor(
                 //todo gestionar :(
             }
         }
+    }
+    suspend fun loadTunings(){
+        _tunings.value = getAmountTuningsUseCase.call(10)
     }
 
     suspend fun loadPreferences(){
