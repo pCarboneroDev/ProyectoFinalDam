@@ -53,7 +53,9 @@ fun UserTuningsView(navController: NavHostController, vm: UserTuningsVM = hiltVi
 
     Column(Modifier
         .fillMaxSize()
-        .systemBarsPadding()) {
+        .systemBarsPadding()
+        .padding(horizontal = 12.dp)
+    ) {
         DetailsHeader(title = "My tunings", subtitle = "${tunings.size}", navController = navController)
         LazyColumn {
             items(tunings.size) { index ->
