@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TuningAnimation(
-    graphValue: Float,  // Value from 0 (too low) to 1 (too high), 0.5 is centered
+    graphValue: Float,
     modifier: Modifier = Modifier,
     color: Color
 ) {
@@ -35,7 +35,6 @@ fun TuningAnimation(
         label = "tuningAnimation"
     )
 
-    //if (min == null) min = 0f
 
     var containerWidth by remember { mutableStateOf(0) }
 
@@ -52,7 +51,7 @@ fun TuningAnimation(
             //.background(Color.LightGray.copy(alpha = 0.3f)),
             contentAlignment = Alignment.Center
         ) {
-            // Center line
+            // linea central
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -60,7 +59,7 @@ fun TuningAnimation(
                     .background(Color.Gray)
             )
 
-            // Range indicator
+            // indicador del rango correcto
             Box(
                 modifier = Modifier
                     .width(80.dp)
@@ -68,12 +67,12 @@ fun TuningAnimation(
                     .background(Color.Green.copy(alpha = 0.5f))
             )
 
-            // Moving sphere
+            // esfera indicadora del sonido detectado
             Box(
                 modifier = Modifier
                     .offset {
                         IntOffset(
-                            x = ((animatedValue - 0.5f) * containerWidth * 0.8f).toInt(), //Function invocation 'size(...)' expected. // Function invocation 'width(...)' expected.
+                            x = ((animatedValue - 0.5f) * containerWidth * 0.8f).toInt(),
                             y = 0
                         )
                     }
