@@ -15,7 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Input
+import androidx.compose.material.icons.filled.Input
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -74,24 +79,38 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                     item {
                         SettingsRow(
                             "Notation system",
-                            {Switch(
-                                checked = latinNotes,
-                                onCheckedChange = {
-                                    vm.setNotationValue(it)
-                                }
-                            )}
+                            {
+                                Switch(
+                                    checked = latinNotes,
+                                    onCheckedChange = {
+                                        vm.setNotationValue(it)
+                                    }
+                                )
+                            },
+                            {}
+                        )
+                    }
+
+                    item {
+                        SettingsRow(
+                            "My tunings",
+                            { Icon(imageVector = Icons.Default.Tune, contentDescription = "") },
+                            {}
                         )
                     }
 
                     items(20){ i->
                         SettingsRow(
                             "Notation system",
-                            {Switch(
-                                checked = latinNotes,
-                                onCheckedChange = {
-                                    vm.setNotationValue(it)
-                                }
-                            )}
+                            {
+                                Switch(
+                                    checked = latinNotes,
+                                    onCheckedChange = {
+                                        vm.setNotationValue(it)
+                                    }
+                                )
+                            },
+                            {}
                         )
                     }
                 }
@@ -104,11 +123,10 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
 }
 
 @Composable
-fun SettingsRow(title: String, composable: @Composable () -> Unit){
-    Column(Modifier.padding(top = 12.dp)) {
+fun SettingsRow(title: String, composable: @Composable () -> Unit, onClick: () -> Unit){
+    Column(Modifier.clickable(onClick = {})) {
         Row(
-            Modifier.fillMaxWidth()
-                .clickable(onClick = {}),
+            Modifier.fillMaxWidth().padding(top = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(title)
