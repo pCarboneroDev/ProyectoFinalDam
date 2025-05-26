@@ -143,7 +143,7 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                         modifier = Modifier.fillMaxWidth(),
                         query = searchQuery,
                         onQueryChange = { newQuery ->
-                            vm.type(newQuery)
+                            vm.onQueryChanged(newQuery)
                         },
                         onSearch = { query ->
 
@@ -155,7 +155,7 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                         trailingIcon = {
                             IconButton(
-                                onClick = { vm.clear() }
+                                onClick = { vm.clearQuery() }
                             ) { Icon(Icons.Default.Clear, "clear") }
                         },
 
@@ -163,7 +163,7 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                     ){
                         LazyColumn {
                             items(searchResult.size){ i ->
-                                SongRow(songList[i], navController)
+                                SongRow(searchResult[i], navController)
                             }
                         }
                     }
