@@ -15,6 +15,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.MusicNot
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAmountNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.InsertAllMusicNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.DeleteSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.UpdateFavouriteUseCase
@@ -60,6 +61,14 @@ object UsecaseModule {
             noteRepository,
             tuningMusicNoteRepository
         ) // Your implementation
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetAmountNotes(
+        noteRepository: MusicNoteRepository
+    ): GetAmountNotesUseCase {
+        return GetAmountNotesUseCase(noteRepository)
     }
 
     @Provides

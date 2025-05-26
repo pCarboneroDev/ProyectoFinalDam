@@ -1,13 +1,16 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.params.AmountNotesParams
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAllNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.InsertTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAmountNotesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +23,8 @@ import kotlin.Array
 class CreateTuningVM @Inject constructor(
     private val getAllNotesUseCase: GetAllNotesUseCase,
     private val insertTuningUseCase: InsertTuningUseCase,
-    private val preferencesRepo: UserPreferencesRepository
+    private val preferencesRepo: UserPreferencesRepository,
+    //private val getAmountNotesUseCase: GetAmountNotesUseCase
 ): ViewModel() {
     private val _tuningName = MutableStateFlow<String>("")
     val tuningName: StateFlow<String> = _tuningName
@@ -42,8 +46,10 @@ class CreateTuningVM @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try{
                 list = getAllNotesUseCase.call(Unit).toMutableList();
+                //list = getAmountNotesUseCase.call(AmountNotesParams(10)).toMutableList()
                 list.sort()
                 _noteList.value = list
+                Log.d("FILTER", "Resultados: ${_noteList.value.map { it.englishName }}")
             }catch (e: Exception){
                 //TODO Gestionar la posible excepcion
             }

@@ -28,4 +28,11 @@ class MusicNoteRepositoryImpl @Inject constructor(
     override suspend fun getMusicNoteById(noteId: Long): MusicNote {
         return musicNoteDao.getMusicNoteById(noteId)
     }
+
+    override suspend fun getAmountNotes(
+        number: Int,
+        lastIndex: Long
+    ): List<MusicNote> {
+        return musicNoteDao.getAmountNotes(number, lastIndex);
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories
 
+import androidx.room.Index
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 
 /**
@@ -19,4 +20,6 @@ interface MusicNoteRepository {
     suspend fun deleteAllMusicNotes(): Int
 
     suspend fun getMusicNoteById(noteId: Long): MusicNote
+
+    suspend fun getAmountNotes(number: Int, lastIndex: Long = 0): List<MusicNote>
 }

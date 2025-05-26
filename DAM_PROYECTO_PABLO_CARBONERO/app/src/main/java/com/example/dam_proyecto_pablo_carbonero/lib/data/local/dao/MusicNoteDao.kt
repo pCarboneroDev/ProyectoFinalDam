@@ -22,4 +22,7 @@ interface MusicNoteDao {
 
     @Query("Select * FROM MusicNotes WHERE id = :noteId")
     suspend fun getMusicNoteById(noteId: Long): MusicNote
+
+    @Query("SELECT * FROM MusicNotes WHERE id > :lastIndex ORDER BY id DESC LIMIT :number")
+    suspend fun getAmountNotes(number: Int, lastIndex: Long = 0):List<MusicNote>
 }
