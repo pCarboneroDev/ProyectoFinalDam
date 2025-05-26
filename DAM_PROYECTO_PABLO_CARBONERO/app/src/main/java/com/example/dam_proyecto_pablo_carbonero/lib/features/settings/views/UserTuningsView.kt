@@ -40,7 +40,6 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels.UserTuningsVM
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.views.DetailsHeader
-import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.views.DropdownMenuOption
 import com.example.dam_proyecto_pablo_carbonero.lib.utils.NoteList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -75,7 +74,8 @@ fun UserTuningsView(navController: NavHostController, vm: UserTuningsVM = hiltVi
 fun TuningRow(tuning: TuningWithNotesModel, navController: NavHostController, onDelete: () -> Unit, onFav: suspend (TuningWithNotesModel) -> Boolean) {
     var expanded by remember { mutableStateOf(false) }
     Column(Modifier.clickable(onClick = {
-        navController.navigate("EditTuning/${tuning.tuning.id}")
+        if(tuning.tuning.name != "Standard Tuning")
+            navController.navigate("EditTuning/${tuning.tuning.id}")
 
     })) {
         Row(Modifier
@@ -105,16 +105,18 @@ fun TuningRow(tuning: TuningWithNotesModel, navController: NavHostController, on
                             }
                         }
                     )
-                    DropdownMenuItem(
-                        text = {Text("Edit")},
-                        leadingIcon = { Icon(Icons.Default.Tune, "") },
-                        onClick = { navController.navigate("EditTuning/${tuning.tuning.id}")}
-                    )
-                    DropdownMenuItem(
-                        text = {Text("Delete")},
-                        leadingIcon = { Icon(Icons.Default.Delete, "delete", tint = Color.Red) },
-                        onClick = {}
-                    )
+                    if(tuning.tuning.name != "Standard Tuning"){
+                        DropdownMenuItem(
+                            text = {Text("Edit")},
+                            leadingIcon = { Icon(Icons.Default.Tune, "") },
+                            onClick = { navController.navigate("EditTuning/${tuning.tuning.id}")}
+                        )
+                        DropdownMenuItem(
+                            text = {Text("Delete")},
+                            leadingIcon = { Icon(Icons.Default.Delete, "delete", tint = Color.Red) },
+                            onClick = {}
+                        )
+                    }
                 }
             }
         }

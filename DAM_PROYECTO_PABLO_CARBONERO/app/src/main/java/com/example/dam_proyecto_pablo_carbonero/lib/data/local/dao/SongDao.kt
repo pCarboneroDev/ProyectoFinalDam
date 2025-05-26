@@ -25,6 +25,9 @@ interface SongDao {
     @Query("DELETE FROM Songs WHERE id = :id")
     suspend fun deleteSong(id: Long): Int
 
+   /* @Query("SELECT * FROM songs WHERE name LIKE '%' || :query || '%' OR bandName LIKE '%' || :query || '%'")
+    suspend fun searchSong(query: String): List<Song>*/
+
     /*@Query("UPDATE Songs SET name = :name, bandName = :name WHERE id = :id")
     suspend fun updateSong(id: Long, name:String, song: Song)*/
 }

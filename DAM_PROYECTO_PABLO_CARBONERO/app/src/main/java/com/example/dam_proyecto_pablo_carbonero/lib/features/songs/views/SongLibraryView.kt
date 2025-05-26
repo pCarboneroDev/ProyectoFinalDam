@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
@@ -36,6 +37,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,15 +55,18 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongSearchDelegate
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.BottomNavBar
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.SortSelectorModal
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
-import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewsmodels.SongLibraryVM
+import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.CreateSongRow
+import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.SongRow
+import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewmodels.SongLibraryVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltViewModel()){
-    val lifecycleOwner = LocalLifecycleOwner.current
+   /* val lifecycleOwner = LocalLifecycleOwner.current
 
     // TODO probar cambiar esto por launched effect
     DisposableEffect(lifecycleOwner) {
@@ -77,15 +82,21 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
         onDispose {
             lifecycle.removeObserver(observer)
         }
-    }
+    }*/
 
 
     val songList by vm.songList.collectAsState()
     val currentSortOption by vm.selectedSortOption.collectAsState()
 
-    var searchQuery by remember { mutableStateOf("") }
+   // var searchQuery by remember { mutableStateOf("") }
     var isActive by remember { mutableStateOf(false) }
     var openAlertDialog by remember { mutableStateOf(false) }
+    val searchQuery by vm.searchQuery.collectAsState()
+    val searchResult by vm.searchResults.collectAsState()
+
+    LaunchedEffect(Unit) {
+        vm.loadViewModel()
+    }
 
 
     Scaffold(
@@ -94,10 +105,11 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
     )
     { innerPadding ->
         Column(
-            Modifier.fillMaxSize().
-            padding(innerPadding).
-            padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding()).
-            padding(horizontal = 10.dp),
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
+                .padding(horizontal = 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             // = Arrangement.Center
         ) {
@@ -126,23 +138,36 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(15.dp)
                 ) {
+
                     SearchBar(
                         modifier = Modifier.fillMaxWidth(),
                         query = searchQuery,
                         onQueryChange = { newQuery ->
-                            searchQuery = newQuery
+                            vm.type(newQuery)
                         },
                         onSearch = { query ->
 
-                            println("Search triggered with query: $query")
                         },
                         active = isActive,
                         onActiveChange = { active ->
                             isActive = active
                         },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") }
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = { vm.clear() }
+                            ) { Icon(Icons.Default.Clear, "clear") }
+                        },
+
                         //leadingIcon = @Composable (() -> Unit)? = { Icon(Icons.Default.Search, contentDescription = "Search") }
-                    ){}
+                    ){
+                        LazyColumn {
+                            items(searchResult.size){ i ->
+                                SongRow(songList[i], navController)
+                            }
+                        }
+                    }
+
 
                     LazyColumn(Modifier.fillMaxSize()) {
                         item {
@@ -165,80 +190,35 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateSongRow(navController: NavHostController){
+fun SongSearchBar(delegate: SongSearchDelegate){
+    var isActive by remember { mutableStateOf(false) }
 
-    Column(Modifier.clickable(onClick = {navController.navigate("CreateSong")})) {
-        Row(Modifier.fillMaxWidth().padding(top = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Box(Modifier.size(40.dp).background(color = Color.LightGray),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Add, "add song", tint = Color.Black)
-            }
-
-            Text("Create song", color = MaterialTheme.colorScheme.primary, fontSize = 18.sp)
+    SearchBar(
+        modifier = Modifier.fillMaxWidth(),
+        query = delegate.currentQuery,
+        onQueryChange = { newQuery ->
+            delegate.currentQuery = newQuery
+        },
+        onSearch = { query ->
+            delegate.filter()
+        },
+        active = isActive,
+        onActiveChange = { active ->
+            isActive = active
+        },
+        leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+        trailingIcon = {
+            IconButton(
+                onClick = { delegate.clear() }
+            ) { Icon(Icons.Default.Clear, "clear") }
         }
+        //leadingIcon = @Composable (() -> Unit)? = { Icon(Icons.Default.Search, contentDescription = "Search") }
+    ){}
 
-        HorizontalDivider(Modifier.padding(top = 12.dp))
-    }
 }
 
-@Composable
-fun SongRow(song: SongWithTuning, navController: NavHostController){
-    var expanded by remember { mutableStateOf(false) }
-    Column(Modifier.clickable(onClick = {
-        navController.navigate("SongDetails/${song.song.id}/${song.tuning.id}")
 
-    })) {
-        Row(Modifier.fillMaxWidth().padding(top = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(song.song.name, fontWeight = FontWeight.Bold)
-                Text(song.song.bandName, fontSize = 15.sp)
-                Text("${song.tuning.name} | ${song.song.bpm} | ${song.song.key}", fontSize = 12.sp)
-            }
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(Icons.Default.MoreVert, "moreInfo")
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(text = "Load in tuner") },
-                        leadingIcon = {Icon(Icons.Default.Tune, "Load in tuner")},
-                        onClick = {
-                            navController.navigate("Tuner?selectedTuningId=${song.tuning.id}"){
-                                popUpTo("Tuner") { inclusive = true }
-                            }
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Edit") },
-                        leadingIcon = {Icon(Icons.Default.MusicNote, "Edit song")},
-                        onClick = { navController.navigate("EditSong/${song.song.id}")}
-                    )
-                    DropdownMenuItem(
-                        text = {Text("Delete")},
-                        leadingIcon = {Icon(Icons.Default.Delete, "Edit song", tint = Color.Red)},
-                        onClick = {}
-                    )
-                }
-            }
-        }
 
-        HorizontalDivider(Modifier.padding(top = 12.dp))
-    }
-}
 
-@Composable
-fun DropdownMenuOption(icon: ImageVector, text: String, tint: Color? = null){
-    Row(horizontalArrangement = Arrangement.spacedBy(15.dp)) {
-        Icon(icon, "", tint = tint ?: LocalContentColor.current)
-        Text(text = text)
-    }
-}

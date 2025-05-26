@@ -1,4 +1,4 @@
-package com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewsmodels
+package com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewmodels
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
