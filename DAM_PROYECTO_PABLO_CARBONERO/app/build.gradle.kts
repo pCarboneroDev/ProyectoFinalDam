@@ -91,4 +91,7 @@ dependencies {
     ksp("com.google.dagger:hilt-compiler:2.51")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
+    implementation(libs.pagingCompose)
+    implementation(libs.androidx.room.paging)
+    implementation ("androidx.paging:paging-compose:3.3.6")
 }

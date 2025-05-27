@@ -1,5 +1,6 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -24,6 +25,15 @@ interface SongDao {
 
     @Query("DELETE FROM Songs WHERE id = :id")
     suspend fun deleteSong(id: Long): Int
+
+    @Query("SELECT * FROM Songs ORDER By id")
+    fun getPagedSongs(): PagingSource<Int, Song>
+
+    @Query("SELECT * FROM Songs ORDER By id desc")
+    fun getPagedSongsDesc(): PagingSource<Int, Song>
+
+    @Query("SELECT * FROM Songs ORDER By name")
+    fun getPagedSongsByName(): PagingSource<Int, Song>
 
    /* @Query("SELECT * FROM songs WHERE name LIKE '%' || :query || '%' OR bandName LIKE '%' || :query || '%'")
     suspend fun searchSong(query: String): List<Song>*/
