@@ -26,14 +26,26 @@ interface SongDao {
     @Query("DELETE FROM Songs WHERE id = :id")
     suspend fun deleteSong(id: Long): Int
 
+
+    // MÉTODOS PARA PEDIR LA LISTA CON DISTINTO ORDEN DE FORMA PAGINADA
+
+    // por id (fecha)
     @Query("SELECT * FROM Songs ORDER By id")
     fun getPagedSongs(): PagingSource<Int, Song>
-
     @Query("SELECT * FROM Songs ORDER By id desc")
     fun getPagedSongsDesc(): PagingSource<Int, Song>
 
+    // por nombre
     @Query("SELECT * FROM Songs ORDER By name")
     fun getPagedSongsByName(): PagingSource<Int, Song>
+    @Query("SELECT * FROM Songs ORDER By name desc")
+    fun getPagedSongsByNameDesc(): PagingSource<Int, Song>
+
+    // por nombre de la banda
+    @Query("SELECT * FROM Songs ORDER By bandName")
+    fun getPagedSongsByBandName(): PagingSource<Int, Song>
+    @Query("SELECT * FROM Songs ORDER By bandName desc")
+    fun getPagedSongsByBandNameDesc(): PagingSource<Int, Song>
 
    /* @Query("SELECT * FROM songs WHERE name LIKE '%' || :query || '%' OR bandName LIKE '%' || :query || '%'")
     suspend fun searchSong(query: String): List<Song>*/

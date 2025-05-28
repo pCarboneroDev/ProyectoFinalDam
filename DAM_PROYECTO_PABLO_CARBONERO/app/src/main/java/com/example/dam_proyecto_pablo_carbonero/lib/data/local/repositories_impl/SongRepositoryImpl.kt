@@ -42,5 +42,17 @@ class SongRepositoryImpl @Inject constructor(
         return songDao.getPagedSongsByName()
     }
 
+    override fun getPagedSongsByNameDesc(): PagingSource<Int, Song> {
+        return songDao.getPagedSongsByNameDesc()
+    }
+
+    override fun getPagedSongsByBandName(): PagingSource<Int, Song> {
+        return songDao.getPagedSongsByBandName()
+    }
+
+    override fun getPagedSongsByBandNameDesc(): PagingSource<Int, Song> {
+        return songDao.getPagedSongsByBandNameDesc()
+    }
+
 
 }

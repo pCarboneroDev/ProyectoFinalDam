@@ -21,6 +21,12 @@ class GetPagedSongsUseCase @Inject constructor(
             songRepository.getPagedSongsDesc()
         else if (param == SortOption.NAME_ASCENDING)
             songRepository.getPagedSongsByName()
+        else if (param == SortOption.NAME_DESCENDING)
+            songRepository.getPagedSongsByNameDesc()
+        else if (param == SortOption.BAND_NAME)
+            songRepository.getPagedSongsByBandName()
+        else if (param == SortOption.BAND_NAME_DESCENDING)
+            songRepository.getPagedSongsByBandNameDesc()
         else songRepository.getPagedSong()
     }
 }

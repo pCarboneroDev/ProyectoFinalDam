@@ -144,7 +144,7 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                 SortSelectorModal(
                     currentSortOption = currentSortOption,
                     dismissFunction = {openAlertDialog = false},
-                    sortOptionSelected = vm::sortList
+                    sortOptionSelected = { vm.sortList(it) }
                 )
             }
             Column(Modifier.fillMaxSize()) {

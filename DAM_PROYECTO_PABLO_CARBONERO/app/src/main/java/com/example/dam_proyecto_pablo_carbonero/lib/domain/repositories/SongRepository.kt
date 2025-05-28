@@ -13,4 +13,7 @@ interface SongRepository {
     fun getPagedSong(): PagingSource<Int, Song>
     fun getPagedSongsDesc(): PagingSource<Int, Song>
     fun getPagedSongsByName(): PagingSource<Int, Song>
+    fun getPagedSongsByNameDesc(): PagingSource<Int, Song>
+    fun getPagedSongsByBandName(): PagingSource<Int, Song>
+    fun getPagedSongsByBandNameDesc(): PagingSource<Int, Song>
 }

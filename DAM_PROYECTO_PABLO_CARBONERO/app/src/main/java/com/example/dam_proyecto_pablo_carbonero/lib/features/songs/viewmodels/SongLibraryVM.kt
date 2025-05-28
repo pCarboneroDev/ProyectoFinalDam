@@ -16,12 +16,16 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetTuningByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,11 +40,6 @@ class SongLibraryVM @Inject constructor(
     private val _songList = MutableStateFlow<List<SongWithTuning>>(emptyList())
     val songList: StateFlow<List<SongWithTuning>> = _songList
 
-    /*val songListPaged = Pager(
-        config = PagingConfig(pageSize = 5),
-        pagingSourceFactory = { getPagedSongsUseCase.sincCall() }
-    ).flow.cachedIn(viewModelScope)*/
-
     private val _selectedSortOption = MutableStateFlow<SortOption>(SortOption.DATE_ASCENDING)
     val selectedSortOption: StateFlow<SortOption> = _selectedSortOption
 
@@ -53,8 +52,6 @@ class SongLibraryVM @Inject constructor(
     private val _isModalOpen = MutableStateFlow<Boolean>(false)
     val isModalOpen: StateFlow<Boolean> = _isSearchBarOpen
 
-    private val _sortOption = MutableStateFlow<SortOption>(SortOption.DATE_ASCENDING)
-    val sortOption: StateFlow<SortOption> = _sortOption
 
     val searchResults = combine(songList, searchQuery) { list, query ->
         if (query.isBlank()) emptyList<SongWithTuning>()
@@ -65,16 +62,20 @@ class SongLibraryVM @Inject constructor(
         emptyList()
     )
 
-    var songListPaged: Flow<PagingData<SongWithTuning>> = Pager(
-        config = PagingConfig(pageSize = 5),
-        pagingSourceFactory = { getPagedSongsUseCase.synchronousCall(_sortOption.value) }
-    ).flow.map { pagingData ->
-            pagingData.map { song ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    // flatmap lo que hace es que cada vez que el elemento al cual se escucha (sortOption) emite un valor se emite un nuevo flow  del paging
+    val songListPaged: Flow<PagingData<SongWithTuning>> = _selectedSortOption.flatMapLatest { sortOption ->
+        Pager(
+            config = PagingConfig(pageSize = 5, prefetchDistance = 1, initialLoadSize = 5),
+            pagingSourceFactory = { getPagedSongsUseCase.synchronousCall(sortOption) }
+        ).flow.map { pagingData ->
+            pagingData.map { song -> // el map este permite métodos asincrónicos parece
                 val tuning = getTuningByIdUseCase.call(song.tuningId)
                 SongWithTuning(song = song, tuning = tuning.tuning)
             }
         }
-        .cachedIn(viewModelScope)
+            .cachedIn(viewModelScope)
+    }
 
 
     init {
@@ -85,10 +86,11 @@ class SongLibraryVM @Inject constructor(
      * metodo que se encarga de cambiar como se ordena la lista
      */
     fun sortList(sortOption: SortOption){
-        _sortOption.value = sortOption
+        _selectedSortOption.value = sortOption
+
         //loadViewModel()
-        /*_songList.value = _songList.value.sortByOption(sortOption)
-        _selectedSortOption.value = sortOption*/
+
+        Log.d("SortOption: ", "${_selectedSortOption.value}")
     }
 
     /**
@@ -96,23 +98,8 @@ class SongLibraryVM @Inject constructor(
      * Se separa en una función independiente ya que se tendrá que llamar desde la vista en algunos momentos
      */
     fun loadViewModel(){
-        /*songListPaged = Pager(
-            config = PagingConfig(pageSize = 5),
-            pagingSourceFactory = { getPagedSongsUseCase.synchronousCall(_sortOption.value) }
-        ).flow.map { pagingData ->
-            pagingData.map { song ->
-                val tuning = getTuningByIdUseCase.call(song.tuningId)
-                SongWithTuning(song = song, tuning = tuning.tuning)
-            }
-        }
-            .cachedIn(viewModelScope)*/
-
-
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                //_songList.value = getAllSongsUseCase.call(Unit)
-
-                //_searchDelegate.value = SongSearchDelegate(_songList.value)
             }
             catch (e: Exception){
                 //TODO gestionar excepcion
