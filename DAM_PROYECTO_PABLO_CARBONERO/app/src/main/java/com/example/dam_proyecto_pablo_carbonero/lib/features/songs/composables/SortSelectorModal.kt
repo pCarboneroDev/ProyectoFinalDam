@@ -28,7 +28,6 @@ import com.example.dam_proyecto_pablo_carbonero.lib.extensions.getName
 @Composable
 fun SortSelectorModal(
     currentSortOption: SortOption,
-    /*saveMethod: (() -> Unit),*/
     dismissFunction: (() -> Unit),
     sortOptionSelected: ((sort: SortOption) -> Unit)
 ){

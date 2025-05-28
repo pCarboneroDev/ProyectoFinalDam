@@ -45,7 +45,7 @@ fun SongRow(song: SongWithTuning, navController: NavHostController){
             Column {
                 Text(song.song.name, fontWeight = FontWeight.Bold)
                 Text(song.song.bandName, fontSize = 15.sp)
-                Text("${song.tuning.name} | ${song.song.bpm} | ${song.song.key}", fontSize = 12.sp)
+                Text("${song.tuning.name} | ${song.song.bpm}", fontSize = 12.sp)
             }
             IconButton(onClick = { expanded = !expanded }) {
                 Icon(Icons.Default.MoreVert, "moreInfo")
