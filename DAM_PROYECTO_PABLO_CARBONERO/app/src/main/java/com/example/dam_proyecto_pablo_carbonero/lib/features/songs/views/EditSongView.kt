@@ -1,18 +1,24 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.songs.views
 
 import android.R.attr.text
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
@@ -20,10 +26,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,19 +42,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.DeleteModal
+import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.TabsBox
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.TransparentTextField
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewmodels.EditSongVM
 import kotlinx.coroutines.CoroutineScope
@@ -166,13 +180,13 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             isError = vm.isBpmValid()
         )
 
-        TransparentTextField(
+      /*  TransparentTextField(
             modifier = Modifier.fillMaxWidth(),
             value = key,
             label = "Key",
 
             onValueChange = { vm.setKey(it) }
-        )
+        )*/
 
         // load tabs
         Button(
@@ -188,7 +202,7 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
         }
 
         if (tabs) {
-            AddTabsModal(dismissFunction = { tabs = false })
+            AddTabsModal(saveMethod = { vm.setKey(it) }, dismissFunction = { tabs = false }, currentTabs = key, context)
         }
 
 
@@ -217,56 +231,55 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTabsModal(
-    /*saveMethod: (() -> Unit),*/
-    dismissFunction: (() -> Unit)
+    saveMethod: ((String) -> Unit),
+    dismissFunction: (() -> Unit),
+    currentTabs: String,
+    context: Context
 ){
-    var tabs = ""
-    val textFieldState = rememberTextFieldState()
+    var tabs by remember { mutableStateOf(currentTabs) }
     val clipboardManager = LocalClipboardManager.current
-    AlertDialog(
-        title = { Text("Add Tabs")},
 
-        text = {
-            Column(Modifier.fillMaxSize()) {
-                Row(Modifier.fillMaxWidth()) {
-                    Spacer(Modifier.weight(1f))
-                    Button(onClick = {
-                        val annotatedString = clipboardManager.getText()
-                        if(isGuitarTabFormatFlexible(annotatedString.toString())){
-                            tabs = annotatedString.toString()
-                            textFieldState.edit {
-                                append(annotatedString.toString())
-                            }
-                        }
-
-                    }) { Text("Copy from clipboard") }
-                }
-                OutlinedTextField(
-                    value = tabs,
-                    onValueChange = { tabs = it },
-                    textStyle = TextStyle(
-                        fontFamily = FontFamily.Monospace
-                    ),
-                )
-                BasicTextField(
-                    textStyle = TextStyle(fontFamily = FontFamily.Monospace), //Resolution to the classifier 'class TextStyle : Any' is not appropriate here.
-                    state = textFieldState
-                )
-            }
-        },
-
+    ModalBottomSheet(
         onDismissRequest = { dismissFunction() },
+        content = {
 
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    dismissFunction()
+            Box(
+                modifier = Modifier
+                    .padding(10.dp)
+            ){
+                Column(Modifier.padding(10.dp)) {
+
+                    Row(Modifier.fillMaxWidth()) {
+                        Text("Tabs", style = TextStyle(fontSize = 30.sp, fontWeight = FontWeight.Bold))
+                        Spacer(Modifier.weight(1f))
+                        Button(onClick = {
+                            val annotatedString = clipboardManager.getText()
+                            if(isGuitarTabFormatFlexible(annotatedString.toString())){
+                                tabs = annotatedString.toString()
+
+                            }
+                            else{
+                                Toast.makeText(context, "El formato no es correcto", Toast.LENGTH_SHORT).show()
+                            }
+
+                        }) { Text("Paste from clipboard") }
+                    }
+                    TabsBox(tabs)
                 }
-            ) {
-                Text("ok")
+                if(tabs.isNotEmpty())
+                    Button(
+                        onClick = { saveMethod(tabs) },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(bottom = 8.dp) // Optional padding from bottom
+                    ) {
+                        Text("Save")
+                    }
             }
+
         }
     )
 }

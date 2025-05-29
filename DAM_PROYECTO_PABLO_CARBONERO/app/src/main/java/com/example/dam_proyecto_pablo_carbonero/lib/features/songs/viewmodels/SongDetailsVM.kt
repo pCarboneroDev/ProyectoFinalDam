@@ -10,6 +10,8 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepo
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongByIdUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongWithTuningByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,12 +21,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SongDetailsVM @Inject constructor(
-    private val songRepository: SongRepository,
-    private val tuningRepository: TuningRepository,
-    private val tuningMusicNoteRepository: TuningMusicNoteRepository,
-    private val musicNoteRepository: MusicNoteRepository,
     private val savedStateHandle: SavedStateHandle,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val getSongByIdUseCase: GetSongWithTuningByIdUseCase
 ): ViewModel(){
     //val songSerialized = savedStateHandle.get<String>("selectedSong") ?: ""
     val songId = savedStateHandle.get<String>("songId") ?: ""
@@ -40,24 +39,13 @@ class SongDetailsVM @Inject constructor(
     val latinNotes: StateFlow<Boolean> = _latinNotes
 
     init {
-        //_selectedSong.value = Gson().fromJson(songSerialized, SongWithTuning::class.java)
         viewModelScope.launch(Dispatchers.IO) {
-            val song = songRepository.getSongById(songId.toLong())
-            val tuning = tuningRepository.getTuningById(tuningId.toLong())
-            val noteIdList = tuningMusicNoteRepository.getNotesIdFromTuningId(tuningId.toLong())
-            val noteList = mutableListOf<MusicNote>()
-
-            for(id in noteIdList){
-                val note = musicNoteRepository.getMusicNoteById(id)
-                noteList.add(note)
+            try {
+                _selectedSong.value = getSongByIdUseCase.call(songId.toLong())
+                _latinNotes.value = userPreferencesRepository.getNotationPreference()
+            }catch (e: Exception){
+                // todo algo yea
             }
-
-            noteList.sort()
-
-            val songTuning = SongWithTuning(tuning, song, noteList)
-            _selectedSong.value = songTuning
-
-            _latinNotes.value = userPreferencesRepository.getNotationPreference()
         }
     }
 }
