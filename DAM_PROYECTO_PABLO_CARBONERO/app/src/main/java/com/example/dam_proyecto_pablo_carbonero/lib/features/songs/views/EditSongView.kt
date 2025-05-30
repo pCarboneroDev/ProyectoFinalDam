@@ -58,6 +58,7 @@ import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.DeleteModal
+import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.AddTabsModal
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.TabsBox
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.TransparentTextField
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewmodels.EditSongVM
@@ -180,13 +181,6 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             isError = vm.isBpmValid()
         )
 
-      /*  TransparentTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = key,
-            label = "Key",
-
-            onValueChange = { vm.setKey(it) }
-        )*/
 
         // load tabs
         Button(
@@ -229,66 +223,4 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             Text("Delete")
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AddTabsModal(
-    saveMethod: ((String) -> Unit),
-    dismissFunction: (() -> Unit),
-    currentTabs: String,
-    context: Context
-){
-    var tabs by remember { mutableStateOf(currentTabs) }
-    val clipboardManager = LocalClipboardManager.current
-
-    ModalBottomSheet(
-        onDismissRequest = { dismissFunction() },
-        content = {
-
-            Box(
-                modifier = Modifier
-                    .padding(10.dp)
-            ){
-                Column(Modifier.padding(10.dp)) {
-
-                    Row(Modifier.fillMaxWidth()) {
-                        Text("Tabs", style = TextStyle(fontSize = 30.sp, fontWeight = FontWeight.Bold))
-                        Spacer(Modifier.weight(1f))
-                        Button(onClick = {
-                            val annotatedString = clipboardManager.getText()
-                            if(isGuitarTabFormatFlexible(annotatedString.toString())){
-                                tabs = annotatedString.toString()
-
-                            }
-                            else{
-                                Toast.makeText(context, "El formato no es correcto", Toast.LENGTH_SHORT).show()
-                            }
-
-                        }) { Text("Paste from clipboard") }
-                    }
-                    TabsBox(tabs)
-                }
-                if(tabs.isNotEmpty())
-                    Button(
-                        onClick = { saveMethod(tabs) },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(bottom = 8.dp) // Optional padding from bottom
-                    ) {
-                        Text("Save")
-                    }
-            }
-
-        }
-    )
-}
-
-fun isGuitarTabFormatFlexible(text: String): Boolean {
-    val tabLineRegex = Regex("^[A-Ga-g#b0-9]{1,2}\\|[-\\d~hpbx/\\\\|()*\\s]+$")
-
-    val lines = text.lines()
-    val tabLines = lines.filter { tabLineRegex.matches(it.trim()) }
-
-    return tabLines.size >= 4
 }

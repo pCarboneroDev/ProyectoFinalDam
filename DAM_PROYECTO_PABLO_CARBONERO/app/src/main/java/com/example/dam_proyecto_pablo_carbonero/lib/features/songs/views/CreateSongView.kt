@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
+import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.AddTabsModal
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.TransparentTextField
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewmodels.CreateSongVM
 import kotlinx.coroutines.CoroutineScope
@@ -50,6 +52,7 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
     val formValid by vm.formValid.collectAsState(false)
 
     var expanded by remember { mutableStateOf(false) }
+    var tabs by remember { mutableStateOf(false) }
 
     val maxChars = 25
     Column(
@@ -142,12 +145,21 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
             isError = vm.isBpmValid()
         )
 
-        TransparentTextField(
+        Button(
             modifier = Modifier.fillMaxWidth(),
-            value = key,
-            label = "Key",
-            onValueChange = { vm.setKey(it) }
-        )
+            /*colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.error
+            ),*/
+            onClick = {
+                tabs = true
+            }
+        ) {
+            Text("Add tabs")
+        }
+
+        if (tabs) {
+            AddTabsModal(saveMethod = { vm.setKey(it) }, dismissFunction = { tabs = false }, currentTabs = key, context)
+        }
     }
 }
 
