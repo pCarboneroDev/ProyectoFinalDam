@@ -1,5 +1,6 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
@@ -7,6 +8,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.InsertSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.GetAllTuningUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.exceptions.InvalidFormException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,9 +38,6 @@ class CreateSongVM @Inject constructor(
 
     private val _key = MutableStateFlow<String>("")
     val key: StateFlow<String> = _key
-
-    private val _formValid = MutableStateFlow<Boolean>(false)
-    val formValid: StateFlow<Boolean> = _formValid
 
     private lateinit var _finalSong: SongWithTuning
 
@@ -73,7 +72,7 @@ class CreateSongVM @Inject constructor(
         if (isNumeric(value)){
             _bpm.value = value
 
-            if (_bpm.value!!.toDouble() > 400){
+            if (_bpm.value.toDouble() > 400){
                 _bpm.value = "400"
             }
         }
@@ -88,10 +87,14 @@ class CreateSongVM @Inject constructor(
      * Metodo para guardar una canción en la bbdd
      * return: true si se ha guaradado, false si hubo un error.
      */
-    suspend fun saveSong(): Boolean{
+    suspend fun saveSong(): Pair<Boolean, String>{
         var saved = true
+        var message = ""
 
         try{
+            if(!isFormValid()){
+                throw InvalidFormException("Complete all the fields")
+            }
             val song = Song(
                 name = _songName.value,
                 bandName = _bandName.value,
@@ -100,15 +103,18 @@ class CreateSongVM @Inject constructor(
                 key = _key.value
             )
             _finalSong = SongWithTuning(song = song, tuning = _selectedTuning.value!!)
-
-
             insertSongUseCase.call(_finalSong)
-
-        }catch (e: Exception){
+        }
+        catch (form: InvalidFormException){
+            saved = false
+            message = form.message.toString()
+        }
+        catch (e: Exception){
             saved = false;
+            message = "Unexpected error. Try again later"
         }
 
-        return saved;
+        return Pair(saved, message);
     }
 
 
@@ -129,7 +135,7 @@ class CreateSongVM @Inject constructor(
         return numericText.toDoubleOrNull() != null
     }
 
-    fun isFormValid() {
-        _formValid.value = (!isSongNameValid() || !isBandNameValid() || !isBpmValid() || _selectedTuning.value != null)
+    fun isFormValid(): Boolean {
+        return (!isSongNameValid() && !isBandNameValid() && !isBpmValid() && _selectedTuning.value != null)
     }
 }

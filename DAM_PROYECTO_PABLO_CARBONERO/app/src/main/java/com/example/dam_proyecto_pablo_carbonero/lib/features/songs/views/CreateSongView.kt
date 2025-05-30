@@ -18,8 +18,10 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.AddTabsModal
@@ -49,12 +52,12 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
     val bandName by vm.bandName.collectAsState("")
     val bmp by vm.bpm.collectAsState("")
     val key by vm.key.collectAsState("")
-    val formValid by vm.formValid.collectAsState(false)
 
     var expanded by remember { mutableStateOf(false) }
     var tabs by remember { mutableStateOf(false) }
 
     val maxChars = 25
+
     Column(
         Modifier
             .fillMaxSize()
@@ -65,18 +68,15 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
         CreateHeader(
             title = "Create new song",
             saveMethod = {
-                CoroutineScope(Dispatchers.Main).launch {
-                    var result = vm.saveSong()
-                    if (result == true && formValid){
+                CoroutineScope(Dispatchers.Main).launch() {
+                    val (result, message) = vm.saveSong()
+                    if (result == true){
                         navController.navigate("SongTuning"){
                             popUpTo("CreateSong") { inclusive = true }
                         }
                     }
-                    else if (!formValid){
-                        Toast.makeText(context,"Complete all fields",Toast.LENGTH_SHORT).show()
-                    }
                     else{
-                        Toast.makeText(context,"ERROR",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }
                 }
             },
@@ -89,7 +89,7 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
             Modifier.fillMaxWidth()
         ) {
             Column {
-                Row() {
+                Row {
                     Text(text = selectedTuning?.name ?: "Select a tuning for the song")
                     Icon(Icons.Default.ArrowDropDown, contentDescription = "")
                 }
@@ -100,7 +100,7 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
                     onDismissRequest = { expanded = false },
                     Modifier.background(color = MaterialTheme.colorScheme.secondary)
                 ) {
-                    tuningList?.forEach { tuning ->
+                    tuningList.forEach { tuning ->
                         DropdownMenuItem(
                             text = {
                                 Text(tuning.name)
@@ -122,7 +122,7 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
             value = songName,
             label = "Song name",
             trailingIcon = {Text("${songName.length}/$maxChars")},
-            onValueChange = { vm.setSongName(it); vm.isFormValid() },
+            onValueChange = { vm.setSongName(it) },
             isError = vm.isSongNameValid()
         )
 
@@ -131,7 +131,7 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
             value = bandName,
             label = "Band name",
             trailingIcon = {Text("${bandName.length}/$maxChars")},
-            onValueChange = { vm.setBandName(it); vm.isFormValid() },
+            onValueChange = { vm.setBandName(it) },
             isError = vm.isBandNameValid()
         )
 
@@ -140,16 +140,13 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
             modifier = Modifier.fillMaxWidth(),
             value = bmp,
             label = "BPM",
-            onValueChange = { vm.setBpm(it); vm.isFormValid() },
+            onValueChange = { vm.setBpm(it) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             isError = vm.isBpmValid()
         )
 
         Button(
             modifier = Modifier.fillMaxWidth(),
-            /*colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.error
-            ),*/
             onClick = {
                 tabs = true
             }

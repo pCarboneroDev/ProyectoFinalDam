@@ -160,7 +160,7 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                         Icon(Icons.Default.Menu, "order", tint = MaterialTheme.colorScheme.primary)
                     }
                 }
-                HorizontalDivider(thickness = 5.dp)
+                HorizontalDivider(thickness = 2.dp)
 
                 Column(Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,

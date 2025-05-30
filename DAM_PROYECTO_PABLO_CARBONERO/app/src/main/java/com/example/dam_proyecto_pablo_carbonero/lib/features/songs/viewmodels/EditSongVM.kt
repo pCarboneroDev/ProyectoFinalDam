@@ -10,6 +10,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongByIdUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.UpdateSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.GetAllTuningUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.exceptions.InvalidFormException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -69,7 +70,7 @@ class EditSongVM @Inject constructor(
 
 
 
-    suspend fun loadData(song: Song) {
+    fun loadData(song: Song) {
         _songName.value = song.name
         _bandName.value = song.bandName
         _bpm.value = song.bpm.substringBefore(' ')
@@ -116,10 +117,14 @@ class EditSongVM @Inject constructor(
      * Metodo para guardar una canción en la bbdd
      * return: true si se ha guaradado, false si hubo un error.
      */
-    suspend fun saveSong(): Boolean{
+    suspend fun saveSong(): Pair<Boolean, String>{
         var saved = true
+        var message = ""
 
         try{
+            if(!isFormValid()){
+                throw InvalidFormException("Complete all the fields")
+            }
             var s = Song(
                 id = _selectedSong.value!!.id,
                 name = _songName.value,
@@ -128,14 +133,17 @@ class EditSongVM @Inject constructor(
                 bpm = _bpm.value + " bpm",
                 key = _key.value
             )
-
-
             updateSong(s)
-        }catch (e: Exception){
-            saved = false;
-            Log.d("ERROu", e.message.toString());
         }
-        return saved
+        catch (form: InvalidFormException){
+            saved = false
+            message = form.message.toString()
+        }
+        catch (e: Exception){
+            saved = false;
+            message = "Unexpected error. Try again later"
+        }
+        return Pair(saved, message)
     }
 
     /**
@@ -143,7 +151,7 @@ class EditSongVM @Inject constructor(
      */
     suspend fun updateSong(song: Song){
         try{
-            var rowsAffected = updateSongUseCase.call(song)//songRepository.updateSong(song)
+            var rowsAffected = updateSongUseCase.call(song)
         }catch (e: Exception){
             throw e
         }
@@ -158,22 +166,22 @@ class EditSongVM @Inject constructor(
     }
 
     fun isSongNameValid(): Boolean {
-        return _songName.value.isNullOrEmpty()
+        return _songName.value.isEmpty()
     }
 
     fun isBandNameValid(): Boolean {
-        return _bandName.value.isNullOrEmpty()
+        return _bandName.value.isEmpty()
     }
 
     fun isBpmValid(): Boolean {
-        return _bpm.value.isNullOrEmpty()
+        return _bpm.value.isEmpty()
     }
 
     fun isNumeric(numericText: String): Boolean{
         return numericText.toDoubleOrNull() != null
     }
 
-    fun isFormValid() {
-        _formValid.value = (!isSongNameValid() || !isBandNameValid() || !isBpmValid() || _selectedTuning.value == null)
+    fun isFormValid(): Boolean {
+        return (!isSongNameValid() && !isBandNameValid() && !isBpmValid() && _selectedTuning.value != null)
     }
 }

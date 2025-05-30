@@ -81,7 +81,6 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
     val bandName by vm.bandName.collectAsState("")
     val bmp by vm.bpm.collectAsState("")
     val key by vm.key.collectAsState("")
-    val formValid by vm.formValid.collectAsState(false)
 
     var modal by remember { mutableStateOf(false) }
     var tabs by remember { mutableStateOf(false) }
@@ -96,7 +95,7 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             navController = navController,
             saveMethod = {
                 CoroutineScope(Dispatchers.Main).launch {
-                    var saved = vm.saveSong()
+                    var (saved, message) = vm.saveSong()
 
                     if (saved){
                         navController.navigate("SongDetails/${song?.id}/${song?.tuningId}"){
@@ -105,9 +104,7 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
                         }
                     }
                     else{
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "Error saving song", Toast.LENGTH_SHORT).show()
-                        }
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -118,25 +115,23 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             Modifier.fillMaxWidth()
         ) {
             Column {
-                Row() {
+                Row {
                     Text(text = selectedTuning?.name ?: "Select a tuning for the song")
                     Icon(Icons.Default.ArrowDropDown, contentDescription = "")
                 }
-
 
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
                     Modifier.background(color = MaterialTheme.colorScheme.secondary)
                 ) {
-                    tuningList?.forEach { tuning ->
+                    tuningList.forEach { tuning ->
                         DropdownMenuItem(
                             text = {
                                 Text(tuning.name)
                             },
                             onClick = {
                                 vm.setSelectedTuning(tuning)
-                                vm.isFormValid()
                             }
                         )
                     }
@@ -152,7 +147,7 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             label = "Song name",
             trailingIcon = {Text("${song?.name?.length}/$maxChars")},
 
-            onValueChange = { vm.setSongName(it); vm.isFormValid() },
+            onValueChange = { vm.setSongName(it) },
 
             isError = vm.isSongNameValid()
         )
@@ -163,7 +158,7 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             label = "Band name",
             trailingIcon = {Text("${bandName.length}/$maxChars")},
 
-            onValueChange = { vm.setBandName(it); vm.isFormValid() },
+            onValueChange = { vm.setBandName(it) },
 
             isError = vm.isBandNameValid()
         )
@@ -174,7 +169,7 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             value = bmp,
             label = "BPM",
 
-            onValueChange = { vm.setBpm(it); vm.isFormValid() },
+            onValueChange = { vm.setBpm(it) },
 
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 
@@ -185,9 +180,7 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
         // load tabs
         Button(
             modifier = Modifier.fillMaxWidth(),
-            /*colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.error
-            ),*/
+
             onClick = {
                 tabs = true
             }

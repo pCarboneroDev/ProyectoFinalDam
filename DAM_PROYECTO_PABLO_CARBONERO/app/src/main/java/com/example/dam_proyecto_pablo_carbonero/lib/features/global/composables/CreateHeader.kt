@@ -34,5 +34,5 @@ fun CreateHeader(title: String, subtitle: String = "", saveMethod: (() -> Unit)?
     if(subtitle.isNotEmpty()){
         Text(subtitle, fontSize = 13.sp)
     }
-    HorizontalDivider(thickness = 5.dp)
+    HorizontalDivider(thickness = 2.dp)
 }
