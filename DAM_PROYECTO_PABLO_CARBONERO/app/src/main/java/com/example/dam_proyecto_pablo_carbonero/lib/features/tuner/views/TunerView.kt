@@ -73,6 +73,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.viewmodels.Tu
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -106,7 +107,8 @@ fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
         )
         { innerPadding ->
             Column(
-                Modifier.fillMaxSize()
+                Modifier
+                    .fillMaxSize()
                     .padding(innerPadding)
                     .padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
                     .padding(horizontal = 12.dp),
@@ -153,8 +155,32 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
 
     HorizontalDivider()
 
+    Row(Modifier.fillMaxWidth()) {
+        Spacer(Modifier.weight(1f))
+
+        Switch(
+            checked = isRecording,
+            onCheckedChange = {
+                activity?.let {
+                    if (ActivityCompat.checkSelfPermission(it, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                        vm.initializeAudioRecord()
+                        if (!isRecording) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                vm.startRecordingAudio()
+                            }
+                        }
+                        vm.setIsRecording(!isRecording)
+                    } else {
+                        // Solicitar permisos si no se tienen
+                        ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.RECORD_AUDIO), 1)
+                    }
+                }
+            }
+        )
+    }
+
     // TEXTOS DE INFORMACION
-    Text(text = if (isRecording) "$freq Hz" else "", color = mainColor)
+    Text(text = if (isRecording) "${freq.roundToInt()} Hz" else "", color = mainColor)
 
     Text(
         text = guidetext, color = mainColor
@@ -167,26 +193,6 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
             if (latinNotes == true) selectedNote!!.latinName else selectedNote!!.englishName
         else "",
         color = mainColor
-    )
-
-    Switch(
-        checked = isRecording,
-        onCheckedChange = {
-            activity?.let {
-                if (ActivityCompat.checkSelfPermission(it, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                    vm.initializeAudioRecord()
-                    if (!isRecording) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            vm.startRecordingAudio()
-                        }
-                    }
-                    vm.setIsRecording(!isRecording)
-                } else {
-                    // Solicitar permisos si no se tienen
-                    ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.RECORD_AUDIO), 1)
-                }
-            }
-        }
     )
 
     TuningNotesSelector(
@@ -203,15 +209,19 @@ fun TuningNotesSelector(
     latinNotes: Boolean
 ){
     var i by remember { mutableStateOf(-1) }
-    Row(Modifier.fillMaxWidth()) {
+    Column() {
         selectedTuning?.noteList?.forEachIndexed { index, note ->
             val isSelected = index == i
             val cuerda = (5 - index * 0.5).toInt()
 
-            Column(
+            Row(
                 modifier = Modifier
-                    .weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .clickable { onNoteSelected(note); i = index },
+                //horizontalAlignment = Alignment.CenterHorizontally
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
@@ -220,8 +230,8 @@ fun TuningNotesSelector(
                         .background(
                             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                             shape = CircleShape
-                        )
-                        .clickable { onNoteSelected(note); i = index },
+                        ),
+                        //.clickable { onNoteSelected(note); i = index },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -231,8 +241,9 @@ fun TuningNotesSelector(
                 }
                 Box(
                     modifier = Modifier
-                        .width(cuerda.dp)
-                        .height(300.dp)
+                        //.fillMaxWidth()
+                        .weight(5f)
+                        .height(cuerda.dp)
                         .background(Color.Gray)
                 )
             }
