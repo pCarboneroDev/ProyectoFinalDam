@@ -19,14 +19,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Input
 import androidx.compose.material.icons.filled.Input
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -38,14 +44,13 @@ import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.BottomNavBar
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels.SettingsVM
-//import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels.SettingsVM
-//import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.UserPreferencesRepositoryImpl
+
 
 @Composable
 fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewModel()){
     val latinNotes by vm.latinNotes.collectAsState()
 
-
+    var notations by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -80,14 +85,37 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                         SettingsRow(
                             "Notation system",
                             {
-                                Switch(
+                                TextButton(
+                                    onClick = { notations = !notations }
+                                ) {
+                                    Text(if (latinNotes) "Latin" else "English")
+                                    DropdownMenu(
+                                        expanded = notations,
+                                        onDismissRequest = { notations = false }
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = { Text("Latin") },
+                                            onClick = {
+                                                vm.setNotationValue(true)
+                                                notations = false
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("English") },
+                                            onClick = {
+                                                vm.setNotationValue(false)
+                                                notations = false
+                                            }
+                                        )
+                                    }
+                                }
+                                /*Switch(
                                     checked = latinNotes,
                                     onCheckedChange = {
                                         vm.setNotationValue(it)
                                     }
-                                )
-                            },
-                            {}
+                                )*/
+                            }
                         )
                     }
 
@@ -96,21 +124,6 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                             "My tunings",
                             { Icon(imageVector = Icons.Default.Tune, contentDescription = "") },
                             { navController.navigate("UserTunings") }
-                        )
-                    }
-
-                    items(20){ i->
-                        SettingsRow(
-                            "Notation system",
-                            {
-                                Switch(
-                                    checked = latinNotes,
-                                    onCheckedChange = {
-                                        vm.setNotationValue(it)
-                                    }
-                                )
-                            },
-                            {}
                         )
                     }
                 }
@@ -123,10 +136,12 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
 }
 
 @Composable
-fun SettingsRow(title: String, composable: @Composable () -> Unit, onClick: () -> Unit){
+fun SettingsRow(title: String, composable: @Composable () -> Unit, onClick: () -> Unit = {}){
     Column(Modifier.clickable(onClick = onClick)) {
         Row(
-            Modifier.fillMaxWidth().padding(top = 12.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(title)
