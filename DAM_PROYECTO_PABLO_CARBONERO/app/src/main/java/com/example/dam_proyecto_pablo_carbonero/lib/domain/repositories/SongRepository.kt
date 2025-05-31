@@ -16,4 +16,5 @@ interface SongRepository {
     fun getPagedSongsByNameDesc(): PagingSource<Int, Song>
     fun getPagedSongsByBandName(): PagingSource<Int, Song>
     fun getPagedSongsByBandNameDesc(): PagingSource<Int, Song>
+    fun searchSong(query: String): PagingSource<Int, Song>
 }

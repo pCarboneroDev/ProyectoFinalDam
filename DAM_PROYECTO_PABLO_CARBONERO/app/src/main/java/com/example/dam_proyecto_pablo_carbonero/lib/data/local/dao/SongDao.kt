@@ -47,8 +47,8 @@ interface SongDao {
     @Query("SELECT * FROM Songs ORDER By bandName desc")
     fun getPagedSongsByBandNameDesc(): PagingSource<Int, Song>
 
-   /* @Query("SELECT * FROM songs WHERE name LIKE '%' || :query || '%' OR bandName LIKE '%' || :query || '%'")
-    suspend fun searchSong(query: String): List<Song>*/
+    @Query("SELECT * FROM songs WHERE name LIKE '%' || :query || '%' OR bandName LIKE '%' || :query || '%'")
+    fun searchSong(query: String): PagingSource<Int, Song>
 
     /*@Query("UPDATE Songs SET name = :name, bandName = :name WHERE id = :id")
     suspend fun updateSong(id: Long, name:String, song: Song)*/
