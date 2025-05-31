@@ -69,7 +69,7 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                 Modifier.fillMaxSize()
             ) {
                 Text("Settings", fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                HorizontalDivider(thickness = 5.dp)
+                HorizontalDivider(thickness = 2.dp)
 
                 /*Text("${latinNotes}")
 

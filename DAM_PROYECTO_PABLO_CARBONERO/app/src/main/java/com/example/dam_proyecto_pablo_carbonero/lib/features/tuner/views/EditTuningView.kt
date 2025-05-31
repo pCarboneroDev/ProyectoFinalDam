@@ -74,14 +74,14 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
             saveMethod = {
                 if (isValid){
                     CoroutineScope(Dispatchers.Main).launch {
-                        var result = vm.updateTuning()
+                        var (result, message) = vm.updateTuning()
                         if (result == true){
                             navController.navigate("Tuner"){
                                 popUpTo("EditTuning") { inclusive = true }
                             }
                         }
                         else{
-                            Toast.makeText(context,"ERROR",Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -102,7 +102,6 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
             value = tuningName,
             onValueChange = {
                 vm.setTuningName(it)
-                isValid = isFormValid(tuningName, selectedNotes)
             },
             label = { Text("Tuning name") },
             singleLine = true
@@ -154,7 +153,6 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
                             },
                             onClick = {
                                 selectedNotes[i] = note
-                                isValid = isFormValid(tuningName, selectedNotes)
                                 expanded = false
                             }
                         )
@@ -176,7 +174,7 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
         if (modal) DeleteModal(
             dismissFunction = {modal = false}, onDeletePressed = {
                 CoroutineScope(Dispatchers.Main).launch {
-                    vm.borrarAfinacion()
+                    vm.deleteTuning()
                 }
                 navController.navigate("Tuner"){
                     popUpTo("EditTuning") { inclusive = true }
@@ -202,20 +200,5 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
             Text("Delete")
         }
     }
-}
-
-private fun isFormValid(tuningName: String, selectedNotes: Array<MusicNote>?): Boolean{
-    var isValid = true;
-
-    if (tuningName.isEmpty()){
-        isValid = false
-    }
-
-    for(note in selectedNotes!!){
-        if(note.englishName == "0"){
-            isValid = false;
-        }
-    }
-    return isValid;
 }
 

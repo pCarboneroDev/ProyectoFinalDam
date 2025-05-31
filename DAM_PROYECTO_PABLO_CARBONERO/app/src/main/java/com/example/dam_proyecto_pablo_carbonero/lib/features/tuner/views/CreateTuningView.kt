@@ -1,5 +1,6 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.views
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,11 +21,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -59,7 +63,6 @@ fun CreateTuningView(navController: NavHostController, vm: CreateTuningVM = hilt
     var notes = ""
     notes += selectedNotes.map { note -> "${note.englishName} " }
     var isValid by remember {mutableStateOf(false)}
-
 
 
     Column(
@@ -165,7 +168,7 @@ fun CreateTuningView(navController: NavHostController, vm: CreateTuningVM = hilt
                 if (it.englishName == "0") "?" else if (latinNotes) it.latinName else it.englishName
             },
             modifier = Modifier.padding(top = 16.dp),
-            color = if (selectedNotes.any { it.englishName == "0" }) Color.Red else Color.Black
+            color = if (selectedNotes.any { it.englishName == "0" }) Color.Red else MaterialTheme.colorScheme.onSurface
         )
     }
 }

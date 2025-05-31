@@ -78,11 +78,7 @@ fun TuningAnimation(
                     }
                     .size(40.dp)
                     .background(
-                        color = when {
-                            animatedValue in 0.45f..0.55f -> color
-                            animatedValue < 0.45f -> color
-                            else -> color
-                        },
+                        color = color,
                         shape = CircleShape
                     )
                     .border(2.dp, Color.White, CircleShape)

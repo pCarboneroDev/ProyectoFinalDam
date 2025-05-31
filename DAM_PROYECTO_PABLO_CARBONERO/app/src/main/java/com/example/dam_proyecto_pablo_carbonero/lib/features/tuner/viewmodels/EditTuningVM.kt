@@ -12,6 +12,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNo
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetTuningByIdUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.UpdateTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.exceptions.InvalidFormException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -79,8 +80,9 @@ class EditTuningVM @Inject constructor(
 
 
     // METODOS
-    suspend fun updateTuning(): Boolean{
+    suspend fun updateTuning(): Pair<Boolean, String>{
         var saved = true
+        var message = ""
         try{
             var list = selectedNotes.value.toList() as MutableList<MusicNote>
             list.sort()
@@ -88,21 +90,41 @@ class EditTuningVM @Inject constructor(
             _finalTuning.value = Tuning( id = selectedTuningId.toLong() ,name = _tuningName.value.toString())
 
             saved = updateTuningUseCase.call(TuningWithNotesModel(_finalTuning.value!!, list))
-        }catch (e: Exception){
-            Log.d("ERROU", e.message.toString())
+        }
+        catch (formE: InvalidFormException){
+            saved = false
+            message = formE.message.toString()
+        }
+        catch (e: Exception){
+            message = "Unexpected error. Try again later"
             saved = false
         }
-        return saved
+        return Pair(saved, message)
     }
 
 
-    fun borrarAfinacion(){
+    fun deleteTuning(){
         viewModelScope.launch(Dispatchers.IO) {
             var list = _selectedNotes.value.toMutableList()
             list.sort()
             deleteTuningUseCase.call(TuningWithNotesModel(tuningModel.tuning, list))
 
         }
+    }
+
+    private fun isFormValid(): Boolean{
+        var isValid = true;
+
+        if (_tuningName.value.isEmpty()){
+            isValid = false
+        }
+
+        for(note in _selectedNotes.value){
+            if(note.englishName == "0"){
+                isValid = false;
+            }
+        }
+        return isValid;
     }
 
 }

@@ -160,7 +160,7 @@ class TunerVM @Inject constructor(
         }
     }
 
-    fun sigmoidNormalizedBetween(freq: Double, minHz: Double, maxHz: Double, kFactor: Double = 0.07): Double {
+    fun sigmoidNormalizedBetween(freq: Double, minHz: Double, maxHz: Double, kFactor: Double = 0.02): Double {
         if (freq == 0.0) return 0.5
 
         val center = (minHz + maxHz) / 2.0
@@ -173,6 +173,11 @@ class TunerVM @Inject constructor(
      * Este es el metodo principal para identificar una nota musical con las señales digitales de audio
      * Utiliza un algoritmo conocido como YIN que se especializa en la identificación de notas
      * Es mejor que otros metodos cómo FFT ya que YIN sí es capaz de ignorar armónicos.
+     *
+     * @param audioRecord: instancia de AudioRecord que captura el audio
+     * @param bufferSize: cantidad de muestras que se guardan antes de analizarlas
+     * @param sampleRate: cantidad de muestras de audio que se toman por segundo
+     * Return: valor de la frecuencia detectada, 0 si no detecta nada.
      */
     fun processYIN(audioRecord: AudioRecord, bufferSize: Int, sampleRate: Int): Double {
         val buffer = ShortArray(bufferSize)
