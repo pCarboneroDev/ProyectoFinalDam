@@ -74,14 +74,14 @@ fun CreateTuningView(navController: NavHostController, vm: CreateTuningVM = hilt
             saveMethod = {
                 if (isValid){
                     CoroutineScope(Dispatchers.Main).launch {
-                        var result = vm.saveNewTuning()
+                        var (result, message) = vm.saveNewTuning()
                         if (result == true){
                             navController.navigate("Tuner"){
                                 popUpTo("CreateTuning") { inclusive = true }
                             }
                         }
                         else{
-                            Toast.makeText(context,"ERROR",Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
                         }
                     }
                 }

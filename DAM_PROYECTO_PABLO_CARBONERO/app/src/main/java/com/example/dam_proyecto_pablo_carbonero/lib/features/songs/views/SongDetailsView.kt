@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.extensions.toString
+import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.DetailsHeader
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.TabsBox
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewmodels.SongDetailsVM
 import com.example.dam_proyecto_pablo_carbonero.lib.utils.NoteList
@@ -102,21 +103,3 @@ fun SongDetailsView(navController: NavHostController, vm: SongDetailsVM = hiltVi
     }
 }
 
-@Composable
-fun DetailsHeader(title: String, subtitle: String = "", editMethod: (() -> Unit)? = null, navController: NavHostController){
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,) {
-        IconButton(onClick = {navController.popBackStack()}) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, "back", tint = MaterialTheme.colorScheme.primary)
-        }
-        if(editMethod != null){
-            IconButton(onClick = editMethod) {
-                Icon(Icons.Default.Edit, "edit", tint = MaterialTheme.colorScheme.primary)
-            }
-        }
-    }
-    Text(title, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-    if(subtitle.isNotEmpty()){
-        Text(subtitle, fontSize = 13.sp)
-    }
-    HorizontalDivider(thickness = 5.dp)
-}

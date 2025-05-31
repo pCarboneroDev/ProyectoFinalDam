@@ -107,7 +107,6 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
                             },
                             onClick = {
                                 vm.setSelectedTuning(tuning)
-                                vm.isFormValid()
                             }
                         )
                     }

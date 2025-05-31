@@ -29,8 +29,9 @@ class UserTuningsVM @Inject constructor(
         }
     }
 
-    suspend fun setTuningAsFavourite(tuning: TuningWithNotesModel): Boolean{
+    suspend fun setTuningAsFavourite(tuning: TuningWithNotesModel): Pair<Boolean, String> {
         var updated = true
+        var message = ""
         try{
             updateFavouriteUseCase.call(
                 Tuning(
@@ -43,12 +44,13 @@ class UserTuningsVM @Inject constructor(
         }
         catch (favE: FullFavouriteTuningsException){
             updated = false
+            message = favE.message.toString()
         }
         catch (e: Exception){
             updated = false
-            // todo esto
+            message = "Unexpected error. Try again later"
         }
-        return updated
+        return Pair(updated, message)
     }
 
     suspend fun loadTunings(){

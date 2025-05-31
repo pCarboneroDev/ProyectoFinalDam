@@ -11,6 +11,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUse
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.InsertTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAmountNotesUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.exceptions.InvalidFormException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,18 +64,43 @@ class CreateTuningVM @Inject constructor(
     }
 
     // METODOS
-    suspend fun saveNewTuning(): Boolean{
+    suspend fun saveNewTuning(): Pair<Boolean,String>{
         var saved = true
+        var message = ""
         try{
+            if (!isFormValid()){
+                throw InvalidFormException("Complete all the field")
+            }
             _finalTuning.value = Tuning(name = _tuningName.value)
             val list = _selectedNotes.value.toMutableList()
             list.sort()
 
             insertTuningUseCase.call(TuningWithNotesModel(_finalTuning.value!!, list))
-
-        }catch (e: Exception){
-            saved = false
         }
-        return saved
+        catch (formE: InvalidFormException){
+            saved = false
+            message = formE.message.toString()
+        }
+        catch (e: Exception){
+            saved = false
+            message = "Unexpected error. Try again later"
+        }
+        return Pair(saved, message)
+    }
+
+    private fun isFormValid(): Boolean{
+        var isValid = true;
+
+        if (_tuningName.value.isEmpty()){
+            isValid = false
+        }
+
+        for(note in _selectedNotes.value){
+            if(note.englishName == "0"){
+                isValid = false;
+            }
+        }
+        return isValid;
     }
 }
+

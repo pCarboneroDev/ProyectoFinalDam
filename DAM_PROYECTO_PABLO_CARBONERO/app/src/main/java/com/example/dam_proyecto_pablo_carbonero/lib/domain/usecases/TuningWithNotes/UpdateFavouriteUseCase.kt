@@ -14,9 +14,8 @@ class UpdateFavouriteUseCase(
         val tuningList = tuningRepository.getAllTunings().filter { it.favourite == true}
 
         if(param.favourite && tuningList.size >= maxTuningFavs){
-            throw FullFavouriteTuningsException("Max number of tuning added to favourites")
+            throw FullFavouriteTuningsException("You've reached the limit of favourite tunings")
         }
-
         try{
             tuningRepository.updateTuningFavourite(param.id, param.favourite)
         }catch (e: Exception){

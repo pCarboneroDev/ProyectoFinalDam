@@ -111,7 +111,7 @@ fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
                     .fillMaxSize()
                     .padding(innerPadding)
                     .padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
-                    .padding(horizontal = 12.dp),
+                    .padding(horizontal = 10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 if (selectedTuning == null){
@@ -153,7 +153,7 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
         navController
     )
 
-    HorizontalDivider()
+    HorizontalDivider(thickness = 2.dp)
 
     Row(Modifier.fillMaxWidth()) {
         Spacer(Modifier.weight(1f))
