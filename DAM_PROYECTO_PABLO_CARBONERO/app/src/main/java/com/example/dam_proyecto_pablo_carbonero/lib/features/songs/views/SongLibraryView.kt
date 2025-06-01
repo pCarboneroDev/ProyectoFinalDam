@@ -97,29 +97,11 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
    // var searchQuery by remember { mutableStateOf("") }
     var isActive by remember { mutableStateOf(false) }
     var openAlertDialog by remember { mutableStateOf(false) }
-    val searchQuery by vm.searchQuery.collectAsState()
-    val searchResult by vm.searchResults.collectAsState()
+    val searchQuery by vm.query.collectAsState() //vm.searchQuery.collectAsState()
+    val searchResult = vm.searchResultsPaged.collectAsLazyPagingItems() //vm.searchResults.collectAsState()
 
     var loading by remember { mutableStateOf(false) }
-
-
-    LaunchedEffect(songListPaged) {
-        snapshotFlow { songListPaged.loadState }
-            .collect { loadStates ->
-                if (loadStates.append is LoadState.Loading) {
-                    Log.d("PAGING", "⬇ Cargando más desde Room...")
-                    loading = true
-                }
-                if (loadStates.refresh is LoadState.Loading) {
-                    Log.d("PAGING", "🔄 Cargando la primera página...")
-                    loading = true
-                }
-                if (loadStates.append is LoadState.NotLoading) {
-                    Log.d("PAGING", "✅ No se está cargando más")
-                    loading = false
-                }
-            }
-    }
+    
 
     LaunchedEffect(Unit) {
         vm.loadViewModel()
@@ -190,8 +172,13 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                         //leadingIcon = @Composable (() -> Unit)? = { Icon(Icons.Default.Search, contentDescription = "Search") }
                     ){
                         LazyColumn {
-                            items(searchResult.size){ i ->
-                                SongRow(searchResult[i], navController)
+                            if (searchResult.itemCount > 0){
+                                items(searchResult.itemCount) { index ->
+                                    val item = searchResult[index]
+                                    item?.let {
+                                        SongRow(it, navController)
+                                    }
+                                }
                             }
                         }
                     }

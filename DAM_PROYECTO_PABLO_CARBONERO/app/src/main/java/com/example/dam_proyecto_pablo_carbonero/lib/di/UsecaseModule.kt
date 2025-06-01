@@ -20,6 +20,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUse
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.DeleteSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetPagedSongsUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongWithTuningByIdUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.SearchSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.UpdateFavouriteUseCase
 import dagger.Module
 import dagger.Provides
@@ -202,6 +203,16 @@ object UsecaseModule {
         songRepository: SongRepository
     ): GetPagedSongsUseCase{
         return GetPagedSongsUseCase(
+            songRepository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideSearchSong(
+        songRepository: SongRepository
+    ): SearchSongUseCase{
+        return SearchSongUseCase(
             songRepository
         )
     }

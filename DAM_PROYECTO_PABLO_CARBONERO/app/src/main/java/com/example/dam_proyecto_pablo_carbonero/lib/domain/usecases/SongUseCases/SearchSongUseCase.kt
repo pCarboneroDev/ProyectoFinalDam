@@ -1,0 +1,20 @@
+package com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases
+
+import androidx.paging.PagingSource
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.UseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
+import javax.inject.Inject
+
+class SearchSongUseCase @Inject constructor(
+    private val songRepository: SongRepository
+): UseCase<String, PagingSource<Int, Song>> {
+    override suspend fun call(param: String): PagingSource<Int, Song> {
+        return songRepository.searchSong(param)
+    }
+
+    fun synchronousCall(param: String): PagingSource<Int, Song> {
+        return songRepository.searchSong(param)
+    }
+}

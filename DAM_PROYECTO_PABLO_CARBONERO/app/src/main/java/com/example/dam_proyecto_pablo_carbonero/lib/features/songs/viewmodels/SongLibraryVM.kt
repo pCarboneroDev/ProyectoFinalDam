@@ -13,17 +13,23 @@ import com.example.dam_proyecto_pablo_carbonero.lib.extensions.sortByOption
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetAllSongsUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetPagedSongsUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.SearchSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetTuningByIdUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -34,7 +40,8 @@ import javax.inject.Inject
 class SongLibraryVM @Inject constructor(
     private val getAllSongsUseCase: GetAllSongsUseCase,
     private val getPagedSongsUseCase: GetPagedSongsUseCase,
-    private val getTuningByIdUseCase: GetTuningByIdUseCase
+    private val getTuningByIdUseCase: GetTuningByIdUseCase,
+    private val searchSongUseCase: SearchSongUseCase
 ): ViewModel() {
 
     private val _songList = MutableStateFlow<List<SongWithTuning>>(emptyList())
@@ -46,21 +53,15 @@ class SongLibraryVM @Inject constructor(
     private val _searchQuery = MutableStateFlow<String>("")
     val searchQuery: StateFlow<String> = _searchQuery
 
+    private val _query = MutableStateFlow<String>("")
+    val query: StateFlow<String> = _query
+
     private val _isSearchBarOpen = MutableStateFlow<Boolean>(false)
     val isSearchBarOpen: StateFlow<Boolean> = _isSearchBarOpen
 
     private val _isModalOpen = MutableStateFlow<Boolean>(false)
     val isModalOpen: StateFlow<Boolean> = _isSearchBarOpen
 
-
-    val searchResults = combine(songList, searchQuery) { list, query ->
-        if (query.isBlank()) emptyList<SongWithTuning>()
-        else list.filter { it.song.name.contains(query, ignoreCase = true) || it.song.bandName.contains(query, ignoreCase = true) }
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
-        emptyList()
-    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     // flatmap lo que hace es que cada vez que el elemento al cual se escucha (sortOption) emite un valor se emite un nuevo flow  del paging
@@ -76,6 +77,28 @@ class SongLibraryVM @Inject constructor(
         }
             .cachedIn(viewModelScope)
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val searchResultsPaged: Flow<PagingData<SongWithTuning>> = _query
+        .debounce(300)
+        .distinctUntilChanged()
+        .flatMapLatest { query ->
+            if(query.isEmpty()){
+                flowOf(PagingData.empty())
+            }
+            else{
+                Pager(
+                    config = PagingConfig(pageSize = 5, prefetchDistance = 1, initialLoadSize = 5),
+                    pagingSourceFactory = { searchSongUseCase.synchronousCall(query) }
+                ).flow.map { pagingData ->
+                    pagingData.map { song ->
+                        val tuning = getTuningByIdUseCase.call(song.tuningId)
+                        SongWithTuning(song = song, tuning = tuning.tuning)
+                    }
+                }
+            }
+                .cachedIn(viewModelScope)
+        }
 
 
     init {
@@ -112,7 +135,7 @@ class SongLibraryVM @Inject constructor(
      * Limpia la barra de búsqueda
      */
     fun clearQuery() {
-        _searchQuery.value = ""
+        _query.value = ""
         onQueryChanged("")
     }
 
@@ -120,7 +143,7 @@ class SongLibraryVM @Inject constructor(
      * Se encarga de filtrar la lista de la barra de búsqueda y de actualizar el texto
      */
     fun onQueryChanged(value: String){
-        _searchQuery.value = value
+        _query.value = value
     }
 }
 
