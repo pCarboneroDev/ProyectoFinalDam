@@ -23,10 +23,6 @@ import kotlin.math.pow
 
 @HiltViewModel
 class LoadingVM @Inject constructor (
-    private val notesRepo: MusicNoteRepository,
-    private val tuningRepo: TuningRepository,
-    private val tuningMusicNoteRepo: TuningMusicNoteRepository,
-
     private val getAllNotesUseCase: GetAllNotesUseCase,
     private val getAllTuning: GetAllTuningUseCase,
     private val insertAllMusicNotesUseCase: InsertAllMusicNotesUseCase,

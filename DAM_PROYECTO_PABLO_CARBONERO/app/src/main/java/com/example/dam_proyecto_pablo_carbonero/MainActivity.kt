@@ -21,6 +21,8 @@ import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.views.Sett
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.views.CreateTuningView
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.views.EditTuningView
 import com.example.dam_proyecto_pablo_carbonero.lib.features.loadingScreen.views.LoadingScreen
+import com.example.dam_proyecto_pablo_carbonero.lib.features.login.views.LoginView
+import com.example.dam_proyecto_pablo_carbonero.lib.features.login.views.RegisterView
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.views.UserTuningsView
 //import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.views.SettingsView
 //import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels.SettingsVM
@@ -143,6 +145,14 @@ class MainActivity : ComponentActivity() {
 
                         composable("UserTunings") {
                             UserTuningsView(navController)
+                        }
+
+                        composable("Login") {
+                            LoginView(navController)
+                        }
+
+                        composable("Register") {
+                            RegisterView(navController)
                         }
 
                     }
