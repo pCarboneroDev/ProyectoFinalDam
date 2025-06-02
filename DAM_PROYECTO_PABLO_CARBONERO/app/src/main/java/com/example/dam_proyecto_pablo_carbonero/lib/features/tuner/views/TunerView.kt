@@ -2,7 +2,9 @@ package com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.views
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.widget.GridView
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +19,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +39,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,6 +49,7 @@ import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.example.dam_proyecto_pablo_carbonero.R
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.BottomNavBar
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
@@ -192,6 +201,7 @@ fun TuningNotesSelector(
     latinNotes: Boolean,
     selectedNote: MusicNote?
 ){
+
     Column {
         selectedTuning?.noteList?.forEachIndexed { index, note ->
             val isSelected = note == selectedNote
@@ -227,7 +237,7 @@ fun TuningNotesSelector(
                         //.fillMaxWidth()
                         .weight(5f)
                         .height(guitarString.dp)
-                        .background(Color.Gray)
+                        .background(color = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSecondary)
                 )
             }
         }

@@ -59,12 +59,19 @@ fun TuningAnimation(
                     .background(Color.Gray)
             )
 
-            // indicador del rango correcto
             Box(
                 modifier = Modifier
                     .width(80.dp)
                     .height(4.dp)
-                    .background(Color.Green.copy(alpha = 0.5f))
+                    .background(Color.Yellow.copy(alpha = 0.5f))
+            )
+
+            // indicador del rango correcto
+            Box(
+                modifier = Modifier
+                    .width(40.dp)
+                    .height(4.dp)
+                    .background(Color.Green.copy(alpha = 1f))
             )
 
             // esfera indicadora del sonido detectado
@@ -73,7 +80,7 @@ fun TuningAnimation(
                     .offset {
                         IntOffset(
                             x = ((animatedValue - 0.5f) * containerWidth * 0.8f).toInt(),
-                            y = 0
+                            y = 0 //-100
                         )
                     }
                     .size(40.dp)
