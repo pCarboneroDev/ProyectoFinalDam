@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidxRoom)
 
     alias(libs.plugins.hilt.android)
+    id("com.google.gms.google-services")
 }
 
 room {
@@ -94,4 +95,13 @@ dependencies {
     implementation(libs.pagingCompose)
     implementation(libs.androidx.room.paging)
     implementation ("androidx.paging:paging-compose:3.3.6")
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
+
+    // When using the BoM, don't specify versions in Firebase dependencies
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
 }

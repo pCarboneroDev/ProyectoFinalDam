@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Input
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -37,6 +38,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,11 +47,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.BottomNavBar
@@ -60,8 +64,24 @@ import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodel
 @Composable
 fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewModel()){
     val latinNotes by vm.latinNotes.collectAsState()
-
+    val loggedIn by vm.loggedIn.collectAsState()
+    val isLoading by vm.isLoading.collectAsState()
     var notations by remember { mutableStateOf(false) }
+
+
+    //LaunchedEffect(Unit) { vm.loadViewmodel() }
+    if (isLoading) {
+        // Capa de carga encima
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)) // opcional: fondo semitransparente
+                .zIndex(1f), // se asegura de que esté por encima
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -84,32 +104,37 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                 HorizontalDivider(thickness = 2.dp)
 
                 LazyColumn(Modifier.fillMaxSize()) {
-                    item {
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(10.dp)
-                                .background(
-                                    color = MaterialTheme.colorScheme.primary,
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                        ){
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Button(
-                                    onClick = {
-                                        navController.navigate("Register")
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        MaterialTheme.colorScheme.secondaryContainer
+                    if(!loggedIn)
+                        item {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = RoundedCornerShape(12.dp)
                                     )
-                                ) { Text("Register", style = TextStyle(color = MaterialTheme.colorScheme.onSecondaryContainer)) }
+                            ){
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Button(
+                                        onClick = {
+                                            navController.navigate("Register")
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            MaterialTheme.colorScheme.secondaryContainer
+                                        )
+                                    ) { Text("Register", style = TextStyle(color = MaterialTheme.colorScheme.onSecondaryContainer)) }
 
-                                Column {
-                                    Text("Create a free account", style = TextStyle(color = MaterialTheme.colorScheme.onPrimary))
-                                    Text("For saving all your data and recover it in a different device.", style = TextStyle(color = MaterialTheme.colorScheme.onPrimary))
+                                    Column {
+                                        Text("Create a free account", style = TextStyle(color = MaterialTheme.colorScheme.onPrimary))
+                                        Text("For saving all your data and recover it in a different device.", style = TextStyle(color = MaterialTheme.colorScheme.onPrimary))
+                                    }
                                 }
                             }
                         }
+
+                    item {
+                        Text("General", style = TextStyle(fontSize = 35.sp))
                     }
 
                     item {
@@ -140,12 +165,6 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                                         )
                                     }
                                 }
-                                /*Switch(
-                                    checked = latinNotes,
-                                    onCheckedChange = {
-                                        vm.setNotationValue(it)
-                                    }
-                                )*/
                             }
                         )
                     }
@@ -157,6 +176,17 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                             { navController.navigate("UserTunings") }
                         )
                     }
+
+                    item {
+                        Text("Account", style = TextStyle(fontSize = 35.sp))
+                    }
+                    if(loggedIn)
+                        item {
+                            Button(
+                                onClick = { vm.logOut() },
+                                Modifier.fillMaxSize(),
+                            ) { Text("Logout") }
+                        }
                 }
 
 

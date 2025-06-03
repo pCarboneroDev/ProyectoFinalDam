@@ -31,7 +31,7 @@ data class MusicNote(
 
     // CONSTRUCTOR SIN PARAMETROS PARA CREAR OBJETOS SIN INICIALIZAR
     @Ignore
-    constructor() : this( // ERROR AQUÍ
+    constructor() : this(
         id = 0,
         latinName = "",
         englishName = "",

@@ -40,8 +40,8 @@ class LoadingVM @Inject constructor (
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                var notes = getAllNotesUseCase.call(Unit) //notesRepo.getAllNotes()
-                val tunings = getAllTuning.call(Unit) //tuningRepo.getAllTunings()
+                var notes = getAllNotesUseCase.call(Unit)
+                val tunings = getAllTuning.call(Unit)
 
                 if (notes.isEmpty()) {
                     notes = generateMusicNotes()
