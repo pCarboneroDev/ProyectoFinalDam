@@ -26,6 +26,12 @@ interface SongDao {
     @Query("DELETE FROM Songs WHERE id = :id")
     suspend fun deleteSong(id: Long): Int
 
+    @Query("Delete From Songs")
+    suspend fun deleteAllSongs(): Int
+
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    suspend fun insertAllSongs(songs: List<Song>): List<Long>
+
 
     // MÉTODOS PARA PEDIR LA LISTA CON DISTINTO ORDEN DE FORMA PAGINADA
 

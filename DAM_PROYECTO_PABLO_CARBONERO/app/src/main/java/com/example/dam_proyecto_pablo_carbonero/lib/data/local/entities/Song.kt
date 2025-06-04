@@ -22,5 +22,5 @@ data class Song(
     val bandName: String,
     val tuningId: Long,
     val bpm: String,
-    val key: String
+    val tabs: String
 )

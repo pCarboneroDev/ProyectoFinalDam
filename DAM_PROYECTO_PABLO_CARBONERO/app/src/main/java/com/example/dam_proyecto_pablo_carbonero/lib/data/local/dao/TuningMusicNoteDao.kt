@@ -25,4 +25,7 @@ interface TuningMusicNoteDao {
 
     @Query("UPDATE TuningMusicNote Set noteId = :noteId WHERE tuningId = :tuningId")
     suspend fun updateTuningNoteId(tuningId: Long, noteId: Long)
+
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    suspend fun insertAllTuningMusicNote(list: List<TuningMusicNote>): List<Long>
 }

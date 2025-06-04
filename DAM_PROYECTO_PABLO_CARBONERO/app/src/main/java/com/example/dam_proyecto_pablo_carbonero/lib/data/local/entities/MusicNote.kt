@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "MusicNotes")
 data class MusicNote(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     var id: Long = 0,
     var latinName: String = "",
     var englishName: String = "",
@@ -47,31 +47,37 @@ data class MusicNote(
     }
 
     private fun createLatinName(): String {
-        var nombre = latinNotation + "$octave"
+        var name = latinNotation
         if (sharpIndicator != null) {
-            nombre += sharpIndicator
+            name += "$sharpIndicator $octave"
         }
-        return nombre
+        else{
+            name += octave
+        }
+        return name
     }
 
     private fun createEnglishName(): String {
-        var nombre = englishNotation + "$octave"
+        var name = englishNotation
         if (sharpIndicator != null) {
-            nombre += sharpIndicator
+            name += "$sharpIndicator $octave"
         }
-        return nombre
+        else{
+            name += octave
+        }
+        return name
     }
 
     override fun toString(): String {
-        var cadena = ""
-        cadena += "Nombre Latino: $latinNotation\n"
-        cadena += "Nombre Anglosajón: $englishNotation\n"
-        cadena += "Octava: $octave\n"
-        cadena += "Frecuencia Mínima: $minHz Hz\n"
-        cadena += "Frecuencia Máxima: $maxHz Hz\n"
-        cadena += "Semitono Sostenido: ${sharpIndicator ?: "Ninguno"}\n"
-        cadena += "Semitono Bemol: ${alternativeName ?: "Ninguno"}\n"
-        return cadena
+        var string = ""
+        string += "Nombre Latino: $latinNotation\n"
+        string += "Nombre Anglosajón: $englishNotation\n"
+        string += "Octava: $octave\n"
+        string += "Frecuencia Mínima: $minHz Hz\n"
+        string += "Frecuencia Máxima: $maxHz Hz\n"
+        string += "Semitono Sostenido: ${sharpIndicator ?: "Ninguno"}\n"
+        string += "Semitono Bemol: ${alternativeName ?: "Ninguno"}\n"
+        return string
     }
 
     override fun compareTo(other: MusicNote): Int {

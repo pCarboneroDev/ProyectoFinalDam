@@ -4,7 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.UserPreferencesRepositoryImpl
-import com.example.dam_proyecto_pablo_carbonero.lib.features.login.views.LoginView
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.CreateBackupUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DownloadBackupUseCase
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -17,7 +18,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsVM @Inject constructor(
-    private val prefRepo: UserPreferencesRepositoryImpl
+    private val prefRepo: UserPreferencesRepositoryImpl,
+    private val createBackupUseCase: CreateBackupUseCase,
+    private val downloadBackupUseCase: DownloadBackupUseCase
 ) : ViewModel() {
     private val _auth: FirebaseAuth = Firebase.auth
 
@@ -39,6 +42,9 @@ class SettingsVM @Inject constructor(
         }
     }
 
+    /**
+     * Carga todos los datos necesarios para el funcionamiento correcto de la pantalla
+     */
     suspend fun loadViewmodel() {
         _latinNotes.value = prefRepo.getNotationPreference()
 
@@ -53,6 +59,10 @@ class SettingsVM @Inject constructor(
 
 
     // MÉTODOS
+    /**
+     * Cambia el valor de la notación en las preferencias de usuario
+     * @param value: el nuevo valor, boolean
+     */
     fun setNotationValue(value: Boolean) {
         _latinNotes.value = value
         viewModelScope.launch(Dispatchers.IO) {
@@ -60,9 +70,26 @@ class SettingsVM @Inject constructor(
         }
     }
 
-
+    /**
+     * Deslogea al usuario de firebase
+     */
     fun logOut() {
         _auth.signOut()
         _loggedIn.value = false
+    }
+
+    /**
+     * Se encarga de iniciar
+     */
+    fun subirDatos(){
+        viewModelScope.launch {
+            createBackupUseCase.call(Unit)
+        }
+    }
+
+    fun downloadData(){
+        viewModelScope.launch {
+            downloadBackupUseCase.call(Unit)
+        }
     }
 }

@@ -23,7 +23,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Input
+import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.CloudDownload
+import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Input
+import androidx.compose.material.icons.filled.Login
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -69,13 +75,12 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
     var notations by remember { mutableStateOf(false) }
 
 
-    //LaunchedEffect(Unit) { vm.loadViewmodel() }
     if (isLoading) {
         // Capa de carga encima
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f)) // opcional: fondo semitransparente
+                .background(Color.Black.copy(alpha = 0.3f))
                 .zIndex(1f), // se asegura de que esté por encima
             contentAlignment = Alignment.Center
         ) {
@@ -94,7 +99,6 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                 .padding(innerPadding)
                 .padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
                 .padding(horizontal = 10.dp),
-            // = Arrangement.Center
         ) {
             Column(
                 Modifier.fillMaxSize()
@@ -180,17 +184,49 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                     item {
                         Text("Account", style = TextStyle(fontSize = 35.sp))
                     }
-                    if(loggedIn)
+                    if(loggedIn){
+                        item {
+                            SettingsRow(
+                                "SaveData",
+                                { Icon(imageVector = Icons.Default.CloudUpload, contentDescription = "") },
+                                { vm.subirDatos() }
+                            )
+                        }
+
+                        item {
+                            SettingsRow(
+                                "Load data",
+                                { Icon(imageVector = Icons.Default.CloudDownload, contentDescription = "") },
+                                { vm.downloadData() }
+                            )
+                        }
+
+                        item {
+                            SettingsRow(
+                                "Delete data",
+                                { Icon(imageVector = Icons.Default.CloudOff, contentDescription = "") },
+                                {  }
+                            )
+                        }
+
+
                         item {
                             Button(
                                 onClick = { vm.logOut() },
                                 Modifier.fillMaxSize(),
                             ) { Text("Logout") }
                         }
+                    }
+                    else{
+                        item {
+                            SettingsRow(
+                                "Login",
+                                { Icon(imageVector = Icons.AutoMirrored.Default.Login, contentDescription = "") },
+                                { navController.navigate("Login") }
+                            )
+                        }
+                    }
                 }
-
-
-
             }
         }
     }

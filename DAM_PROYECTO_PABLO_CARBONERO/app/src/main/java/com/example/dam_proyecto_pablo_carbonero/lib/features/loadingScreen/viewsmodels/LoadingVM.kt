@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.pow
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class LoadingVM @Inject constructor (
@@ -124,13 +125,16 @@ class LoadingVM @Inject constructor (
                 var indexN = englishNames.indexOf(note[0].toString())
 
                 val sharp = if (note.contains("#")) "#" else null
-                val bemol = sharpToFlatMap[note] + i
+                val bemol = if (note.contains("#")) sharpToFlatMap[note] + i else null
 
 
                 val cents = 10
                 val marginRatio = 2.0.pow(cents / 1200.0)
 
+                val id = freqWanted.roundToInt().toLong()
+
                 var nota = MusicNote(
+                    id = id,
                     latinNotation = latinNames[indexN],
                     englishNotation = englishNames[indexN],
                     octave = octave,

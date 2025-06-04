@@ -1,6 +1,5 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
@@ -100,7 +99,7 @@ class CreateSongVM @Inject constructor(
                 bandName = _bandName.value,
                 tuningId = _selectedTuning.value!!.id,
                 bpm = _bpm.value + " bpm",
-                key = _key.value
+                tabs = _key.value
             )
             _finalSong = SongWithTuning(song = song, tuning = _selectedTuning.value!!)
             insertSongUseCase.call(_finalSong)

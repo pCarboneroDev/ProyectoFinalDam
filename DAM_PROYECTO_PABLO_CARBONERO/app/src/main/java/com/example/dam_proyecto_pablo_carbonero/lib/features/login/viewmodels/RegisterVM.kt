@@ -1,14 +1,21 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.login.viewmodels
 
 import androidx.lifecycle.ViewModel
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.params.UserParams
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.CreateUserWithEmailAndPasswordUseCase
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class RegisterVM: ViewModel() {
+@HiltViewModel
+class RegisterVM @Inject constructor(
+    private val createUserWithEmailAndPasswordUseCase: CreateUserWithEmailAndPasswordUseCase
+): ViewModel() {
     private val _auth: FirebaseAuth = Firebase.auth
 
     private val _loading = MutableStateFlow<Boolean>(false)
@@ -41,15 +48,11 @@ class RegisterVM: ViewModel() {
         var registerSuccesful = true
 
         try{
-            _auth.createUserWithEmailAndPassword(_email.value, _password.value).addOnCompleteListener { task ->
-                if(!task.isSuccessful){
-                    registerSuccesful = false
-                }
-            }.await()
+            val user = createUserWithEmailAndPasswordUseCase.call(UserParams(_email.value, _password.value))
+            if (user == null) registerSuccesful = false
         }
         catch (e: Exception){
             registerSuccesful = false
-            //todo gestionar
         }
 
         return registerSuccesful

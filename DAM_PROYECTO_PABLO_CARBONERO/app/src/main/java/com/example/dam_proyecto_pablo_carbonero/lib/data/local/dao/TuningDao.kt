@@ -28,4 +28,7 @@ interface TuningDao {
 
     @Query("UPDATE Tunings SET favourite = :favourite WHERE id = :tuningId")
     suspend fun updateTuningFavourite(tuningId: Long, favourite: Boolean)
+
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    suspend fun insertAllTuning(tuning: List<Tuning>): List<Long>
 }

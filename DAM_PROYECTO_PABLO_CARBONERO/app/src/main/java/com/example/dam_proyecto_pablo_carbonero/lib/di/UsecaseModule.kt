@@ -1,5 +1,10 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.di
 
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.MusicNoteDao
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.SongDao
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningDao
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningMusicNoteDao
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.FirebaseRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAllNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetAllSongsUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongByIdUseCase
@@ -22,6 +27,10 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongWithTuningByIdUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.SearchSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.UpdateFavouriteUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.CreateBackupUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.CreateUserWithEmailAndPasswordUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.GetCurrentUserUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.SignInWithEmailAndPasswordUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -233,5 +242,49 @@ object UsecaseModule {
         )
     }
 
+    @Provides
+    @Singleton
+    fun provideCreateBackup(
+        musicNoteDao: MusicNoteDao,
+        tuningDao: TuningDao,
+        tuningMusicNoteDao: TuningMusicNoteDao,
+        songDao: SongDao
+    ): CreateBackupUseCase{
+        return CreateBackupUseCase(
+            musicNoteDao,
+            tuningDao,
+            tuningMusicNoteDao,
+            songDao
+        )
+    }
 
+    @Provides
+    @Singleton
+    fun provideGetCurrentUser(
+        firebaseRepository: FirebaseRepository
+    ): GetCurrentUserUseCase{
+        return GetCurrentUserUseCase(
+            firebaseRepository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideCreateUserWithEmailAndPassword(
+        firebaseRepository: FirebaseRepository
+    ): CreateUserWithEmailAndPasswordUseCase{
+        return CreateUserWithEmailAndPasswordUseCase(
+            firebaseRepository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideSignInWithEmailAndPassword(
+        firebaseRepository: FirebaseRepository
+    ): SignInWithEmailAndPasswordUseCase{
+        return SignInWithEmailAndPasswordUseCase(
+            firebaseRepository
+        )
+    }
 }

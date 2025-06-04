@@ -1,6 +1,5 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -74,7 +73,7 @@ class EditSongVM @Inject constructor(
         _songName.value = song.name
         _bandName.value = song.bandName
         _bpm.value = song.bpm.substringBefore(' ')
-        _key.value = song.key
+        _key.value = song.tabs
     }
 
 
@@ -131,7 +130,7 @@ class EditSongVM @Inject constructor(
                 bandName = _bandName.value,
                 tuningId = _selectedTuning.value!!.id,
                 bpm = _bpm.value + " bpm",
-                key = _key.value
+                tabs = _key.value
             )
             updateSong(s)
         }
