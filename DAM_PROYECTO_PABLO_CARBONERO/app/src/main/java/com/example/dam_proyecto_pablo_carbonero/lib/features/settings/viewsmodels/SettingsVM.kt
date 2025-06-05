@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.UserPreferencesRepositoryImpl
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.CreateBackupUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DownloadBackupUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.GetDatesInfoUseCase
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -20,7 +21,8 @@ import javax.inject.Inject
 class SettingsVM @Inject constructor(
     private val prefRepo: UserPreferencesRepositoryImpl,
     private val createBackupUseCase: CreateBackupUseCase,
-    private val downloadBackupUseCase: DownloadBackupUseCase
+    private val downloadBackupUseCase: DownloadBackupUseCase,
+    private val getDatesInfoUseCase: GetDatesInfoUseCase
 ) : ViewModel() {
     private val _auth: FirebaseAuth = Firebase.auth
 
@@ -34,9 +36,14 @@ class SettingsVM @Inject constructor(
     private val _isLoading = MutableStateFlow<Boolean>(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _localDate = MutableStateFlow<String>("")
+    val localDate: StateFlow<String> = _localDate
+
+    private val _cloudDate = MutableStateFlow<String>("")
+    val cloudDate: StateFlow<String> = _cloudDate
 
     init {
-        viewModelScope.launch(Dispatchers.Main){
+        viewModelScope.launch(Dispatchers.Main) {
             loadViewmodel()
             _isLoading.value = false
         }
@@ -55,6 +62,14 @@ class SettingsVM @Inject constructor(
         if (user != null) {
             _loggedIn.value = true
         }
+    }
+
+    suspend fun loadBackUpInfo() {
+        _isLoading.value = true
+        val list = getDatesInfoUseCase.call(Unit)
+        _localDate.value = list[0]
+        _cloudDate.value = list[1]
+        _isLoading.value = false
     }
 
 
@@ -81,15 +96,29 @@ class SettingsVM @Inject constructor(
     /**
      * Se encarga de iniciar
      */
-    fun subirDatos(){
-        viewModelScope.launch {
-            createBackupUseCase.call(Unit)
+    suspend fun uploadData(): Boolean {
+        try {
+            _isLoading.value = true
+            val value = createBackupUseCase.call(Unit)
+            _isLoading.value = false
+
+            return value
+        } catch (e: Exception) {
+            // todo gestionar esto
+            return false
         }
     }
 
-    fun downloadData(){
-        viewModelScope.launch {
-            downloadBackupUseCase.call(Unit)
+    suspend fun downloadData(): Boolean {
+        try {
+            _isLoading.value = true
+            val value = downloadBackupUseCase.call(Unit)
+            _isLoading.value = false
+
+            return value
+        } catch (e: Exception) {
+            // todo gestionar esto
+            return false
         }
     }
 }

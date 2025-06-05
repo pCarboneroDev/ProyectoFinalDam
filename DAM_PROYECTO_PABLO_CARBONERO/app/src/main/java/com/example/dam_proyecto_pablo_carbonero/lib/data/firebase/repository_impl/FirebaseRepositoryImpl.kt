@@ -26,4 +26,8 @@ class FirebaseRepositoryImpl @Inject constructor(
     ): FirebaseUser? {
         return firebase.signInWithEmailAndPassword(email, password)
     }
+
+    override suspend fun getCurrentDate(): String {
+        return firebase.getCurrentDate()
+    }
 }

@@ -6,4 +6,5 @@ interface FirebaseRepository {
     suspend fun getCurrentUser(): FirebaseUser?
     suspend fun createUserWithEmailAndPassword(email: String, password: String): FirebaseUser?
     suspend fun signInWithEmailAndPassword(email: String, password: String): FirebaseUser?
+    suspend fun getCurrentDate(): String
 }

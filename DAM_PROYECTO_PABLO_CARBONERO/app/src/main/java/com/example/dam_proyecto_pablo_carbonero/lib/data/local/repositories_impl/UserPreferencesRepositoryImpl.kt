@@ -36,4 +36,21 @@ class UserPreferencesRepositoryImpl @Inject constructor(
             pref[PreferenceKeys.latinNotes] = value
         }
     }
+
+    override suspend fun setLastModificationDate(value: String) {
+        datastore.edit { pref ->
+            pref[PreferenceKeys.lastModificationDate] = value
+        }
+    }
+
+    override suspend fun getLastModificationDate(): String {
+        val lastModificationDate: Flow<String> = datastore.data.catch { e ->
+            if(e is IOException){
+                emit(emptyPreferences())
+            }
+        }.map { prefs ->
+            prefs[PreferenceKeys.lastModificationDate] ?: ""
+        }
+        return lastModificationDate.firstOrNull() ?: ""
+    }
 }
