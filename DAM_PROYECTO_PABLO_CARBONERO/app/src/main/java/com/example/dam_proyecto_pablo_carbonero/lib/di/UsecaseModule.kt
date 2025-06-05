@@ -89,11 +89,13 @@ object UsecaseModule {
     @Singleton
     fun provideInsertTuning(
         tuningRepository: TuningRepository,
-        tuningMusicNoteRepository: TuningMusicNoteRepository
+        tuningMusicNoteRepository: TuningMusicNoteRepository,
+        prefsRepo: UserPreferencesRepository
     ): InsertTuningUseCase {
         return InsertTuningUseCase(
             tuningRepository,
-            tuningMusicNoteRepository
+            tuningMusicNoteRepository,
+            prefsRepo
         ) // Your implementation
     }
 
@@ -101,11 +103,13 @@ object UsecaseModule {
     @Singleton
     fun provideDeleteTuning(
         tuningRepository: TuningRepository,
-        tuningMusicNoteRepository: TuningMusicNoteRepository
+        tuningMusicNoteRepository: TuningMusicNoteRepository,
+        prefsRepo: UserPreferencesRepository
     ): DeleteTuningUseCase {
         return DeleteTuningUseCase(
             tuningRepository,
-            tuningMusicNoteRepository
+            tuningMusicNoteRepository,
+            prefsRepo
         ) // Your implementation
     }
 
@@ -113,11 +117,13 @@ object UsecaseModule {
     @Singleton
     fun provideUpdateTuning(
         tuningRepository: TuningRepository,
-        tuningMusicNoteRepository: TuningMusicNoteRepository
+        tuningMusicNoteRepository: TuningMusicNoteRepository,
+        prefsRepo: UserPreferencesRepository
     ): UpdateTuningUseCase {
         return UpdateTuningUseCase(
             tuningRepository,
-            tuningMusicNoteRepository
+            tuningMusicNoteRepository,
+            prefsRepo
         ) // Your implementation
     }
 
@@ -138,20 +144,24 @@ object UsecaseModule {
     @Provides
     @Singleton
     fun provideGetAllTunings(
-        tuningRepository: TuningRepository
+        tuningRepository: TuningRepository,
+        prefsRepo: UserPreferencesRepository
     ): GetAllTuningUseCase{
         return GetAllTuningUseCase(
-            tuningRepository
+            tuningRepository,
+            prefsRepo
         )
     }
 
     @Provides
     @Singleton
     fun provideUpdateFavouriteUseCase(
-        tuningRepository: TuningRepository
+        tuningRepository: TuningRepository,
+        prefsRepo: UserPreferencesRepository
     ): UpdateFavouriteUseCase {
         return UpdateFavouriteUseCase(
-            tuningRepository
+            tuningRepository,
+            prefsRepo
         ) // Your implementation
     }
 
@@ -193,10 +203,12 @@ object UsecaseModule {
     @Provides
     @Singleton
     fun provideUpdateSong(
-        songRepository: SongRepository
+        songRepository: SongRepository,
+        prefsRepo: UserPreferencesRepository
     ): UpdateSongUseCase{
         return UpdateSongUseCase(
-            songRepository
+            songRepository,
+            prefsRepo
         )
     }
 

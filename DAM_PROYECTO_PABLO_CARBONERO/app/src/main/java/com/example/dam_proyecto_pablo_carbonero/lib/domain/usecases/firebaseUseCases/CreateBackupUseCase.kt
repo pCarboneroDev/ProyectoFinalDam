@@ -30,7 +30,7 @@ class CreateBackupUseCase @Inject constructor(
         val songs = songDao.getAllSongs()
 
 
-        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
+        val formatter = SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault())
         val date = formatter.parse(prefsRepo.getLastModificationDate())!!
         val timestamp = Timestamp(date)
 

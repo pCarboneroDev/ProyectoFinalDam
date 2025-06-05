@@ -5,15 +5,27 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotes
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.UseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
+import com.google.firebase.Timestamp
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class UpdateTuningUseCase(
     private val tuningRepository: TuningRepository,
-    private val tuningMusicNoteRepository: TuningMusicNoteRepository
+    private val tuningMusicNoteRepository: TuningMusicNoteRepository,
+    private val prefsRepo: UserPreferencesRepository
 ): UseCase<TuningWithNotesModel, Boolean> {
 
     override suspend fun call(param: TuningWithNotesModel): Boolean {
         var saved = true
         try{
+            val date = Timestamp.now().toDate()
+            val formatter = SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault())
+
+            prefsRepo.setLastModificationDate(
+                formatter.format(date)
+            )
+
             tuningRepository.updateTuningName(param.tuning.id, param.tuning.name)
             tuningMusicNoteRepository.deleteNoteByTuningId(param.tuning.id)
             param.noteList.forEach { note ->

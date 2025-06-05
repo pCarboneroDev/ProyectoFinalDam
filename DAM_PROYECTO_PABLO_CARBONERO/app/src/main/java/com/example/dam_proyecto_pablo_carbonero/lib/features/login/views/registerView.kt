@@ -59,6 +59,10 @@ fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewMode
     val email by vm.email.collectAsState()
     val password by vm.password.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
+    val isLoading by vm.loading.collectAsState()
+
+    val wrongPassword by vm.wrongPassword.collectAsState()
+    val wrongEmail by vm.wrongEmail.collectAsState()
 
     Column(
         modifier = Modifier
@@ -67,29 +71,6 @@ fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewMode
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
-        /*Box(
-            modifier = Modifier
-                .size(100.dp)
-                .padding(bottom = 16.dp)
-                .aspectRatio(1f)
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = CircleShape
-                )
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(R.drawable.logo),
-                contentDescription = "logo",
-                modifier = Modifier.matchParentSize()//size(20.dp)
-            )
-        }*/
 
         Image(
             painter = painterResource(R.drawable.logo),
@@ -126,12 +107,17 @@ fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewMode
             value = email,
             onValueChange = { vm.setEmail(it) },
             label = { Text("Email") },
+            supportingText = {
+                if(wrongEmail)
+                    Text("Is not a valid email format")
+            },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
             shape = RoundedCornerShape(12.dp),
+            isError = wrongEmail
         )
 
         // cpntraseña
@@ -139,6 +125,10 @@ fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewMode
             value = password,
             onValueChange = { vm.setpassword(it) },
             label = { Text("Password") },
+            supportingText = {
+                if(wrongPassword)
+                    Text("Password must contain at least 6 characters")
+            },
             singleLine = true,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -154,10 +144,11 @@ fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewMode
                 .fillMaxWidth()
                 .padding(bottom = 24.dp),
             shape = RoundedCornerShape(12.dp),
+            isError = wrongPassword
         )
 
         // confirmar contraseñaa
-        OutlinedTextField(
+        /*OutlinedTextField(
             value = password,
             onValueChange = {  },
             label = { Text("Confirm password") },
@@ -176,7 +167,7 @@ fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewMode
                 .fillMaxWidth()
                 .padding(bottom = 24.dp),
             shape = RoundedCornerShape(12.dp),
-        )
+        )*/
 
         // register
         Button(

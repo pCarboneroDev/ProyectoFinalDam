@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,11 +36,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.R
@@ -53,6 +56,10 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
     val email by vm.email.collectAsState()
     val password by vm.password.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
+    val isLoading by vm.loading.collectAsState()
+
+    val wrongPassword by vm.wrongPassword.collectAsState()
+    val wrongEmail by vm.wrongEmail.collectAsState()
 
     Box(
         modifier = Modifier
@@ -68,6 +75,19 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
             )
             .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
     )
+
+    if (isLoading) {
+        // Capa de carga encima
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f))
+                .zIndex(1f), // se asegura de que esté por encima
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -85,7 +105,8 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = CircleShape
-                ).padding(10.dp),
+                )
+                .padding(10.dp),
             contentAlignment = Alignment.Center
         ) {
             Image(
@@ -116,12 +137,18 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
             value = email,
             onValueChange = { vm.setEmail(it) },
             label = { Text("Email") },
+            supportingText = {
+                if(wrongEmail)
+                    Text("Is not a valid email format")
+            },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+
+            isError = wrongEmail
         )
 
         // Password Field
@@ -129,6 +156,10 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
             value = password,
             onValueChange = { vm.setPassword(it) },
             label = { Text("Password") },
+            supportingText = {
+                if(wrongPassword)
+                    Text("Password must contain at least 6 characters")
+            },
             singleLine = true,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -143,7 +174,8 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 24.dp),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(12.dp),
+            isError = wrongPassword
         )
 
 
@@ -162,6 +194,7 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
+            enabled = !isLoading,
             shape = RoundedCornerShape(12.dp)
         ) {
             Text("Login", style = MaterialTheme.typography.labelLarge)

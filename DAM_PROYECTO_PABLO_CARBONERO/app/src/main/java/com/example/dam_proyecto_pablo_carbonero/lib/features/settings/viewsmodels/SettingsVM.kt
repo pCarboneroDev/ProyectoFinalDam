@@ -105,6 +105,7 @@ class SettingsVM @Inject constructor(
             return value
         } catch (e: Exception) {
             // todo gestionar esto
+            Log.d("EL ERROR", e.message.toString())
             return false
         }
     }

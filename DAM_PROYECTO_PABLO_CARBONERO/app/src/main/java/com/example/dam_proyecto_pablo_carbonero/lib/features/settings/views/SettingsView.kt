@@ -272,7 +272,7 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                     cloudDate,
                     Icons.Default.CloudUpload,
                     onSubmit = {
-                        CoroutineScope(Dispatchers.IO).launch {
+                        CoroutineScope(Dispatchers.Main).launch {
                             val result = vm.uploadData()
                             if (!result)
                                 Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show()
@@ -290,7 +290,7 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                     cloudDate,
                     Icons.Default.CloudDownload,
                     onSubmit = {
-                        CoroutineScope(Dispatchers.IO).launch {
+                        CoroutineScope(Dispatchers.Main).launch {
                             val result = vm.downloadData()
                             if (!result)
                                 Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show()

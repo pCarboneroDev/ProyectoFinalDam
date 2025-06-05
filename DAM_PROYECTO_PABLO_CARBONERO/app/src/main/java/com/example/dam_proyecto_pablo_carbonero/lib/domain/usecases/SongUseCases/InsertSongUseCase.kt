@@ -20,8 +20,8 @@ class InsertSongUseCase @Inject constructor(
             if(id != 0L){
 
                 val date = Timestamp.now().toDate()
-                val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
-                //Log.d("LA FECHA:", formatter.format(date))
+                val formatter = SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault())
+
                 prefsRepo.setLastModificationDate(
                     formatter.format(date)
                 )
