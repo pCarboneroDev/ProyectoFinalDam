@@ -32,6 +32,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseC
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.CreateUserWithEmailAndPasswordUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.GetCurrentUserUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.GetDatesInfoUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.SendPasswordResetEmailUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.SignInWithEmailAndPasswordUseCase
 import dagger.Module
 import dagger.Provides
@@ -314,6 +315,16 @@ object UsecaseModule {
     ): GetDatesInfoUseCase{
         return GetDatesInfoUseCase(
             prefsRepo, firebaseRepository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideSendPasswordResetEmailUseCase(
+        firebaseRepository: FirebaseRepository
+    ): SendPasswordResetEmailUseCase{
+        return SendPasswordResetEmailUseCase(
+            firebaseRepository
         )
     }
 }

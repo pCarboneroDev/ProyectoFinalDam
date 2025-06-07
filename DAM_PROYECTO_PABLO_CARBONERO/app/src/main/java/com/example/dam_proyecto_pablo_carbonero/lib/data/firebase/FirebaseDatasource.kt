@@ -17,9 +17,9 @@ class FirebaseDatasource {
 
 
     suspend fun getCurrentUser(): FirebaseUser? {
-        return try{
+        return try {
             _auth.currentUser
-        }catch (e: Exception){
+        } catch (e: Exception) {
             throw e;
         }
     }
@@ -27,11 +27,10 @@ class FirebaseDatasource {
     suspend fun createUserWithEmailAndPassword(email: String, password: String): FirebaseUser? {
         var user: FirebaseUser? = null
 
-        try{
+        try {
             _auth.createUserWithEmailAndPassword(email, password).await()
             user = getCurrentUser()
-        }
-        catch (e: Exception){
+        } catch (e: Exception) {
             throw e;
         }
 
@@ -41,18 +40,17 @@ class FirebaseDatasource {
     suspend fun signInWithEmailAndPassword(email: String, password: String): FirebaseUser? {
         var user: FirebaseUser? = null
 
-        try{
+        try {
             _auth.signInWithEmailAndPassword(email, password).await()
             user = getCurrentUser()
-        }
-        catch (e: Exception){
+        } catch (e: Exception) {
             throw e;
         }
         return user
     }
 
-    suspend fun getCurrentDate(): String{
-        try{
+    suspend fun getCurrentDate(): String {
+        try {
             val user = getCurrentUser()
 
             if (user == null) return ""
@@ -66,10 +64,26 @@ class FirebaseDatasource {
             val formatter = SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault())
 
             return formatter.format(date.toDate())
-        }
-        catch (e: Exception){
-            throw e;
+        } catch (e: Exception) {
+            return "No data changes registered"
         }
         return ""
+    }
+
+    suspend fun sendPasswordResetEmail(email: String): Boolean {
+        var success = true
+        try {
+
+            _auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener { task ->
+                    if (!task.isSuccessful) {
+                        success = false
+                    }
+                }
+
+        } catch (e: Exception) {
+            throw e;
+        }
+        return success
     }
 }

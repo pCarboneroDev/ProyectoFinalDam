@@ -13,12 +13,12 @@ class GetAllTuningUseCase(
     private val prefsRepo: UserPreferencesRepository
 ) : UseCase<Unit, List<Tuning>> {
     override suspend fun call(param: Unit): List<Tuning> {
-        val date = Timestamp.now().toDate()
+       /* val date = Timestamp.now().toDate()
         val formatter = SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault())
 
         prefsRepo.setLastModificationDate(
             formatter.format(date)
-        )
+        )*/
         return repo.getAllTunings()
     }
 }

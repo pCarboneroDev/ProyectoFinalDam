@@ -43,21 +43,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-
-
 @Composable
-fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltViewModel()){
+fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltViewModel()) {
     val context = LocalContext.current
 
     val noteList by vm.noteList.collectAsState()
     val tuningName by vm.tuningName.collectAsState(initial = "")
     val selectedNotes by vm.selectedNotes.collectAsState()
     val latinNotes by vm.latinNotes.collectAsState()
-    var notes = ""
-    notes += selectedNotes.map { note -> "${note.englishName} " }
-    var isValid by remember {mutableStateOf(false)}
 
-    var modal by remember {mutableStateOf(false)}
+
+    var modal by remember { mutableStateOf(false) }
 
 
 
@@ -72,23 +68,16 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
         CreateHeader(
             title = "Edit tuning",
             saveMethod = {
-                if (isValid){
-                    CoroutineScope(Dispatchers.Main).launch {
-                        var (result, message) = vm.updateTuning()
-                        if (result == true){
-                            navController.navigate("Tuner"){
-                                popUpTo("EditTuning") { inclusive = true }
-                            }
+                CoroutineScope(Dispatchers.Main).launch {
+                    var (result, message) = vm.updateTuning()
+                    if (result == true) {
+                        navController.navigate("Tuner") {
+                            popUpTo("EditTuning") { inclusive = true }
                         }
-                        else{
-                            Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
-                        }
+                    } else {
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }
                 }
-                else{
-                    Toast.makeText(context,"Complete all the fields",Toast.LENGTH_SHORT).show()
-                }
-
             },
             navController = navController
         )
@@ -109,7 +98,7 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
 
         Spacer(Modifier.height(24.dp))
 
-        for (i in 5 downTo 0){
+        for (i in 5 downTo 0) {
             var expanded by remember { mutableStateOf(false) }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -172,11 +161,11 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
         Spacer(modifier = Modifier.weight(1f))
 
         if (modal) DeleteModal(
-            dismissFunction = {modal = false}, onDeletePressed = {
+            dismissFunction = { modal = false }, onDeletePressed = {
                 CoroutineScope(Dispatchers.Main).launch {
                     vm.deleteTuning()
                 }
-                navController.navigate("Tuner"){
+                navController.navigate("Tuner") {
                     popUpTo("EditTuning") { inclusive = true }
                 }
             }

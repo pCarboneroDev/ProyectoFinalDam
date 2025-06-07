@@ -202,7 +202,7 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
 
         //todo Olvidé mi contraseá a ver que hago un html pedorro
         TextButton(
-            onClick = { },
+            onClick = { navController.navigate("ResetPassword") },
             modifier = Modifier.padding(top = 16.dp)
         ) {
             Text(

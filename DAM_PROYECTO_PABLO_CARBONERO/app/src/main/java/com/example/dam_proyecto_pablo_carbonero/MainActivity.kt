@@ -23,6 +23,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.views.EditTun
 import com.example.dam_proyecto_pablo_carbonero.lib.features.loadingScreen.views.LoadingScreen
 import com.example.dam_proyecto_pablo_carbonero.lib.features.login.views.LoginView
 import com.example.dam_proyecto_pablo_carbonero.lib.features.login.views.RegisterView
+import com.example.dam_proyecto_pablo_carbonero.lib.features.login.views.ResetPasswordView
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.views.UserTuningsView
 //import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.views.SettingsView
 //import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels.SettingsVM
@@ -153,6 +154,10 @@ class MainActivity : ComponentActivity() {
 
                         composable("Register") {
                             RegisterView(navController)
+                        }
+
+                        composable("ResetPassword") {
+                            ResetPasswordView(navController)
                         }
 
                     }

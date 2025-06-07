@@ -65,11 +65,24 @@ class SettingsVM @Inject constructor(
     }
 
     suspend fun loadBackUpInfo() {
-        _isLoading.value = true
-        val list = getDatesInfoUseCase.call(Unit)
-        _localDate.value = list[0]
-        _cloudDate.value = list[1]
-        _isLoading.value = false
+        try{
+            _isLoading.value = true
+            val list = getDatesInfoUseCase.call(Unit)
+            _localDate.value = list[0]
+            _cloudDate.value = list[1]
+            _isLoading.value = false
+        }
+        catch (e: NullPointerException){
+            _localDate.value = ""
+            _cloudDate.value = ""
+            _isLoading.value = false
+            Log.d("EXCEPTION", e.stackTraceToString())
+        }
+        catch (e: Exception){
+            Log.d("EXCEPTION", e.stackTraceToString())
+            // todo gestionar error
+        }
+
     }
 
 

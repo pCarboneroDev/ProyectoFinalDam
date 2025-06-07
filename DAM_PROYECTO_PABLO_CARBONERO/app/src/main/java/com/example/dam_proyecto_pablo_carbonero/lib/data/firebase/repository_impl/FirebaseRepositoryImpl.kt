@@ -30,4 +30,8 @@ class FirebaseRepositoryImpl @Inject constructor(
     override suspend fun getCurrentDate(): String {
         return firebase.getCurrentDate()
     }
+
+    override suspend fun sendPasswordResetEmail(email: String): Boolean {
+        return firebase.sendPasswordResetEmail(email)
+    }
 }
