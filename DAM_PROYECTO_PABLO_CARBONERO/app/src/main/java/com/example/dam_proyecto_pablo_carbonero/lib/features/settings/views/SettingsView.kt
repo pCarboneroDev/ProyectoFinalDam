@@ -23,9 +23,12 @@ import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -43,6 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -157,118 +161,124 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                     }
 
                 item {
-                    Text("General", style = TextStyle(fontSize = 35.sp))
-                }
-
-                item {
-                    SettingsRow(
-                        "Notation system",
-                        {
-                            TextButton(
-                                onClick = { notations = !notations }
-                            ) {
-                                Text(if (latinNotes) "Latin" else "English")
-                                DropdownMenu(
-                                    expanded = notations,
-                                    onDismissRequest = { notations = false }
+                    SettingsSection(
+                        "General"
+                    ) {
+                        SettingsRow(
+                            "Notation system",
+                            {
+                                TextButton(
+                                    onClick = { notations = !notations }
                                 ) {
-                                    DropdownMenuItem(
-                                        text = { Text("Latin") },
-                                        onClick = {
-                                            vm.setNotationValue(true)
-                                            notations = false
-                                        }
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text("English") },
-                                        onClick = {
-                                            vm.setNotationValue(false)
-                                            notations = false
-                                        }
-                                    )
+                                    Text(if (latinNotes) "Latin" else "English")
+                                    DropdownMenu(
+                                        expanded = notations,
+                                        onDismissRequest = { notations = false }
+                                    ) {
+                                        DropdownMenuItem(
+                                            text = { Text("Latin") },
+                                            onClick = {
+                                                vm.setNotationValue(true)
+                                                notations = false
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text("English") },
+                                            onClick = {
+                                                vm.setNotationValue(false)
+                                                notations = false
+                                            }
+                                        )
+                                    }
                                 }
                             }
+                        )
+                        SettingsRow(
+                            "My tunings",
+                            { Icon(imageVector = Icons.Default.Tune, contentDescription = "") },
+                            { navController.navigate("UserTunings") }
+                        )
+                    }
+                }
+
+
+                if(loggedIn)
+                    item {
+                        SettingsSection("Cloud data") {
+
+                            SettingsRow(
+                                "Save data",
+                                {
+                                    Icon(
+                                        imageVector = Icons.Default.CloudUpload,
+                                        contentDescription = ""
+                                    )
+                                },
+                                {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        vm.loadBackUpInfo()
+                                        saveModal = true
+                                    }
+                                }
+                            )
+
+                            SettingsRow(
+                                "Load data",
+                                {
+                                    Icon(
+                                        imageVector = Icons.Default.CloudDownload,
+                                        contentDescription = ""
+                                    )
+                                },
+                                {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        vm.loadBackUpInfo()
+                                        loadModal = true
+                                    }
+                                }
+                            )
+
+                            SettingsRow(
+                                "Delete data",
+                                { Icon(imageVector = Icons.Default.CloudOff, contentDescription = "") },
+                                {
+                                    CoroutineScope(Dispatchers.IO).launch {
+                                        vm.loadBackUpInfo()
+                                        deleteModal = true
+                                    }
+                                }
+                            )
                         }
-                    )
-                }
+                    }
+
 
                 item {
-                    SettingsRow(
-                        "My tunings",
-                        { Icon(imageVector = Icons.Default.Tune, contentDescription = "") },
-                        { navController.navigate("UserTunings") }
-                    )
-                }
+                    SettingsSection("User & Account") {
+                        if (loggedIn){
+                            SettingsRow(
+                                title = "Delete Account",
+                                composable = { Icons.Default.Delete },
+                                onClick = { deleteModal = true }
+                            )
 
-                item {
-                    Text("Account", style = TextStyle(fontSize = 35.sp))
-                }
-                if (loggedIn) {
-                    item {
-                        SettingsRow(
-                            "SaveData",
-                            {
-                                Icon(
-                                    imageVector = Icons.Default.CloudUpload,
-                                    contentDescription = ""
-                                )
-                            },
-                            {
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    vm.loadBackUpInfo()
-                                    saveModal = true
-                                }
+                            Button(
+                                onClick = { vm.logOut() },
+                                Modifier.fillMaxWidth(),
+                            ) { Text("Logout") }
+                        }
+                        else{
+                            SettingsRow(
+                                "Login",
+                                {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Default.Login,
+                                        contentDescription = ""
+                                    )
+                                },
+                                { navController.navigate("Login") }
+                            )
+                        }
 
-                            }
-                        )
-                    }
-
-                    item {
-                        SettingsRow(
-                            "Load data",
-                            {
-                                Icon(
-                                    imageVector = Icons.Default.CloudDownload,
-                                    contentDescription = ""
-                                )
-                            },
-                            {
-
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    vm.loadBackUpInfo()
-                                    loadModal = true
-                                }
-                            }
-                        )
-                    }
-
-                    item {
-                        SettingsRow(
-                            "Delete data",
-                            { Icon(imageVector = Icons.Default.CloudOff, contentDescription = "") },
-                            { }
-                        )
-                    }
-
-
-                    item {
-                        Button(
-                            onClick = { vm.logOut() },
-                            Modifier.fillMaxSize(),
-                        ) { Text("Logout") }
-                    }
-                } else {
-                    item {
-                        SettingsRow(
-                            "Login",
-                            {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Default.Login,
-                                    contentDescription = ""
-                                )
-                            },
-                            { navController.navigate("Login") }
-                        )
                     }
                 }
             }
@@ -284,7 +294,7 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                         CoroutineScope(Dispatchers.Main).launch {
                             val result = vm.uploadData()
                             if (!result)
-                                Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
 
                             saveModal = false
                         }
@@ -302,7 +312,7 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                         CoroutineScope(Dispatchers.Main).launch {
                             val result = vm.downloadData()
                             if (!result)
-                                Toast.makeText(context,"Error",Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
 
                             loadModal = false
                         }
@@ -311,12 +321,20 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                 )
             if (deleteModal)
                 BackupWarningModal(
-                    "Save data",
-                    "Uploading your current data will overwrite the information in the cloud. Are you sure you want to confirm this action?",
+                    "Delete data",
+                    "Deleting your uploaded data is irreversible, are you sure you want to continue?",
                     localDate,
                     cloudDate,
-                    Icons.Default.CloudUpload,
-                    onSubmit = {  },
+                    Icons.Default.CloudOff,
+                    onSubmit = {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            val result = vm.deleteData()
+                            if (!result)
+                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+
+                            deleteModal = false
+                        }
+                    },
                     onDismiss = { deleteModal = false }
                 )
 
@@ -325,7 +343,27 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
 }
 
 @Composable
-fun SettingsRow(title: String, composable: @Composable () -> Unit, onClick: () -> Unit = {}) {
+fun SettingsSection(title: String, content: @Composable () -> Unit) {
+    Card(
+        Modifier.padding(10.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
+    ) {
+        Column(Modifier.padding(15.dp)) {
+            Text(title, style = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.Bold))
+            content()
+        }
+    }
+}
+
+@Composable
+fun SettingsRow(
+    title: String,
+    composable: @Composable () -> Unit,
+    onClick: () -> Unit = {},
+    noDivider: Boolean = false
+) {
     Column(Modifier.clickable(onClick = onClick)) {
         Row(
             Modifier
@@ -337,6 +375,12 @@ fun SettingsRow(title: String, composable: @Composable () -> Unit, onClick: () -
             Spacer(Modifier.weight(1f))
             composable()
         }
-        HorizontalDivider(Modifier.padding(top = 12.dp))
+        if (!noDivider)
+            HorizontalDivider(
+                Modifier
+                    .padding(top = 12.dp)
+                    .alpha(0.1f),
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
     }
 }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.coroutines.suspendCoroutine
 
 class FirebaseDatasource {
     private val _db = FirebaseFirestore.getInstance()
@@ -84,6 +85,25 @@ class FirebaseDatasource {
         } catch (e: Exception) {
             throw e;
         }
+        return success
+    }
+
+    suspend fun deleteCloudData(): Boolean{
+        var success = false
+        try {
+            val user = getCurrentUser()
+
+            if(user != null)
+                _db.collection("backups").document(user.uid)
+                    .delete()
+                    .addOnSuccessListener {
+                        success = true
+                    }.await()
+        }
+        catch (e: Exception){
+            throw e
+        }
+
         return success
     }
 }

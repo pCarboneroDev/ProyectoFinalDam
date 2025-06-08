@@ -34,4 +34,8 @@ class FirebaseRepositoryImpl @Inject constructor(
     override suspend fun sendPasswordResetEmail(email: String): Boolean {
         return firebase.sendPasswordResetEmail(email)
     }
+
+    override suspend fun deleteCloudData(): Boolean {
+        return firebase.deleteCloudData()
+    }
 }

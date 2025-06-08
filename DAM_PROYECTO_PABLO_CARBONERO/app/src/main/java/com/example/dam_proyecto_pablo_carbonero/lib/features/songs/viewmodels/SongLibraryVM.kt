@@ -8,6 +8,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
 import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
 import com.example.dam_proyecto_pablo_carbonero.lib.extensions.sortByOption
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
@@ -67,15 +68,19 @@ class SongLibraryVM @Inject constructor(
     // flatmap lo que hace es que cada vez que el elemento al cual se escucha (sortOption) emite un valor se emite un nuevo flow  del paging
     val songListPaged: Flow<PagingData<SongWithTuning>> = _selectedSortOption.flatMapLatest { sortOption ->
         Pager(
-            config = PagingConfig(pageSize = 3, prefetchDistance = 0, initialLoadSize = 3),
+            config = PagingConfig(pageSize = 10, prefetchDistance = 1, initialLoadSize = 20),
             pagingSourceFactory = { getPagedSongsUseCase.synchronousCall(sortOption) }
         ).flow.map { pagingData ->
             pagingData.map { song -> // el map este permite métodos asincrónicos parece
+                //Log.d("PAGING_DEBUG", "Loaded song: ${song.name}")
                 val tuning = getTuningByIdUseCase.call(song.tuningId)
                 SongWithTuning(song = song, tuning = tuning.tuning)
             }
         }
     }.cachedIn(viewModelScope)
+
+
+
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val searchResultsPaged: Flow<PagingData<SongWithTuning>> = _query

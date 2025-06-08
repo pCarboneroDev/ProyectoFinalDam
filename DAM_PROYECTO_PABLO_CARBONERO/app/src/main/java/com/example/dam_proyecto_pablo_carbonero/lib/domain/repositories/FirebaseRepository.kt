@@ -8,4 +8,5 @@ interface FirebaseRepository {
     suspend fun signInWithEmailAndPassword(email: String, password: String): FirebaseUser?
     suspend fun getCurrentDate(): String
     suspend fun sendPasswordResetEmail(email: String): Boolean
+    suspend fun deleteCloudData(): Boolean
 }

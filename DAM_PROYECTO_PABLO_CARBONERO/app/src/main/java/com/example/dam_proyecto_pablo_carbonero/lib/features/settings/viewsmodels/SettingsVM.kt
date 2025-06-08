@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.UserPreferencesRepositoryImpl
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.CreateBackupUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DeleteCloudDataUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DownloadBackupUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.GetDatesInfoUseCase
 import com.google.firebase.Firebase
@@ -22,7 +23,8 @@ class SettingsVM @Inject constructor(
     private val prefRepo: UserPreferencesRepositoryImpl,
     private val createBackupUseCase: CreateBackupUseCase,
     private val downloadBackupUseCase: DownloadBackupUseCase,
-    private val getDatesInfoUseCase: GetDatesInfoUseCase
+    private val getDatesInfoUseCase: GetDatesInfoUseCase,
+    private val deleteCloudDataUseCase: DeleteCloudDataUseCase
 ) : ViewModel() {
     private val _auth: FirebaseAuth = Firebase.auth
 
@@ -132,6 +134,19 @@ class SettingsVM @Inject constructor(
             return value
         } catch (e: Exception) {
             // todo gestionar esto
+            return false
+        }
+    }
+
+    suspend fun deleteData(): Boolean{
+        try {
+            _isLoading.value = true
+            val value = deleteCloudDataUseCase.call(Unit)
+            _isLoading.value = false
+            return value
+        } catch (e: Exception) {
+            // todo gestionar esto
+            Log.d("EL ERROR", e.toString())
             return false
         }
     }

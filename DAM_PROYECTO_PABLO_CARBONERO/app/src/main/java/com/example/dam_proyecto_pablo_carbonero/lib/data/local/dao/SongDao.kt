@@ -42,15 +42,15 @@ interface SongDao {
     fun getPagedSongsDesc(): PagingSource<Int, Song>
 
     // por nombre
-    @Query("SELECT * FROM Songs ORDER By name")
+    @Query("SELECT * FROM Songs ORDER By name COLLATE LOCALIZED")
     fun getPagedSongsByName(): PagingSource<Int, Song>
-    @Query("SELECT * FROM Songs ORDER By name desc")
+    @Query("SELECT * FROM Songs ORDER By name COLLATE LOCALIZED desc")
     fun getPagedSongsByNameDesc(): PagingSource<Int, Song>
 
     // por nombre de la banda
-    @Query("SELECT * FROM Songs ORDER By bandName")
+    @Query("SELECT * FROM Songs ORDER By bandName COLLATE LOCALIZED")
     fun getPagedSongsByBandName(): PagingSource<Int, Song>
-    @Query("SELECT * FROM Songs ORDER By bandName desc")
+    @Query("SELECT * FROM Songs ORDER By bandName COLLATE LOCALIZED desc")
     fun getPagedSongsByBandNameDesc(): PagingSource<Int, Song>
 
     @Query("SELECT * FROM songs WHERE name LIKE '%' || :query || '%' OR bandName LIKE '%' || :query || '%'")
