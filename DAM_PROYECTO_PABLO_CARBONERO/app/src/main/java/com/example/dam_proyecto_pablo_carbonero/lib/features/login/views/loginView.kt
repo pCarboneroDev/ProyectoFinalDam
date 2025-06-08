@@ -1,5 +1,6 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.login.views
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -53,6 +55,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
+    var context = LocalContext.current
     val email by vm.email.collectAsState()
     val password by vm.password.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
@@ -182,12 +185,15 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
         Button(
             onClick = {
                 CoroutineScope(Dispatchers.Main).launch {
-                    val loggedIn = vm.signInWithEmailAndPassword()
+                    val (loggedIn, message) = vm.signInWithEmailAndPassword()
 
                     if(loggedIn){
                         navController.navigate("Settings"){
                             popUpTo("Settings") { inclusive = true }
                         }
+                    }
+                    else if(message.isNotEmpty()){
+                        Toast.makeText(context, message,Toast.LENGTH_SHORT).show()
                     }
                 }
             },
@@ -200,10 +206,11 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
             Text("Login", style = MaterialTheme.typography.labelLarge)
         }
 
-        //todo Olvidé mi contraseá a ver que hago un html pedorro
+
         TextButton(
             onClick = { navController.navigate("ResetPassword") },
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = 16.dp),
+            enabled = !isLoading
         ) {
             Text(
                 "Forgot Password?",
@@ -214,15 +221,20 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
         // Sign Up Prompt
         Row(
             modifier = Modifier.padding(top = 32.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 "Don't have an account?",
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
-            TextButton(onClick = { navController.navigate("Register"){
-                popUpTo("Settings") {  }
-            } }) {
+            TextButton(
+                onClick = {
+                    navController.navigate("Register") {
+                        popUpTo("Settings") {  }
+                    }
+                },
+                enabled = !isLoading)
+            {
                 Text("Sign Up", color = MaterialTheme.colorScheme.primary)
             }
         }

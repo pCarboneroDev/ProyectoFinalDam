@@ -3,6 +3,7 @@ package com.example.dam_proyecto_pablo_carbonero.lib.features.settings.views
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -78,12 +80,11 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
 
 
     if (isLoading) {
-        // Capa de carga encima
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = 0.3f))
-                .zIndex(1f), // se asegura de que esté por encima
+                .zIndex(1f),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
@@ -118,7 +119,10 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                                     shape = RoundedCornerShape(12.dp)
                                 )
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
+                            Row(
+                                Modifier.padding(5.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Button(
                                     onClick = {
                                         navController.navigate("Register")
@@ -133,13 +137,18 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                                     )
                                 }
 
+                                Spacer(Modifier.width(3.dp))
+
                                 Column {
                                     Text(
                                         "Create a free account",
-                                        style = TextStyle(color = MaterialTheme.colorScheme.onPrimary)
+                                        style = TextStyle(
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            fontWeight = FontWeight.Bold
+                                        )
                                     )
                                     Text(
-                                        "For saving all your data and recover it in a different device.",
+                                        "Save your data and recover it in a different device.",
                                         style = TextStyle(color = MaterialTheme.colorScheme.onPrimary)
                                     )
                                 }

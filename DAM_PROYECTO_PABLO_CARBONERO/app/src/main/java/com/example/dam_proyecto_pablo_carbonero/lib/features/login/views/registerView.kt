@@ -1,5 +1,6 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.login.views
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,12 +43,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.dam_proyecto_pablo_carbonero.R
 import com.example.dam_proyecto_pablo_carbonero.lib.features.login.viewmodels.RegisterVM
@@ -56,6 +61,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewModel()) {
+    var context = LocalContext.current
     val email by vm.email.collectAsState()
     val password by vm.password.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
@@ -63,6 +69,20 @@ fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewMode
 
     val wrongPassword by vm.wrongPassword.collectAsState()
     val wrongEmail by vm.wrongEmail.collectAsState()
+
+
+    if (isLoading) {
+        // Capa de carga encima
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f))
+                .zIndex(1f), // se asegura de que esté por encima
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -173,12 +193,15 @@ fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewMode
         Button(
             onClick = {
                 CoroutineScope(Dispatchers.Main).launch {
-                    val loggedIn = vm.createUserWithEmailAndPassword()
+                    val (loggedIn, message) = vm.createUserWithEmailAndPassword()
 
                     if(loggedIn){
                         navController.navigate("Settings"){
                             popUpTo("Settings") { inclusive = true }
                         }
+                    }
+                    else if(message.isNotEmpty()){
+                        Toast.makeText(context, message,Toast.LENGTH_SHORT).show()
                     }
                 }
             },
@@ -186,6 +209,7 @@ fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewMode
                 .fillMaxWidth()
                 .height(56.dp),
             shape = RoundedCornerShape(12.dp),
+            enabled = !isLoading
 
         ) {
             Text("Create account", style = MaterialTheme.typography.labelLarge)
@@ -200,9 +224,14 @@ fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewMode
                 "Already have an account?",
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
-            TextButton(onClick = { navController.navigate("Login"){
-                popUpTo("Settings") {  }
-            } }) {
+            TextButton(
+                onClick = {
+                    navController.navigate("Login"){
+                        popUpTo("Settings") {  }
+                    }
+                },
+                enabled = !isLoading
+            ) {
                 Text("Login", color = MaterialTheme.colorScheme.primary)
             }
         }

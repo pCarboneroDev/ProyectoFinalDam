@@ -52,9 +52,10 @@ class RegisterVM @Inject constructor(
     }*/
 
 
-    suspend fun createUserWithEmailAndPassword(): Boolean{
+    suspend fun createUserWithEmailAndPassword(): Pair<Boolean, String>{
         _loading.value = true
         var registerSuccesful = true
+        var message = ""
 
         try{
             if(isFormValid()){
@@ -66,15 +67,16 @@ class RegisterVM @Inject constructor(
             }
         }
         catch (e: FirebaseAuthUserCollisionException){
-            Log.d("EX", e.toString())
+            message = "Email already in use"
             registerSuccesful = false
         }
         catch (e: Exception){
             Log.d("EX", e.toString())
+            message = "Unexpected error. Try again later"
             registerSuccesful = false
         }
         _loading.value = false
-        return registerSuccesful
+        return Pair(registerSuccesful, message)
     }
 
 

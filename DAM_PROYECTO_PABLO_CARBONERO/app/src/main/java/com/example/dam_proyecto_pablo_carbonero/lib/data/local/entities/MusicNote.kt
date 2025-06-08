@@ -49,7 +49,7 @@ data class MusicNote(
     private fun createLatinName(): String {
         var name = latinNotation
         if (sharpIndicator != null) {
-            name += "$sharpIndicator $octave"
+            name += "$sharpIndicator$octave"
         }
         else{
             name += octave
@@ -60,7 +60,7 @@ data class MusicNote(
     private fun createEnglishName(): String {
         var name = englishNotation
         if (sharpIndicator != null) {
-            name += "$sharpIndicator $octave"
+            name += "$sharpIndicator$octave"
         }
         else{
             name += octave

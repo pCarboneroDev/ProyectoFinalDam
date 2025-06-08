@@ -39,9 +39,10 @@ class LoginVM @Inject constructor(
     }
 
 
-    suspend fun signInWithEmailAndPassword(): Boolean{
+    suspend fun signInWithEmailAndPassword(): Pair<Boolean, String>{
         _loading.value = true
         var loginSuccesful = true
+        var message = ""
 
         try{
             if(isFormValid()){
@@ -53,13 +54,15 @@ class LoginVM @Inject constructor(
             }
         }
         catch (e: FirebaseAuthInvalidCredentialsException){
+            message = "Wrong email or password"
             loginSuccesful = false
         }
         catch (e: Exception){
+            message = "Unexpected error. Try again later"
             loginSuccesful = false
         }
         _loading.value = false
-        return loginSuccesful
+        return Pair(loginSuccesful, message)
     }
 
     private fun isEmailValid(): Boolean{

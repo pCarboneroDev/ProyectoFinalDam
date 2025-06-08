@@ -67,7 +67,7 @@ class SongLibraryVM @Inject constructor(
     // flatmap lo que hace es que cada vez que el elemento al cual se escucha (sortOption) emite un valor se emite un nuevo flow  del paging
     val songListPaged: Flow<PagingData<SongWithTuning>> = _selectedSortOption.flatMapLatest { sortOption ->
         Pager(
-            config = PagingConfig(pageSize = 5, prefetchDistance = 1, initialLoadSize = 5),
+            config = PagingConfig(pageSize = 3, prefetchDistance = 0, initialLoadSize = 3),
             pagingSourceFactory = { getPagedSongsUseCase.synchronousCall(sortOption) }
         ).flow.map { pagingData ->
             pagingData.map { song -> // el map este permite métodos asincrónicos parece
@@ -75,8 +75,7 @@ class SongLibraryVM @Inject constructor(
                 SongWithTuning(song = song, tuning = tuning.tuning)
             }
         }
-            .cachedIn(viewModelScope)
-    }
+    }.cachedIn(viewModelScope)
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val searchResultsPaged: Flow<PagingData<SongWithTuning>> = _query

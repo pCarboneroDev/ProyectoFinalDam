@@ -71,26 +71,6 @@ import androidx.paging.compose.LazyPagingItems
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltViewModel()){
-   /* val lifecycleOwner = LocalLifecycleOwner.current
-
-    // TODO probar cambiar esto por launched effect
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                vm.loadViewModel()
-            }
-        }
-
-        val lifecycle = lifecycleOwner.lifecycle
-        lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycle.removeObserver(observer)
-        }
-    }*/
-
-
-    val songList by vm.songList.collectAsState()
     val songListPaged = vm.songListPaged.collectAsLazyPagingItems()
     val currentSortOption by vm.selectedSortOption.collectAsState()
 
@@ -183,17 +163,20 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                         }
                     }
 
-
-
-
                     LazyColumn(Modifier.fillMaxSize()) {
                         item {
                             CreateSongRow(navController)
                         }
 
-                        item {
-                            if(songListPaged.itemCount <= 0) CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-                        }
+                       /* item {
+                            when {
+                                songListPaged.loadState.append is LoadState.Loading -> {
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                                    }
+                                }
+                            }
+                        }*/
 
                         if (songListPaged.itemCount > 0){
                             items(songListPaged.itemCount) { index ->
@@ -207,7 +190,9 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                         item {
                             when {
                                 songListPaged.loadState.append is LoadState.Loading -> {
-                                    CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                                    }
                                 }
                             }
                         }
@@ -217,6 +202,8 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
         }
     }
 }
+
+
 
 
 
