@@ -9,4 +9,5 @@ interface FirebaseRepository {
     suspend fun getCurrentDate(): String
     suspend fun sendPasswordResetEmail(email: String): Boolean
     suspend fun deleteCloudData(): Boolean
+    suspend fun deleteAccount(password: String): Boolean
 }

@@ -38,4 +38,8 @@ class FirebaseRepositoryImpl @Inject constructor(
     override suspend fun deleteCloudData(): Boolean {
         return firebase.deleteCloudData()
     }
+
+    override suspend fun deleteAccount(password: String): Boolean {
+        return firebase.deleteAccount(password)
+    }
 }

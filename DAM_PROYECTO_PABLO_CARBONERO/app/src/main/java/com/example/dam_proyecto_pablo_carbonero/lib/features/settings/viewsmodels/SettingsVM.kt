@@ -5,11 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.UserPreferencesRepositoryImpl
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.CreateBackupUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DeleteAccountUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DeleteCloudDataUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DownloadBackupUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.GetDatesInfoUseCase
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.auth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +26,8 @@ class SettingsVM @Inject constructor(
     private val createBackupUseCase: CreateBackupUseCase,
     private val downloadBackupUseCase: DownloadBackupUseCase,
     private val getDatesInfoUseCase: GetDatesInfoUseCase,
-    private val deleteCloudDataUseCase: DeleteCloudDataUseCase
+    private val deleteCloudDataUseCase: DeleteCloudDataUseCase,
+    private val deleteAccountUseCase: DeleteAccountUseCase
 ) : ViewModel() {
     private val _auth: FirebaseAuth = Firebase.auth
 
@@ -145,6 +148,28 @@ class SettingsVM @Inject constructor(
             _isLoading.value = false
             return value
         } catch (e: Exception) {
+            // todo gestionar esto
+            Log.d("EL ERROR", e.toString())
+            return false
+        }
+    }
+
+    /**
+     * Metodo que llama a DeleteAccountUseCase para borrar la cuenta del usuario
+     */
+    suspend fun deleteAccount(password: String): Boolean{
+        try {
+            _isLoading.value = true
+            val value = deleteAccountUseCase.call(password)
+            _isLoading.value = false
+            return value
+        }
+        catch (e: FirebaseAuthInvalidCredentialsException){
+            Log.d("EL ERROR", "CONTRASEÑA MAAAAl")
+            _isLoading.value = false
+            return false
+        }
+        catch (e: Exception) {
             // todo gestionar esto
             Log.d("EL ERROR", e.toString())
             return false

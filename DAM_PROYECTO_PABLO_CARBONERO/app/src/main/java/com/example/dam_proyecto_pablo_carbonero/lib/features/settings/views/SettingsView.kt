@@ -3,7 +3,6 @@ package com.example.dam_proyecto_pablo_carbonero.lib.features.settings.views
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +24,7 @@ import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -57,7 +57,8 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.BottomNavBar
-import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.BackupWarningModal
+import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.composables.BackupWarningModal
+import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.composables.DeleteAccountModal
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels.SettingsVM
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -80,6 +81,7 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
     var saveModal by remember { mutableStateOf(false) }
     var loadModal by remember { mutableStateOf(false) }
     var deleteModal by remember { mutableStateOf(false) }
+    var deleteAccountModal by remember { mutableStateOf(false) }
 
 
 
@@ -258,7 +260,9 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                             SettingsRow(
                                 title = "Delete Account",
                                 composable = { Icons.Default.Delete },
-                                onClick = { deleteModal = true }
+                                onClick = {
+                                    deleteAccountModal = true
+                                }
                             )
 
                             Button(
@@ -336,6 +340,28 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                         }
                     },
                     onDismiss = { deleteModal = false }
+                )
+
+            if(deleteAccountModal)
+                DeleteAccountModal(
+                    title = "Delete Account",
+                    body = "You cannot undo this action",
+                    onDismiss = { deleteAccountModal = false },
+                    onSubmit = {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            val result = vm.deleteAccount(it)
+                            if (!result){
+                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+                                deleteModal = false
+                            }
+                            else{
+                                deleteModal = false
+                                navController.navigate("Load"){
+                                    popUpTo("Tuner"){ inclusive = true }
+                                }
+                            }
+                        }
+                    }
                 )
 
         }

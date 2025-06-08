@@ -30,6 +30,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.UpdateFavouriteUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.CreateBackupUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.CreateUserWithEmailAndPasswordUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DeleteAccountUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DeleteCloudDataUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.GetCurrentUserUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.GetDatesInfoUseCase
@@ -335,6 +336,16 @@ object UsecaseModule {
         firebaseRepository: FirebaseRepository
     ): DeleteCloudDataUseCase{
         return DeleteCloudDataUseCase(
+            firebaseRepository
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideDeleteAccountUseCase(
+        firebaseRepository: FirebaseRepository
+    ): DeleteAccountUseCase{
+        return DeleteAccountUseCase(
             firebaseRepository
         )
     }

@@ -1,7 +1,9 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.data.firebase
 
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
@@ -88,20 +90,35 @@ class FirebaseDatasource {
         return success
     }
 
-    suspend fun deleteCloudData(): Boolean{
+    suspend fun deleteCloudData(): Boolean {
         var success = false
         try {
             val user = getCurrentUser()
 
-            if(user != null)
-                _db.collection("backups").document(user.uid)
-                    .delete()
-                    .addOnSuccessListener {
-                        success = true
-                    }.await()
-        }
-        catch (e: Exception){
+            if (user != null) {
+                _db.collection("backups").document(user.uid).delete().await()
+                success = true
+            }
+        } catch (e: Exception) {
             throw e
+        }
+
+        return success
+    }
+
+    /**
+     * Metodo que se encarga de borrar la cuenta del usuario de firebase
+     * @return true si ha sido eliminada con éxito, false si no se ha podido borrar
+     */
+    suspend fun deleteAccount(password: String): Boolean {
+        var success = false
+
+        val user = _auth.currentUser
+        if (user != null) {
+            val credential = EmailAuthProvider.getCredential(user.email.toString(), password)
+            user.reauthenticate(credential).await()
+            user.delete().await()
+            success = true
         }
 
         return success
