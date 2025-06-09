@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.DAM_PROYECTO_PABLO_CARBONERO" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.DAM_PROYECTO_PABLO_CARBONERO" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowSplashScreenBackground">@color/bg</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_logo_round</item>
+        <item name="android:windowSplashScreenAnimationDuration">300</item>
+    </style>
 </resources>
