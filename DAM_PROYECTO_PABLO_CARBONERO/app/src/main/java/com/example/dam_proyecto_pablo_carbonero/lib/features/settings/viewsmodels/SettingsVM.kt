@@ -9,6 +9,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseC
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DeleteCloudDataUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DownloadBackupUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.GetDatesInfoUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -46,6 +47,10 @@ class SettingsVM @Inject constructor(
 
     private val _cloudDate = MutableStateFlow<String>("")
     val cloudDate: StateFlow<String> = _cloudDate
+
+
+    private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true, ""))
+    val messageManager: StateFlow<MessageManager> = _messageManager
 
     init {
         viewModelScope.launch(Dispatchers.Main) {
@@ -165,13 +170,12 @@ class SettingsVM @Inject constructor(
             return value
         }
         catch (e: FirebaseAuthInvalidCredentialsException){
-            Log.d("EL ERROR", "CONTRASEÑA MAAAAl")
+            _messageManager.value = MessageManager(false, "Wrong password")
             _isLoading.value = false
             return false
         }
         catch (e: Exception) {
-            // todo gestionar esto
-            Log.d("EL ERROR", e.toString())
+            _messageManager.value = MessageManager(false)
             return false
         }
     }

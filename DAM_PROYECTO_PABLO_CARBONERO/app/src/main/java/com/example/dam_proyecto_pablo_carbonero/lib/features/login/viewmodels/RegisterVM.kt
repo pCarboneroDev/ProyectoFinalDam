@@ -70,6 +70,10 @@ class RegisterVM @Inject constructor(
             message = "Email already in use"
             registerSuccesful = false
         }
+        catch(e: FirebaseAuthInvalidCredentialsException){
+            message = e.message.toString()
+            registerSuccesful = false
+        }
         catch (e: Exception){
             Log.d("EX", e.toString())
             message = "Unexpected error. Try again later"

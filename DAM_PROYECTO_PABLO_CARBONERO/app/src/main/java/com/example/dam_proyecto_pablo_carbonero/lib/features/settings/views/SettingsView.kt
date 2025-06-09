@@ -39,6 +39,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -83,7 +84,14 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
     var deleteModal by remember { mutableStateOf(false) }
     var deleteAccountModal by remember { mutableStateOf(false) }
 
+    val message by vm.messageManager.collectAsState()
 
+
+    LaunchedEffect(message) {
+        if (message.isSuccess == false){
+            Toast.makeText(context, message.message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     if (isLoading) {
         Box(
@@ -246,6 +254,7 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                                 {
                                     CoroutineScope(Dispatchers.IO).launch {
                                         vm.loadBackUpInfo()
+
                                         deleteModal = true
                                     }
                                 }
@@ -350,11 +359,7 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                     onSubmit = {
                         CoroutineScope(Dispatchers.Main).launch {
                             val result = vm.deleteAccount(it)
-                            if (!result){
-                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-                                deleteModal = false
-                            }
-                            else{
+                            if (result){
                                 deleteModal = false
                                 navController.navigate("Load"){
                                     popUpTo("Tuner"){ inclusive = true }

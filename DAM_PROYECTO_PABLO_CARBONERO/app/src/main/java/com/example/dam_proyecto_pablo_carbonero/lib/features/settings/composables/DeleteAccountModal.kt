@@ -54,6 +54,7 @@ fun DeleteAccountModal(
 
                 OutlinedTextField(
                     value = password,
+                    label = { Text("Enter your password") },
                     onValueChange = { password = it }
                 )
             }
