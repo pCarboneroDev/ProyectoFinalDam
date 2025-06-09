@@ -12,10 +12,12 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
 import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
 import com.example.dam_proyecto_pablo_carbonero.lib.extensions.sortByOption
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.DeleteSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetAllSongsUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetPagedSongsUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.SearchSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetTuningByIdUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -39,10 +41,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SongLibraryVM @Inject constructor(
-    private val getAllSongsUseCase: GetAllSongsUseCase,
     private val getPagedSongsUseCase: GetPagedSongsUseCase,
     private val getTuningByIdUseCase: GetTuningByIdUseCase,
-    private val searchSongUseCase: SearchSongUseCase
+    private val searchSongUseCase: SearchSongUseCase,
+    private val deleteSongUseCase: DeleteSongUseCase
 ): ViewModel() {
 
     private val _songList = MutableStateFlow<List<SongWithTuning>>(emptyList())
@@ -60,8 +62,16 @@ class SongLibraryVM @Inject constructor(
     private val _isSearchBarOpen = MutableStateFlow<Boolean>(false)
     val isSearchBarOpen: StateFlow<Boolean> = _isSearchBarOpen
 
-    private val _isModalOpen = MutableStateFlow<Boolean>(false)
-    val isModalOpen: StateFlow<Boolean> = _isSearchBarOpen
+    private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true, ""))
+    val messageManager: StateFlow<MessageManager> = _messageManager
+
+    private val _deleteModal = MutableStateFlow<Boolean>(false)
+    val deleteModal: StateFlow<Boolean> = _deleteModal
+
+    fun setDeleteModal(value: Boolean){
+        _deleteModal.value = value
+    }
+
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -148,6 +158,18 @@ class SongLibraryVM @Inject constructor(
      */
     fun onQueryChanged(value: String){
         _query.value = value
+    }
+
+    suspend fun deleteSong(songId: Long){
+        try{
+            deleteSongUseCase.call(songId)
+        }catch (e: Exception){
+            _messageManager.value = MessageManager(false)
+        }
+    }
+
+    fun resetMessageManager(){
+        _messageManager.value = MessageManager(true, "")
     }
 }
 

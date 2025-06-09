@@ -19,9 +19,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
 @Composable
-fun CreateHeader(title: String, subtitle: String = "", saveMethod: (() -> Unit)? = null, navController: NavHostController){
+fun CreateHeader(
+    title: String,
+    subtitle: String = "",
+    saveMethod: (() -> Unit)? = null,
+    navController: NavHostController,
+    enabledSave: Boolean = true)
+{
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,) {
-        IconButton(onClick = {navController.popBackStack()}) {
+        IconButton(
+            onClick = {navController.popBackStack()},
+            enabled = enabledSave
+        ) {
             Icon(Icons.Default.Close, "close", tint = MaterialTheme.colorScheme.primary)
         }
         if(saveMethod != null){

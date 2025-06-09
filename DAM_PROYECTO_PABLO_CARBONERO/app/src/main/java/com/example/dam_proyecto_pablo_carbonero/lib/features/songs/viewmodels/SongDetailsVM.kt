@@ -10,8 +10,10 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepo
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.DeleteSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongByIdUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongWithTuningByIdUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +39,7 @@ class SongDetailsVM @Inject constructor(
 
     private val _latinNotes = MutableStateFlow<Boolean>(false)
     val latinNotes: StateFlow<Boolean> = _latinNotes
+
 
     init {
         viewModelScope.launch(Dispatchers.IO) {

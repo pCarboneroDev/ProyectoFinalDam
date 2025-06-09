@@ -6,12 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
-import com.example.dam_proyecto_pablo_carbonero.lib.domain.params.AmountNotesParams
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAllNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.InsertTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAmountNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.exceptions.InvalidFormException
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,9 +23,11 @@ import kotlin.Array
 class CreateTuningVM @Inject constructor(
     private val getAllNotesUseCase: GetAllNotesUseCase,
     private val insertTuningUseCase: InsertTuningUseCase,
-    private val preferencesRepo: UserPreferencesRepository,
-    //private val getAmountNotesUseCase: GetAmountNotesUseCase
+    private val preferencesRepo: UserPreferencesRepository
 ): ViewModel() {
+    private val _isLoading = MutableStateFlow<Boolean>(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     private val _tuningName = MutableStateFlow<String>("")
     val tuningName: StateFlow<String> = _tuningName
 
@@ -41,20 +42,24 @@ class CreateTuningVM @Inject constructor(
 
     private val _finalTuning = MutableStateFlow<Tuning?>(null)
 
+    private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true, ""))
+    val messageManager: StateFlow<MessageManager> = _messageManager
+
 
     init {
         var list: MutableList<MusicNote>
         viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.value = true
             try{
-                list = getAllNotesUseCase.call(Unit).toMutableList();
-                //list = getAmountNotesUseCase.call(AmountNotesParams(10)).toMutableList()
+                list = getAllNotesUseCase.call(Unit).toMutableList()
                 list.sort()
                 _noteList.value = list
                 Log.d("FILTER", "Resultados: ${_noteList.value.map { it.englishName }}")
             }catch (e: Exception){
-                //TODO Gestionar la posible excepcion
+                _messageManager.value = MessageManager(false, "Unexpected error loading data.")
             }
             _latinNotes.value = preferencesRepo.getNotationPreference()
+            _isLoading.value = false
         }
     }
 
@@ -64,9 +69,9 @@ class CreateTuningVM @Inject constructor(
     }
 
     // METODOS
-    suspend fun saveNewTuning(): Pair<Boolean,String>{
+    suspend fun saveNewTuning(): Boolean{
+        _isLoading.value = true
         var saved = true
-        var message = ""
         try{
             if (!isFormValid()){
                 throw InvalidFormException("Complete all the field")
@@ -79,17 +84,20 @@ class CreateTuningVM @Inject constructor(
         }
         catch (formE: InvalidFormException){
             saved = false
-            message = formE.message.toString()
+            _isLoading.value = false
+            _messageManager.value = MessageManager(false, formE.message.toString())
         }
         catch (e: Exception){
             saved = false
-            message = "Unexpected error. Try again later"
+            _isLoading.value = false
+            _messageManager.value = MessageManager(false)
         }
-        return Pair(saved, message)
+        _isLoading.value = false
+        return saved
     }
 
     private fun isFormValid(): Boolean{
-        var isValid = true;
+        var isValid = true
 
         if (_tuningName.value.isEmpty()){
             isValid = false
@@ -97,10 +105,14 @@ class CreateTuningVM @Inject constructor(
 
         for(note in _selectedNotes.value){
             if(note.englishName == "0"){
-                isValid = false;
+                isValid = false
             }
         }
-        return isValid;
+        return isValid
+    }
+
+    fun resetMessageManager(){
+        _messageManager.value = MessageManager(true)
     }
 }
 

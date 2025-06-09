@@ -1,6 +1,7 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.songs.views
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,12 +42,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -66,13 +69,18 @@ import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.C
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.SongRow
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewmodels.SongLibraryVM
 import androidx.paging.compose.LazyPagingItems
+import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.DeleteModal
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltViewModel()){
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val songListPaged = vm.songListPaged.collectAsLazyPagingItems()
     val currentSortOption by vm.selectedSortOption.collectAsState()
+    val deleteModal by vm.deleteModal.collectAsState()
 
    // var searchQuery by remember { mutableStateOf("") }
     var isActive by remember { mutableStateOf(false) }
@@ -80,9 +88,14 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
     val searchQuery by vm.query.collectAsState() //vm.searchQuery.collectAsState()
     val searchResult = vm.searchResultsPaged.collectAsLazyPagingItems() //vm.searchResults.collectAsState()
 
-    var loading by remember { mutableStateOf(false) }
-    
+    val message by vm.messageManager.collectAsState()
 
+
+    LaunchedEffect(message) {
+        if (message.isSuccess == false){
+            Toast.makeText(context, message.message, Toast.LENGTH_SHORT).show()
+        }
+    }
     LaunchedEffect(Unit) {
         vm.loadViewModel()
     }
@@ -109,12 +122,13 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                     sortOptionSelected = { vm.sortList(it) }
                 )
             }
+
+
             Column(Modifier.fillMaxSize()) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     Column {
                         Text("Song library", fontSize = 22.sp, fontWeight = FontWeight.Bold)
                         Text( text = "${songListPaged.itemCount} songs", fontSize = 13.sp)
-                        //Text( text = "${songList.size} songs", fontSize = 13.sp)
                     }
 
                     Spacer(Modifier.weight(1f))
@@ -156,7 +170,7 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                                 items(searchResult.itemCount) { index ->
                                     val item = searchResult[index]
                                     item?.let {
-                                        SongRow(it, navController)
+                                        SongRow(it, navController, { vm.setDeleteModal(true) })
                                     }
                                 }
                             }
@@ -168,21 +182,15 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                             CreateSongRow(navController)
                         }
 
-                       /* item {
-                            when {
-                                songListPaged.loadState.append is LoadState.Loading -> {
-                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
-                                    }
-                                }
-                            }
-                        }*/
-
                         if (songListPaged.itemCount > 0){
                             items(songListPaged.itemCount) { index ->
                                 val item = songListPaged[index]
                                 item?.let {
-                                    SongRow(it, navController)
+                                    SongRow(it, navController, {
+                                        coroutineScope.launch {
+                                            vm.deleteSong(it)
+                                        }
+                                    })
                                 }
                             }
                         }

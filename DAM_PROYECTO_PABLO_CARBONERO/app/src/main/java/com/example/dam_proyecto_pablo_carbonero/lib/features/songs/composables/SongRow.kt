@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,10 +31,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
+import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.DeleteModal
+import kotlinx.coroutines.launch
 
 @Composable
-fun SongRow(song: SongWithTuning, navController: NavHostController){
+fun SongRow(
+    song: SongWithTuning,
+    navController: NavHostController,
+    onDelete: (Long) -> Unit
+){
     var expanded by remember { mutableStateOf(false) }
+    var deleteModal by remember { mutableStateOf(false) }
     Column(Modifier.clickable(onClick = {
         navController.navigate("SongDetails/${song.song.id}/${song.tuning.id}")
 
@@ -46,6 +54,14 @@ fun SongRow(song: SongWithTuning, navController: NavHostController){
                 Text(song.song.name, fontWeight = FontWeight.Bold)
                 Text(song.song.bandName, fontSize = 15.sp)
                 Text("${song.tuning.name} | ${song.song.bpm}", fontSize = 12.sp)
+            }
+            if (deleteModal){
+                DeleteModal(
+                    dismissFunction = { deleteModal = false },
+                    onDeletePressed = {
+                        onDelete(song.song.id)
+                    }
+                )
             }
             IconButton(onClick = { expanded = !expanded }) {
                 Icon(Icons.Default.MoreVert, "moreInfo")
@@ -70,7 +86,7 @@ fun SongRow(song: SongWithTuning, navController: NavHostController){
                     DropdownMenuItem(
                         text = {Text("Delete")},
                         leadingIcon = {Icon(Icons.Default.Delete, "Edit song", tint = Color.Red)},
-                        onClick = {}
+                        onClick = { deleteModal = true }
                     )
                 }
             }

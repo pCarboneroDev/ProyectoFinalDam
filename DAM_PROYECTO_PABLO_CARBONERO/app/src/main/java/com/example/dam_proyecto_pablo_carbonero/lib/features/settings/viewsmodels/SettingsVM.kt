@@ -86,10 +86,9 @@ class SettingsVM @Inject constructor(
             _localDate.value = ""
             _cloudDate.value = ""
             _isLoading.value = false
-            Log.d("EXCEPTION", e.stackTraceToString())
         }
         catch (e: Exception){
-            Log.d("EXCEPTION", e.stackTraceToString())
+            _messageManager.value = MessageManager(false)
             // todo gestionar error
         }
 
@@ -127,21 +126,23 @@ class SettingsVM @Inject constructor(
 
             return value
         } catch (e: Exception) {
-            // todo gestionar esto
-            Log.d("EL ERROR", e.message.toString())
+            _messageManager.value = MessageManager(false)
             return false
         }
     }
 
+    /**
+     * Metodo que se encarga de descargar una copia de seguirada ycargarla en el dispositivo
+     * @return boolean indicando si la operación ha sido exitosa
+     */
     suspend fun downloadData(): Boolean {
         try {
             _isLoading.value = true
             val value = downloadBackupUseCase.call(Unit)
             _isLoading.value = false
-
             return value
         } catch (e: Exception) {
-            // todo gestionar esto
+            _messageManager.value = MessageManager(false)
             return false
         }
     }

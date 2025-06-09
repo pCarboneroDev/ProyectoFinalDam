@@ -1,6 +1,5 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +12,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNo
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.UpdateTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.exceptions.InvalidFormException
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,21 +47,23 @@ class EditTuningVM @Inject constructor(
     private val _latinNotes = MutableStateFlow<Boolean>(false)
     val latinNotes: StateFlow<Boolean> = _latinNotes
 
+    private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true, ""))
+    val messageManager: StateFlow<MessageManager> = _messageManager
+
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
             try{
-                //tuningModel = Gson().fromJson(selectedTuningId, TuningWithNotesModel::class.java)
                 tuningModel = getTuningByIdUseCase.call(selectedTuningId.toLong())
                 _tuningName.value = tuningModel.tuning.name
 
-                var list: List<MusicNote> = getAllNotesUseCase.call(Unit);
+                var list: List<MusicNote> = getAllNotesUseCase.call(Unit)
 
                 _noteList.value = list
                 _latinNotes.value = preferencesRepo.getNotationPreference()
             }
             catch (e: Exception){
-                //TODO Gestionar la posible excepcion
+                _messageManager.value = MessageManager(false, "Unexpected error loading data.")
             }
             var i = _selectedNotes.value.size - 1
             for (note in tuningModel.noteList){
@@ -80,10 +82,13 @@ class EditTuningVM @Inject constructor(
 
 
     // METODOS
-    suspend fun updateTuning(): Pair<Boolean, String>{
+    suspend fun updateTuning(): Boolean{
         var saved = true
-        var message = ""
+
         try{
+            if (!isFormValid()){
+                throw InvalidFormException("Complete all the field")
+            }
             var list = selectedNotes.value.toList() as MutableList<MusicNote>
             list.sort()
 
@@ -93,23 +98,27 @@ class EditTuningVM @Inject constructor(
         }
         catch (formE: InvalidFormException){
             saved = false
-            message = formE.message.toString()
+            _messageManager.value = MessageManager(false, formE.message.toString())
         }
         catch (e: Exception){
-            message = "Unexpected error. Try again later"
+            _messageManager.value = MessageManager(false)
             saved = false
         }
-        return Pair(saved, message)
+        return saved
     }
 
 
-    fun deleteTuning(){
-        viewModelScope.launch(Dispatchers.IO) {
+    suspend fun deleteTuning(): Boolean{
+        var saved = false
+        try {
             var list = _selectedNotes.value.toMutableList()
             list.sort()
-            deleteTuningUseCase.call(TuningWithNotesModel(tuningModel.tuning, list))
-
+            val rowsDeleted = deleteTuningUseCase.call(TuningWithNotesModel(tuningModel.tuning, list))
+            saved = rowsDeleted > 0
+        }catch (e: Exception){
+            _messageManager.value = MessageManager(false)
         }
+        return saved
     }
 
     private fun isFormValid(): Boolean{
@@ -125,6 +134,11 @@ class EditTuningVM @Inject constructor(
             }
         }
         return isValid;
+    }
+
+
+    fun resetMessageManager(){
+        _messageManager.value = MessageManager(true)
     }
 
 }

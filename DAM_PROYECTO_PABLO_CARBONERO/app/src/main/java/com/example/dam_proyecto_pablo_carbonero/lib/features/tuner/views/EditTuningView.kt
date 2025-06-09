@@ -21,10 +21,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,15 +48,21 @@ import kotlinx.coroutines.launch
 @Composable
 fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltViewModel()) {
     val context = LocalContext.current
-
     val noteList by vm.noteList.collectAsState()
     val tuningName by vm.tuningName.collectAsState(initial = "")
     val selectedNotes by vm.selectedNotes.collectAsState()
     val latinNotes by vm.latinNotes.collectAsState()
-
-
+    val messageManager by vm.messageManager.collectAsState()
     var modal by remember { mutableStateOf(false) }
 
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(messageManager) {
+        if(!messageManager.isSuccess){
+            Toast.makeText(context, messageManager.message, Toast.LENGTH_SHORT).show()
+            vm.resetMessageManager()
+        }
+    }
 
 
     Column(
@@ -62,20 +70,17 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
             .fillMaxSize()
             .systemBarsPadding()
             .padding(horizontal = 10.dp),
-        //horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         CreateHeader(
             title = "Edit tuning",
             saveMethod = {
                 CoroutineScope(Dispatchers.Main).launch {
-                    var (result, message) = vm.updateTuning()
+                    var result = vm.updateTuning()
                     if (result == true) {
                         navController.navigate("Tuner") {
                             popUpTo("EditTuning") { inclusive = true }
                         }
-                    } else {
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }
                 }
             },
@@ -162,11 +167,12 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
 
         if (modal) DeleteModal(
             dismissFunction = { modal = false }, onDeletePressed = {
-                CoroutineScope(Dispatchers.Main).launch {
-                    vm.deleteTuning()
-                }
-                navController.navigate("Tuner") {
-                    popUpTo("EditTuning") { inclusive = true }
+                coroutineScope.launch {
+                    val result = vm.deleteTuning()
+                    if (result)
+                        navController.navigate("Tuner") {
+                            popUpTo("EditTuning") { inclusive = true }
+                        }
                 }
             }
         )

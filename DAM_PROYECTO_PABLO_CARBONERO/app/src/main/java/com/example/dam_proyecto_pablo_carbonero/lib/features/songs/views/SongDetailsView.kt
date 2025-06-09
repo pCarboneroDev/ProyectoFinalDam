@@ -7,11 +7,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,7 +39,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.T
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.viewmodels.SongDetailsVM
 
 @Composable
-fun SongDetailsView(navController: NavHostController, vm: SongDetailsVM = hiltViewModel()){
+fun SongDetailsView(navController: NavHostController, vm: SongDetailsVM = hiltViewModel()) {
     val selectedSong by vm.selectedSong.collectAsState()
     val latinNotes by vm.latinNotes.collectAsState()
 
@@ -45,10 +49,12 @@ fun SongDetailsView(navController: NavHostController, vm: SongDetailsVM = hiltVi
         label = "Icon Rotation"
     )
 
-    Column(Modifier
-        .fillMaxSize()
-        .systemBarsPadding()
-        .padding(horizontal = 10.dp)) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+            .padding(horizontal = 10.dp)
+    ) {
         DetailsHeader(
             title = selectedSong?.song?.name ?: "",
             navController = navController,
@@ -56,27 +62,50 @@ fun SongDetailsView(navController: NavHostController, vm: SongDetailsVM = hiltVi
             editMethod = { navController.navigate("EditSong/${selectedSong!!.song.id}") }
         )
 
-        Row {
-            Column {
-                Text(selectedSong?.tuning?.name ?: "", style = TextStyle(fontWeight = FontWeight.Bold))
-                Text(selectedSong?.noteList?.toString(latinNotes) ?: "")
-            }
+        Spacer(Modifier.height(10.dp))
 
-            Spacer(Modifier.weight(1f))
-
-            Button(onClick = {
-                navController.navigate("Tuner?selectedTuningId=${selectedSong?.tuning?.id}"){
+        Button(
+            onClick = {
+                navController.navigate("Tuner?selectedTuningId=${selectedSong?.tuning?.id}") {
                     popUpTo("Tuner") { inclusive = true }
                 }
-            }) { Text("Load in tuner") }
-        }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = RoundedCornerShape(12.dp)
+        ) { Text("LOAD IN TUNER", style = TextStyle(
+            fontWeight = FontWeight.Bold,
+            fontSize = 17.sp
+        )) }
 
-        if(selectedSong?.song?.tabs?.isNotEmpty() == true){
+        Spacer(Modifier.height(10.dp))
+
+        Text(selectedSong?.tuning?.name ?: "",
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            ))
+        Text(selectedSong?.noteList?.toString(latinNotes) ?: "")
+
+        HorizontalDivider(Modifier.padding(vertical = 5.dp), thickness = 2.dp)
+
+        Text("BPM",
+            style = TextStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            ))
+        Text(selectedSong?.song?.bpm ?: "")
+
+        Spacer(Modifier.height(10.dp))
+
+        if (selectedSong?.song?.tabs?.isNotEmpty() == true) {
             Row(Modifier.clickable(onClick = {
                 showTabs = !showTabs
             })) {
                 Text("Tabs", style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 25.sp))
-                Icon(Icons.Default.ExpandMore, "more",
+                Icon(
+                    Icons.Default.ExpandMore, "more",
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.rotate(rotation)
                 )
