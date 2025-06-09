@@ -22,12 +22,15 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
+import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.DeleteModal
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.DetailsHeader
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels.UserTuningsVM
 import com.example.dam_proyecto_pablo_carbonero.lib.utils.NoteList
@@ -50,10 +54,20 @@ import kotlinx.coroutines.launch
 @Composable
 fun UserTuningsView(navController: NavHostController, vm: UserTuningsVM = hiltViewModel()){
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     val tunings by vm.tuningList.collectAsState()
+    val messageManager by vm.messageManager.collectAsState()
 
-    Column(Modifier
+    LaunchedEffect(messageManager) {
+        if (!messageManager.isSuccess) {
+            Toast.makeText(context, messageManager.message, Toast.LENGTH_SHORT).show()
+            vm.resetMessageManager()
+        }
+    }
+
+    Column(
+        Modifier
         .fillMaxSize()
         .systemBarsPadding()
         .padding(horizontal = 12.dp)
@@ -64,14 +78,17 @@ fun UserTuningsView(navController: NavHostController, vm: UserTuningsVM = hiltVi
                 TuningRow(
                     tuning = tunings[index],
                     navController,
-                    onDelete = {},
+                    onDelete = {
+                        coroutineScope.launch {
+                            vm.deleteTuning(it)
+                        }
+                    },
                     onFav = {
                         CoroutineScope(Dispatchers.Main).launch() {
                             val (result, message) =  vm.setTuningAsFavourite(it)
                             if(!result){
                                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                             }
-                            //Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                         }
                     }
                 )
@@ -82,13 +99,25 @@ fun UserTuningsView(navController: NavHostController, vm: UserTuningsVM = hiltVi
 }
 
 @Composable
-fun TuningRow(tuning: TuningWithNotesModel, navController: NavHostController, onDelete: () -> Unit, onFav: (TuningWithNotesModel) -> Unit) {
+fun TuningRow(
+    tuning: TuningWithNotesModel,
+    navController: NavHostController,
+    onDelete: (TuningWithNotesModel) -> Unit,
+    onFav: (TuningWithNotesModel) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
+    var deleteModal by remember { mutableStateOf(false) }
+
     Column(Modifier.clickable(onClick = {
         if(tuning.tuning.name != "Standard Tuning")
             navController.navigate("EditTuning/${tuning.tuning.id}")
 
     })) {
+        if(deleteModal){
+            DeleteModal(
+                dismissFunction = { deleteModal = false },
+                onDeletePressed = { onDelete(tuning) }
+            )
+        }
         Row(Modifier
             .fillMaxWidth()
             .padding(top = 12.dp),
@@ -109,7 +138,11 @@ fun TuningRow(tuning: TuningWithNotesModel, navController: NavHostController, on
                         text = {
                             Text(text = "Mark as favourite")
                         },
-                        leadingIcon = { Icon(if (tuning.tuning.favourite == true) Icons.Default.Favorite else Icons.Default.FavoriteBorder, "fav") },
+                        leadingIcon = { Icon(
+                            if (tuning.tuning.favourite == true) Icons.Default.Favorite
+                            else Icons.Default.FavoriteBorder, "fav",
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        ) },
                         onClick ={
                             CoroutineScope(Dispatchers.Main).launch {
                                 onFav(tuning)
@@ -119,13 +152,17 @@ fun TuningRow(tuning: TuningWithNotesModel, navController: NavHostController, on
                     if(tuning.tuning.name != "Standard Tuning"){
                         DropdownMenuItem(
                             text = {Text("Edit")},
-                            leadingIcon = { Icon(Icons.Default.Tune, "") },
+                            leadingIcon = { Icon(
+                                Icons.Default.Tune,
+                                "goToTuner",
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            ) },
                             onClick = { navController.navigate("EditTuning/${tuning.tuning.id}")}
                         )
                         DropdownMenuItem(
                             text = {Text("Delete")},
                             leadingIcon = { Icon(Icons.Default.Delete, "delete", tint = Color.Red) },
-                            onClick = {}
+                            onClick = { deleteModal = true }
                         )
                     }
                 }
