@@ -197,11 +197,13 @@ class TunerVM @Inject constructor(
         val numOfSamples = audioRecord.read(buffer, 0, bufferSize)
         if (numOfSamples <= 0) return 0.0
 
-        //  convierte los valores enteros del audio a Double, que se necesita para mayor precision en los cálculos
+        //  convierte los valores detectados a double para mejorar la precisión
         val signal = DoubleArray(numOfSamples) { buffer[it].toDouble() }
+
         // se configuran la frecuencia máxima y mínima detectables
-        val tauMin = sampleRate / 2000
-        val tauMax = sampleRate / 20
+        // tau es la latencia entre muestras (τ)
+        val tauMin = sampleRate / 2000 // 500 hz
+        val tauMax = sampleRate / 20 // 50 hz (creo)
 
         val differenceFunction = DoubleArray(tauMax)
         val cumulativeMeanNormalizedDifferenceFunction = DoubleArray(tauMax)
@@ -210,7 +212,6 @@ class TunerVM @Inject constructor(
         // se mide la diferencia entre la señal y su versión mas avanzada en el tiempo
         // cuanto menor la diferencia mas probable de que haya una frecuencia fundamental
         // de esta forma se pueden ignorar los armónicos de las notas
-
         for (tau in tauMin until tauMax) {
             var sum = 0.0
             for (i in 0 until (numOfSamples - tau)) {
@@ -222,6 +223,8 @@ class TunerVM @Inject constructor(
 
         // se normaliza para que sea mas preciso
         cumulativeMeanNormalizedDifferenceFunction[0] = 1.0
+        // se divide cada valor entre la suma de los valores de tau
+        // se hace para evitar latencias muy cortas
         for (tau in 1 until tauMax) {
             var sum = 0.0
             for (j in 1..tau) {
@@ -232,8 +235,10 @@ class TunerVM @Inject constructor(
         }
 
         // se busca el primer valle por debajo del umbral
-        // si el valle es menor 0.1 es la frecuencia fundamental,
+        // si el valle es menor 0.1 es la frecuencia fundamental, es decir,
+        // que el periodo de la onda se repite,
         // por lo que es la frecuencia de la nota principal en el momento
+        //
         val threshold = 0.1
         var tauEstimate = -1
         var aux = 0

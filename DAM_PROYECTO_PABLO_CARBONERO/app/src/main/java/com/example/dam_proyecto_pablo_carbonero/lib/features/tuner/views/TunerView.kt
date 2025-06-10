@@ -4,8 +4,11 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.widget.GridView
 import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,9 +28,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -38,6 +46,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -142,13 +152,18 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
     HorizontalDivider(thickness = 2.dp)
 
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        /*Column {
-            Text("Now Tuning E2", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold))
-        }*/
         if(selectedNote != null)
             Text("Tuning: ${selectedNote?.englishName}", style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary))
         Spacer(Modifier.weight(1f))
 
+        Icon(
+            if(isRecording)
+                Icons.Default.Mic
+            else
+                Icons.Default.MicOff,
+            ""
+        )
+        Spacer(Modifier.width(5.dp))
         Switch(
             checked = isRecording,
             onCheckedChange = {
@@ -179,12 +194,16 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
 
     TuningAnimation(graphValue.toFloat(), Modifier, colorGraph)
 
-    Text(
-        text = if (selectedNote != null)
-            if (latinNotes == true) selectedNote!!.latinName else selectedNote!!.englishName
-        else "",
-        color = mainColor
-    )
+    if(isRecording && selectedNote == null)
+        Box(
+            Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = RoundedCornerShape(50)
+                )
+                //.alpha(0.5f)
+                .padding(5.dp)
+        ){ Text("Select a string to star tuning!", style = TextStyle(color = MaterialTheme.colorScheme.onPrimaryContainer)) }
 
     TuningNotesSelector(
         selectedTuning = selectedTuning,
