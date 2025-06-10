@@ -27,15 +27,13 @@ class SongDetailsVM @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
     private val getSongByIdUseCase: GetSongWithTuningByIdUseCase
 ): ViewModel(){
-    //val songSerialized = savedStateHandle.get<String>("selectedSong") ?: ""
+    // parámetros de la navegación
     val songId = savedStateHandle.get<String>("songId") ?: ""
     val tuningId = savedStateHandle.get<String>("tuningId") ?: ""
 
+    // Propiedades
     private val _selectedSong = MutableStateFlow<SongWithTuning?>(null)
     val selectedSong: StateFlow<SongWithTuning?> = _selectedSong
-
-    private val _songName = MutableStateFlow<String>("")
-    val songName: StateFlow<String> = _songName
 
     private val _latinNotes = MutableStateFlow<Boolean>(false)
     val latinNotes: StateFlow<Boolean> = _latinNotes

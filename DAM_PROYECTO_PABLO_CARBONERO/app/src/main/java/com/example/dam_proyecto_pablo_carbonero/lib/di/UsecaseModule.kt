@@ -32,6 +32,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseC
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.CreateUserWithEmailAndPasswordUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DeleteAccountUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DeleteCloudDataUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.DownloadBackupUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.GetCurrentUserUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.GetDatesInfoUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.SendPasswordResetEmailUseCase
@@ -264,17 +265,35 @@ object UsecaseModule {
     @Provides
     @Singleton
     fun provideCreateBackup(
-        musicNoteDao: MusicNoteDao,
-        tuningDao: TuningDao,
-        tuningMusicNoteDao: TuningMusicNoteDao,
-        songDao: SongDao,
+        musicNoteRepository: MusicNoteRepository,
+        tuningRepository: TuningRepository,
+        tuningMusicNoteRepository: TuningMusicNoteRepository,
+        songRepository: SongRepository,
         prefsRepo: UserPreferencesRepository
     ): CreateBackupUseCase{
         return CreateBackupUseCase(
-            musicNoteDao,
-            tuningDao,
-            tuningMusicNoteDao,
-            songDao,
+            musicNoteRepository,
+            tuningRepository,
+            tuningMusicNoteRepository,
+            songRepository,
+            prefsRepo
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideDownloadBackup(
+        musicNoteRepository: MusicNoteRepository,
+        tuningRepository: TuningRepository,
+        tuningMusicNoteRepository: TuningMusicNoteRepository,
+        songRepository: SongRepository,
+        prefsRepo: UserPreferencesRepository
+    ): DownloadBackupUseCase{
+        return DownloadBackupUseCase(
+            musicNoteRepository,
+            tuningRepository,
+            tuningMusicNoteRepository,
+            songRepository,
             prefsRepo
         )
     }

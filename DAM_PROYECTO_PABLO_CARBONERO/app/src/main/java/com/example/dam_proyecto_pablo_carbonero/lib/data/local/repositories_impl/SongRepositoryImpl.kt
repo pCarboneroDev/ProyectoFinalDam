@@ -29,6 +29,14 @@ class SongRepositoryImpl @Inject constructor(
         return songDao.deleteSong(id)
     }
 
+    override suspend fun insertAllSongs(songs: List<Song>): List<Long> {
+        return songDao.insertAllSongs(songs)
+    }
+
+    override suspend fun deleteAllSongs(): Int {
+        return songDao.deleteAllSongs()
+    }
+
     // PAGING
     override fun getPagedSong(): PagingSource<Int, Song> {
         return songDao.getPagedSongs()

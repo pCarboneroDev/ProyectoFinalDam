@@ -73,7 +73,7 @@ class SongLibraryVM @Inject constructor(
     }
 
 
-
+    // recibe la lista de canciones gestionada por paging
     @OptIn(ExperimentalCoroutinesApi::class)
     // flatmap lo que hace es que cada vez que el elemento al cual se escucha (sortOption) emite un valor se emite un nuevo flow  del paging
     val songListPaged: Flow<PagingData<SongWithTuning>> = _selectedSortOption.flatMapLatest { sortOption ->
@@ -89,9 +89,7 @@ class SongLibraryVM @Inject constructor(
         }
     }.cachedIn(viewModelScope)
 
-
-
-
+    // recibe la lista de canciones gestionada por paging
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val searchResultsPaged: Flow<PagingData<SongWithTuning>> = _query
         .debounce(300)
@@ -160,6 +158,9 @@ class SongLibraryVM @Inject constructor(
         _query.value = value
     }
 
+    /**
+     * llama al caso de uso para borrar la canción deseada
+     */
     suspend fun deleteSong(songId: Long){
         try{
             deleteSongUseCase.call(songId)
@@ -168,6 +169,9 @@ class SongLibraryVM @Inject constructor(
         }
     }
 
+    /**
+     * resetea el valor de resetManager
+     */
     fun resetMessageManager(){
         _messageManager.value = MessageManager(true, "")
     }

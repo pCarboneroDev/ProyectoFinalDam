@@ -5,6 +5,10 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.MusicNoteDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.SongDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningMusicNoteDao
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.MusicNoteRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.UseCase
 import com.google.firebase.Firebase
@@ -17,17 +21,17 @@ import java.util.Locale
 import javax.inject.Inject
 
 class CreateBackupUseCase @Inject constructor(
-    private val musicNoteDao: MusicNoteDao,
-    private val tuningDao: TuningDao,
-    private val tuningMusicNoteDao: TuningMusicNoteDao,
-    private val songDao: SongDao,
+    private val musicNoteRepository: MusicNoteRepository,
+    private val tuningRepository: TuningRepository,
+    private val tuningMusicNoteRepository: TuningMusicNoteRepository,
+    private val songRepository: SongRepository,
     private val prefsRepo: UserPreferencesRepository
 ): UseCase<Unit, Boolean> {
     override suspend fun call(param: Unit): Boolean {
-        val notes = musicNoteDao.getAllNotes()
-        val tunings = tuningDao.getAllTunings()
-        val tuningMusicNote = tuningMusicNoteDao.getAllTuningMusicNote()
-        val songs = songDao.getAllSongs()
+        val notes = musicNoteRepository.getAllNotes()
+        val tunings = tuningRepository.getAllTunings()
+        val tuningMusicNote = tuningMusicNoteRepository.getAllTuningMusicNote()
+        val songs = songRepository.getAllSongs()
 
 
         val formatter = SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault())

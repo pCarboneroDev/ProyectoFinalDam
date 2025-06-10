@@ -16,4 +16,6 @@ interface TuningRepository {
     suspend fun updateTuningName(tuningId: Long, newName: String)
 
     suspend fun updateTuningFavourite(tuningId: Long, favourite: Boolean)
+
+    suspend fun insertAllTuning(list: List<Tuning>): List<Long>
 }

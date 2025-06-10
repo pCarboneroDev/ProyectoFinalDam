@@ -14,4 +14,6 @@ interface TuningMusicNoteRepository {
     suspend fun deleteNoteByTuningId(tuningId: Long): Int
 
     suspend fun updateTuningNoteId(tuningId: Long, noteId: Long)
+
+    suspend fun insertAllTuningMusicNote(list: List<TuningMusicNote>): List<Long>
 }

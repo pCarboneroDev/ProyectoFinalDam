@@ -4,6 +4,10 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.MusicNoteDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.SongDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningMusicNoteDao
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.MusicNoteRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.UseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.extensions.toMusicNote
@@ -22,10 +26,10 @@ import java.util.Locale
 import javax.inject.Inject
 
 class DownloadBackupUseCase @Inject constructor(
-    private val musicNoteDao: MusicNoteDao,
-    private val tuningDao: TuningDao,
-    private val tuningMusicNoteDao: TuningMusicNoteDao,
-    private val songDao: SongDao,
+    private val musicNoteRepository: MusicNoteRepository,
+    private val tuningRepository: TuningRepository,
+    private val tuningMusicNoteRepository: TuningMusicNoteRepository,
+    private val songRepository: SongRepository,
     private val prefsRepository: UserPreferencesRepository
 ) : UseCase<Unit, Boolean> {
     override suspend fun call(param: Unit): Boolean {
@@ -51,18 +55,18 @@ class DownloadBackupUseCase @Inject constructor(
 
                     // Guardar en Room reemplazando lo anterior
                     CoroutineScope(Dispatchers.IO).launch {
-                        tuningMusicNoteDao.deleteAllTuningMusicNote()
-                        musicNoteDao.deleteAllMusicNotes()
-                        tuningDao.deleteAllTunings()
-                        songDao.deleteAllSongs()
+                        tuningMusicNoteRepository.deleteAllTuningMusicNote()
+                        musicNoteRepository.deleteAllMusicNotes()
+                        tuningRepository.deleteAllTunings()
+                        songRepository.deleteAllSongs()
 
-                        musicNoteDao.insertAllMusicNotes(restoredNotes ?: emptyList())
-                        tuningDao.insertAllTuning(restoredTunings ?: emptyList())
-                        tuningMusicNoteDao.insertAllTuningMusicNote(restoredTuningMusicNote ?: emptyList())
-                        songDao.insertAllSongs(restoredSong ?: emptyList())
+                        musicNoteRepository.insertAllMusicNotes(restoredNotes ?: emptyList())
+                        tuningRepository.insertAllTuning(restoredTunings ?: emptyList())
+                        tuningMusicNoteRepository.insertAllTuningMusicNote(restoredTuningMusicNote ?: emptyList())
+                        songRepository.insertAllSongs(restoredSong ?: emptyList())
 
                         val date = Timestamp.now().toDate()
-                        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
+                        val formatter = SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault())
                         prefsRepository.setLastModificationDate(formatter.format(date))
                     }
                 }

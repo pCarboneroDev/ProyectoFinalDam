@@ -63,11 +63,13 @@ class LoadingVM @Inject constructor (
     private suspend fun generateMusicNotes(): List<MusicNote>{
         val notesListToInsert = getFreqAccordingOnA4();
 
-        //notesRepo.insertAllMusicNotes(notesListToInsert)
         insertAllMusicNotesUseCase.call(notesListToInsert)
-        return getAllNotesUseCase.call(Unit) // notesRepo.getAllNotes()
+        return getAllNotesUseCase.call(Unit)
     }
 
+    /**
+     * Metodo que genera la afinación básica para el funcionamiento de la app
+     */
     private suspend fun generateStandardTuning(notes: List<MusicNote>){
         val list = mutableListOf<MusicNote>()
 
@@ -88,15 +90,10 @@ class LoadingVM @Inject constructor (
         val tuningwithNotes = TuningWithNotesModel(tuning = standardTunning, noteList = list)
 
         var standardId = insertTuningUseCase.call(tuningwithNotes)//tuningRepo.insertTuning(standardTunning)
-
-        /*for (nota in list){
-            var insert = TuningMusicNote(tuningId = standardId, noteId = nota.id)
-            tuningMusicNoteRepo.insertTuningMusicNote(insert)
-        }*/
     }
 
 
-    // Metodos de insercion de datos
+    // Metodo que recorre todas las notas musicales y crea todas las necesarias para el funcionamiento de la app
     fun getFreqAccordingOnA4(): List<MusicNote> {
         var freqRef: Double = 440.0
         var index = 0;

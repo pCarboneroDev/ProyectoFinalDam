@@ -28,8 +28,7 @@ import kotlin.math.pow
 class TunerVM @Inject constructor(
     private val getAllTuningWithNotesUseCase: GetAllTuningWithNotesUseCase,
     private val savedStateHandle: SavedStateHandle,
-    private val preferencesRepo: UserPreferencesRepository,
-    private val getAmountTuningsUseCase: GetAmountTuningsUseCase
+    private val preferencesRepo: UserPreferencesRepository
 ): ViewModel() {
     private val startingTuning: String? = savedStateHandle["selectedTuningId"]
 
@@ -96,10 +95,17 @@ class TunerVM @Inject constructor(
             }
         }
     }
+
+    /**
+     * Llama al caso de uso que le devuelve una lista de TuningWithNotes
+     */
     suspend fun loadTunings(){
-        _tunings.value = getAmountTuningsUseCase.call(10)
+        _tunings.value = getAllTuningWithNotesUseCase.call(Unit)
     }
 
+    /**
+     * Comprueba la configuración de usuario para mostrar las notas
+     */
     suspend fun loadPreferences(){
         _latinNotes.value = preferencesRepo.getNotationPreference()
     }
@@ -160,6 +166,11 @@ class TunerVM @Inject constructor(
         }
     }
 
+    /**
+     * Metodo que se encarga de calcular el punto medio de el rango de frecuencias
+     * y da un valor a la frecuencia encontrada entre 0 y 1 para ubicar el círculo que muestra
+     * la afinación de la nota seleccionada
+     */
     fun sigmoidNormalizedBetween(freq: Double, minHz: Double, maxHz: Double, kFactor: Double = 0.02): Double {
         if (freq == 0.0) return 0.5
 
@@ -171,7 +182,7 @@ class TunerVM @Inject constructor(
 
     /**
      * Este es el metodo principal para identificar una nota musical con las señales digitales de audio
-     * Utiliza un algoritmo conocido como YIN que se especializa en la identificación de notas
+     * Utiliza un algoritmo conocido como YIN que se especializa en la identificación de notas, ya que identifica la frecuencia fundamental
      * Es mejor que otros metodos cómo FFT ya que YIN sí es capaz de ignorar armónicos.
      *
      * @param audioRecord: instancia de AudioRecord que captura el audio
@@ -180,13 +191,17 @@ class TunerVM @Inject constructor(
      * Return: valor de la frecuencia detectada, 0 si no detecta nada.
      */
     fun processYIN(audioRecord: AudioRecord, bufferSize: Int, sampleRate: Int): Double {
+        // se crea un array de shorts del tamaño del número de muestras que se pueden capturar
         val buffer = ShortArray(bufferSize)
+        // se comprueba si audio record tiene muestras capturadas, si no devuelkve 0
         val numOfSamples = audioRecord.read(buffer, 0, bufferSize)
         if (numOfSamples <= 0) return 0.0
 
+        //  convierte los valores enteros del audio a Double, que se necesita para mayor precision en los cálculos
         val signal = DoubleArray(numOfSamples) { buffer[it].toDouble() }
-        val tauMin = sampleRate / 2000  // Frecuencia máxima detectable
-        val tauMax = sampleRate / 20    // Frecuencia mínima detectable
+        // se configuran la frecuencia máxima y mínima detectables
+        val tauMin = sampleRate / 2000
+        val tauMax = sampleRate / 20
 
         val differenceFunction = DoubleArray(tauMax)
         val cumulativeMeanNormalizedDifferenceFunction = DoubleArray(tauMax)
@@ -195,6 +210,7 @@ class TunerVM @Inject constructor(
         // se mide la diferencia entre la señal y su versión mas avanzada en el tiempo
         // cuanto menor la diferencia mas probable de que haya una frecuencia fundamental
         // de esta forma se pueden ignorar los armónicos de las notas
+
         for (tau in tauMin until tauMax) {
             var sum = 0.0
             for (i in 0 until (numOfSamples - tau)) {
@@ -232,7 +248,6 @@ class TunerVM @Inject constructor(
             }
         }
         // se sigue la fórmula f = samplerate/tau
-        //return if (tauEstimate != -1) sampleRate.toDouble() / tauEstimate else 0.0
         var f = 0.0
 
         if (tauEstimate != -1){

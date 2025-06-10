@@ -31,4 +31,8 @@ class TuningMusicNoteRepositoryImpl @Inject constructor(
     override suspend fun updateTuningNoteId(tuningId: Long, noteId: Long) {
         return tuningMusicNoteDao.updateTuningNoteId(tuningId, noteId)
     }
+
+    override suspend fun insertAllTuningMusicNote(list: List<TuningMusicNote>): List<Long> {
+        return tuningMusicNoteDao.insertAllTuningMusicNote(list)
+    }
 }

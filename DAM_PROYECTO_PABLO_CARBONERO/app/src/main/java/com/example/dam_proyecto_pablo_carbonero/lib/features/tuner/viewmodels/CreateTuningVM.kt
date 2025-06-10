@@ -69,6 +69,9 @@ class CreateTuningVM @Inject constructor(
     }
 
     // METODOS
+    /**
+     * Metodo que llama al caso de uso para crear una nueva afinación en la bbdd
+     */
     suspend fun saveNewTuning(): Boolean{
         _isLoading.value = true
         var saved = true
@@ -96,6 +99,9 @@ class CreateTuningVM @Inject constructor(
         return saved
     }
 
+    /**
+     * Función que comprueba los datos necesarios para la creación de una afinación han sido correctamente introducidos
+     */
     private fun isFormValid(): Boolean{
         var isValid = true
 
@@ -111,6 +117,9 @@ class CreateTuningVM @Inject constructor(
         return isValid
     }
 
+    /**
+     * Resetea el valor del gestor de toasts
+     */
     fun resetMessageManager(){
         _messageManager.value = MessageManager(true)
     }

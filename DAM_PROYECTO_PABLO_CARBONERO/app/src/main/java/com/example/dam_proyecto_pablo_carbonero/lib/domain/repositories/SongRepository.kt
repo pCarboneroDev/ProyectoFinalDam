@@ -9,6 +9,8 @@ interface SongRepository {
     suspend fun insertSong(song: Song): Long
     suspend fun updateSong(song: Song): Int
     suspend fun deleteSong(id: Long): Int
+    suspend fun insertAllSongs(songs: List<Song>): List<Long>
+    suspend fun deleteAllSongs(): Int
     // paging
     fun getPagedSong(): PagingSource<Int, Song>
     fun getPagedSongsDesc(): PagingSource<Int, Song>

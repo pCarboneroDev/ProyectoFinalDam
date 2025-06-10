@@ -45,11 +45,9 @@ class EditSongVM @Inject constructor(
     private val _bpm = MutableStateFlow<String>("")
     val bpm: StateFlow<String> = _bpm
 
-    private val _key = MutableStateFlow<String>("")
-    val key: StateFlow<String> = _key
+    private val _tabs = MutableStateFlow<String>("")
+    val tabs: StateFlow<String> = _tabs
 
-    private val _formValid = MutableStateFlow<Boolean>(false)
-    val formValid: StateFlow<Boolean> = _formValid
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -73,7 +71,7 @@ class EditSongVM @Inject constructor(
         _songName.value = song.name
         _bandName.value = song.bandName
         _bpm.value = song.bpm.substringBefore(' ')
-        _key.value = song.tabs
+        _tabs.value = song.tabs
     }
 
 
@@ -109,7 +107,7 @@ class EditSongVM @Inject constructor(
     }
 
     fun setKey(value: String) {
-        _key.value = value
+        _tabs.value = value
     }
 
     /**
@@ -130,7 +128,7 @@ class EditSongVM @Inject constructor(
                 bandName = _bandName.value,
                 tuningId = _selectedTuning.value!!.id,
                 bpm = _bpm.value + " bpm",
-                tabs = _key.value
+                tabs = _tabs.value
             )
             updateSong(s)
         }

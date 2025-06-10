@@ -82,6 +82,9 @@ class EditTuningVM @Inject constructor(
 
 
     // METODOS
+    /**
+     * Llama al caso de uso que se encarga de actualizar una afinación de la bbdd
+     */
     suspend fun updateTuning(): Boolean{
         var saved = true
 
@@ -108,6 +111,9 @@ class EditTuningVM @Inject constructor(
     }
 
 
+    /**
+     * Llama al caso de uso para borrar una afinación de la bbdd
+     */
     suspend fun deleteTuning(): Boolean{
         var saved = false
         try {
@@ -121,6 +127,9 @@ class EditTuningVM @Inject constructor(
         return saved
     }
 
+    /**
+     * Comprueba si los campos necesarios para guardar la afinación sean correctos
+     */
     private fun isFormValid(): Boolean{
         var isValid = true;
 
@@ -137,6 +146,9 @@ class EditTuningVM @Inject constructor(
     }
 
 
+    /**
+     * Resetea la pripiedad que gestiona los mensajes de los toasts
+     */
     fun resetMessageManager(){
         _messageManager.value = MessageManager(true)
     }

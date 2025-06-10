@@ -94,6 +94,7 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
     LaunchedEffect(message) {
         if (message.isSuccess == false){
             Toast.makeText(context, message.message, Toast.LENGTH_SHORT).show()
+            vm.resetMessageManager()
         }
     }
     LaunchedEffect(Unit) {

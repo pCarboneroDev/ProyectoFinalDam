@@ -18,10 +18,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +30,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.CreateHeader
 import com.example.dam_proyecto_pablo_carbonero.lib.features.songs.composables.AddTabsModal
@@ -51,7 +48,7 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
     val songName by vm.songName.collectAsState("")
     val bandName by vm.bandName.collectAsState("")
     val bmp by vm.bpm.collectAsState("")
-    val key by vm.key.collectAsState("")
+    val key by vm.tabs.collectAsState("")
 
     var expanded by remember { mutableStateOf(false) }
     var tabs by remember { mutableStateOf(false) }

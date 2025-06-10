@@ -35,8 +35,8 @@ class CreateSongVM @Inject constructor(
     private val _bpm = MutableStateFlow<String>("")
     val bpm: StateFlow<String> = _bpm
 
-    private val _key = MutableStateFlow<String>("")
-    val key: StateFlow<String> = _key
+    private val _tabs = MutableStateFlow<String>("")
+    val tabs: StateFlow<String> = _tabs
 
     private lateinit var _finalSong: SongWithTuning
 
@@ -49,7 +49,6 @@ class CreateSongVM @Inject constructor(
     }
 
     //SETTERS
-
     fun setSelectedTuning(value: Tuning){
         _selectedTuning.value = value
     }
@@ -79,7 +78,7 @@ class CreateSongVM @Inject constructor(
     }
 
     fun setKey(value: String) {
-        _key.value = value
+        _tabs.value = value
     }
 
     /**
@@ -99,7 +98,7 @@ class CreateSongVM @Inject constructor(
                 bandName = _bandName.value,
                 tuningId = _selectedTuning.value!!.id,
                 bpm = _bpm.value + " bpm",
-                tabs = _key.value
+                tabs = _tabs.value
             )
             _finalSong = SongWithTuning(song = song, tuning = _selectedTuning.value!!)
             insertSongUseCase.call(_finalSong)
@@ -134,6 +133,9 @@ class CreateSongVM @Inject constructor(
         return numericText.toDoubleOrNull() != null
     }
 
+    /**
+     * Comprueba que todos los campos cumplen los requisitos
+     */
     fun isFormValid(): Boolean {
         return (!isSongNameValid() && !isBandNameValid() && !isBpmValid() && _selectedTuning.value != null)
     }
