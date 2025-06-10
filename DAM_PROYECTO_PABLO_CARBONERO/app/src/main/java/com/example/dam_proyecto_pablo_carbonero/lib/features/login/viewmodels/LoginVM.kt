@@ -1,9 +1,9 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.login.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.params.UserParams
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.SignInWithEmailAndPasswordUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +29,8 @@ class LoginVM @Inject constructor(
     private val _wrongEmail = MutableStateFlow<Boolean>(false)
     val wrongEmail: StateFlow<Boolean> = _wrongEmail
 
+    private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true))
+    val messageManager: StateFlow<MessageManager> = _messageManager
 
     fun setEmail(value:String){
         _email.value = value
@@ -39,10 +41,13 @@ class LoginVM @Inject constructor(
     }
 
 
-    suspend fun signInWithEmailAndPassword(): Pair<Boolean, String>{
+    /**
+     * LLama al caso de uso para realizar el login
+     * @return si ha sido exitoso o no
+     */
+    suspend fun signInWithEmailAndPassword(): Boolean{
         _loading.value = true
         var loginSuccesful = true
-        var message = ""
 
         try{
             if(isFormValid()){
@@ -54,15 +59,15 @@ class LoginVM @Inject constructor(
             }
         }
         catch (e: FirebaseAuthInvalidCredentialsException){
-            message = "Wrong email or password"
+            _messageManager.value = MessageManager(false, "Wrong email or password")
             loginSuccesful = false
         }
         catch (e: Exception){
-            message = "Unexpected error. Try again later"
+            _messageManager.value = MessageManager(false)
             loginSuccesful = false
         }
         _loading.value = false
-        return Pair(loginSuccesful, message)
+        return loginSuccesful
     }
 
     private fun isEmailValid(): Boolean{
@@ -77,6 +82,10 @@ class LoginVM @Inject constructor(
         _wrongEmail.value = !isEmailValid()
         _wrongPassword.value = !isPasswordValid()
         return (!_wrongEmail.value && !_wrongPassword.value)
+    }
+
+    fun resetMessageManager(){
+        _messageManager.value = MessageManager(true)
     }
 
 }

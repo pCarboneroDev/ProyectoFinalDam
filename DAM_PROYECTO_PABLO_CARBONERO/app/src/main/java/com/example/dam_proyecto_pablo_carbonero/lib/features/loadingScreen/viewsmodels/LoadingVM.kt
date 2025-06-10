@@ -96,7 +96,7 @@ class LoadingVM @Inject constructor (
     // Metodo que recorre todas las notas musicales y crea todas las necesarias para el funcionamiento de la app
     fun getFreqAccordingOnA4(): List<MusicNote> {
         var freqRef: Double = 440.0
-        var index = 0;
+        var index = 0
 
         var noteList = listOf<String>("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#","A", "A#", "B")
 

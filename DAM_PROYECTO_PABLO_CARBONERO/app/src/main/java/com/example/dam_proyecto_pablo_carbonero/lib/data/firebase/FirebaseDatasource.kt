@@ -19,6 +19,9 @@ class FirebaseDatasource {
     private val _auth = FirebaseAuth.getInstance()
 
 
+    /**
+     * Metodo que hace una consulta con firebase y obtiene lso datos del usuario que tiene la sesión inicada
+     */
     suspend fun getCurrentUser(): FirebaseUser? {
         return try {
             _auth.currentUser
@@ -27,31 +30,36 @@ class FirebaseDatasource {
         }
     }
 
+    /**
+     * Metodo que se encarga de crear un nuevo usuario en firebase
+     * @param email email del nuevo usuario
+     * @param password contraseña del nuevo usuario
+     * @return el nuevo usuario registrado, null si hay algún fallo
+     */
     suspend fun createUserWithEmailAndPassword(email: String, password: String): FirebaseUser? {
         var user: FirebaseUser? = null
-
-        try {
-            _auth.createUserWithEmailAndPassword(email, password).await()
-            user = getCurrentUser()
-        } catch (e: Exception) {
-            throw e;
-        }
-
+        _auth.createUserWithEmailAndPassword(email, password).await()
+        user = getCurrentUser()
         return user
     }
 
+    /**
+     * Metodo que se encarga de logear a un usuario registrado
+     * @param email email del usuario
+     * @param password contraseña del usuario
+     * @return el usuario
+     */
     suspend fun signInWithEmailAndPassword(email: String, password: String): FirebaseUser? {
         var user: FirebaseUser? = null
-
-        try {
-            _auth.signInWithEmailAndPassword(email, password).await()
-            user = getCurrentUser()
-        } catch (e: Exception) {
-            throw e;
-        }
+        _auth.signInWithEmailAndPassword(email, password).await()
+        user = getCurrentUser()
         return user
     }
 
+    /**
+     * Metodo que comprueba la última fecha de modificación registrada en firebase
+     * @return la fecha en formato string o mensaje informando que no hay ningún dato
+     */
     suspend fun getCurrentDate(): String {
         try {
             val user = getCurrentUser()
@@ -70,9 +78,13 @@ class FirebaseDatasource {
         } catch (e: Exception) {
             return "No data changes registered"
         }
-        return ""
     }
 
+    /**
+     * Metodo que se encarga de enviar a una dirección de correo un enlace para reestablecer su contraseña
+     * @param la dirección a la que se enviará el correo
+     * @return boolean indicando si ha podido enviarse o no
+     */
     suspend fun sendPasswordResetEmail(email: String): Boolean {
         var success = true
         try {
@@ -90,6 +102,9 @@ class FirebaseDatasource {
         return success
     }
 
+    /**
+     * Metodo que borra los datos guardados de un usuario en la bbdd de firebase
+     */
     suspend fun deleteCloudData(): Boolean {
         var success = false
         try {

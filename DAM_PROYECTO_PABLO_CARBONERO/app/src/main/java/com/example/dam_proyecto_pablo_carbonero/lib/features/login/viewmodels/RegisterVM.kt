@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.params.UserParams
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.CreateUserWithEmailAndPasswordUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -35,8 +36,8 @@ class RegisterVM @Inject constructor(
     private val _wrongEmail = MutableStateFlow<Boolean>(false)
     val wrongEmail: StateFlow<Boolean> = _wrongEmail
 
-    //private val _confirmPassword = MutableStateFlow<String>("")
-    //val confirmPassword: StateFlow<String> = _confirmPassword
+    private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true))
+    val messageManager: StateFlow<MessageManager> = _messageManager
 
 
     fun setEmail(value:String){
@@ -47,15 +48,14 @@ class RegisterVM @Inject constructor(
         _password.value = value
     }
 
-    /*fun _confirmPassword(value:String){
-        _password.value = value
-    }*/
 
-
-    suspend fun createUserWithEmailAndPassword(): Pair<Boolean, String>{
+    /**
+     * Llama al caso de uso para realizar el registro del usuario en firebase
+     * @return boolean indicando si ha salido bien la acción
+     */
+    suspend fun createUserWithEmailAndPassword(): Boolean {
         _loading.value = true
         var registerSuccesful = true
-        var message = ""
 
         try{
             if(isFormValid()){
@@ -67,35 +67,50 @@ class RegisterVM @Inject constructor(
             }
         }
         catch (e: FirebaseAuthUserCollisionException){
-            message = "Email already in use"
+            _messageManager.value = MessageManager(false, "Email already in use")
             registerSuccesful = false
         }
         catch(e: FirebaseAuthInvalidCredentialsException){
-            message = e.message.toString()
+            //_messageManager.value = MessageManager(false, e.message.toString())
+            _wrongEmail.value = true
             registerSuccesful = false
         }
         catch (e: Exception){
-            Log.d("EX", e.toString())
-            message = "Unexpected error. Try again later"
+            _messageManager.value = MessageManager(false)
             registerSuccesful = false
         }
         _loading.value = false
-        return Pair(registerSuccesful, message)
+        return registerSuccesful
     }
 
-
+    /**
+     * Metodo que comprueba que el email introducido sea válido
+     */
     private fun isEmailValid(): Boolean{
         val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
         return (_email.value.isNotEmpty() && _email.value.matches(emailRegex.toRegex()))
     }
+    /**
+     * Metodo que comprueba que la contraseña introducida sea válida
+     */
     private fun isPasswordValid(): Boolean{
         return  (_password.value.isNotEmpty() && _password.value.length >= 6)
     }
 
+    /**
+     * Comprueba que todos los campos sean correctos
+     */
     private fun isFormValid(): Boolean{
         _wrongEmail.value = !isEmailValid()
         _wrongPassword.value = !isPasswordValid()
         return (!_wrongEmail.value && !_wrongPassword.value)
+    }
+
+    /**
+     * Resetea el valor del message manager
+     */
+    fun resetMessageManager(){
+        _messageManager.value = MessageManager(true)
     }
 
 }

@@ -28,6 +28,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,9 +61,17 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
     val password by vm.password.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
     val isLoading by vm.loading.collectAsState()
-
     val wrongPassword by vm.wrongPassword.collectAsState()
     val wrongEmail by vm.wrongEmail.collectAsState()
+    val message by vm.messageManager.collectAsState()
+
+
+    LaunchedEffect(message) {
+        if(!message.isSuccess){
+            Toast.makeText(context, message.message,Toast.LENGTH_SHORT).show()
+            vm.resetMessageManager()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -185,15 +194,12 @@ fun LoginView(navController: NavHostController, vm: LoginVM = hiltViewModel()) {
         Button(
             onClick = {
                 CoroutineScope(Dispatchers.Main).launch {
-                    val (loggedIn, message) = vm.signInWithEmailAndPassword()
+                    val loggedIn = vm.signInWithEmailAndPassword()
 
                     if(loggedIn){
                         navController.navigate("Settings"){
                             popUpTo("Settings") { inclusive = true }
                         }
-                    }
-                    else if(message.isNotEmpty()){
-                        Toast.makeText(context, message,Toast.LENGTH_SHORT).show()
                     }
                 }
             },

@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,9 +67,16 @@ fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewMode
     val password by vm.password.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
     val isLoading by vm.loading.collectAsState()
-
     val wrongPassword by vm.wrongPassword.collectAsState()
     val wrongEmail by vm.wrongEmail.collectAsState()
+    val message by vm.messageManager.collectAsState()
+
+    LaunchedEffect(message) {
+        if(!message.isSuccess){
+            Toast.makeText(context, message.message,Toast.LENGTH_SHORT).show()
+            vm.resetMessageManager()
+        }
+    }
 
 
     if (isLoading) {
@@ -167,41 +175,16 @@ fun RegisterView(navController: NavHostController, vm: RegisterVM = hiltViewMode
             isError = wrongPassword
         )
 
-        // confirmar contraseñaa
-        /*OutlinedTextField(
-            value = password,
-            onValueChange = {  },
-            label = { Text("Confirm password") },
-            singleLine = true,
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            trailingIcon = {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(
-                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Hide password" else "Show password"
-                    )
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp),
-            shape = RoundedCornerShape(12.dp),
-        )*/
-
         // register
         Button(
             onClick = {
                 CoroutineScope(Dispatchers.Main).launch {
-                    val (loggedIn, message) = vm.createUserWithEmailAndPassword()
+                    val loggedIn = vm.createUserWithEmailAndPassword()
 
                     if(loggedIn){
                         navController.navigate("Settings"){
                             popUpTo("Settings") { inclusive = true }
                         }
-                    }
-                    else if(message.isNotEmpty()){
-                        Toast.makeText(context, message,Toast.LENGTH_SHORT).show()
                     }
                 }
             },
