@@ -269,14 +269,16 @@ object UsecaseModule {
         tuningRepository: TuningRepository,
         tuningMusicNoteRepository: TuningMusicNoteRepository,
         songRepository: SongRepository,
-        prefsRepo: UserPreferencesRepository
+        prefsRepo: UserPreferencesRepository,
+        firebaseRepository: FirebaseRepository
     ): CreateBackupUseCase{
         return CreateBackupUseCase(
             musicNoteRepository,
             tuningRepository,
             tuningMusicNoteRepository,
             songRepository,
-            prefsRepo
+            prefsRepo,
+            firebaseRepository
         )
     }
 
@@ -287,14 +289,16 @@ object UsecaseModule {
         tuningRepository: TuningRepository,
         tuningMusicNoteRepository: TuningMusicNoteRepository,
         songRepository: SongRepository,
-        prefsRepo: UserPreferencesRepository
+        prefsRepo: UserPreferencesRepository,
+        firebaseRepository: FirebaseRepository
     ): DownloadBackupUseCase{
         return DownloadBackupUseCase(
             musicNoteRepository,
             tuningRepository,
             tuningMusicNoteRepository,
             songRepository,
-            prefsRepo
+            prefsRepo,
+            firebaseRepository
         )
     }
 

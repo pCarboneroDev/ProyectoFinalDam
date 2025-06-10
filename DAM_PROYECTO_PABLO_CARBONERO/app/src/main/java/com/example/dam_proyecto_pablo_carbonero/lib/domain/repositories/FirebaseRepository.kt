@@ -1,6 +1,7 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories
 
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentSnapshot
 
 interface FirebaseRepository {
     suspend fun getCurrentUser(): FirebaseUser?
@@ -10,4 +11,6 @@ interface FirebaseRepository {
     suspend fun sendPasswordResetEmail(email: String): Boolean
     suspend fun deleteCloudData(): Boolean
     suspend fun deleteAccount(password: String): Boolean
+    suspend fun createBackup(map: Map<String, Any>): Boolean
+    suspend fun downloadBackup(): DocumentSnapshot?
 }

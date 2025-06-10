@@ -5,6 +5,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.MusicNoteDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.SongDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningDao
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningMusicNoteDao
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.FirebaseRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.MusicNoteRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
@@ -25,7 +26,8 @@ class CreateBackupUseCase @Inject constructor(
     private val tuningRepository: TuningRepository,
     private val tuningMusicNoteRepository: TuningMusicNoteRepository,
     private val songRepository: SongRepository,
-    private val prefsRepo: UserPreferencesRepository
+    private val prefsRepo: UserPreferencesRepository,
+    private val firebaseRepository: FirebaseRepository
 ): UseCase<Unit, Boolean> {
     override suspend fun call(param: Unit): Boolean {
         val notes = musicNoteRepository.getAllNotes()
@@ -47,23 +49,7 @@ class CreateBackupUseCase @Inject constructor(
             "lastModificationDate" to timestamp
         )
 
-
-        val firestore = Firebase.firestore
-        val userId = Firebase.auth.currentUser?.uid ?: return false
-
-        firestore.collection("backups")
-            .document(userId)
-            .set(notesMap)
-            .addOnSuccessListener {
-                Log.d("Backup", "Datos subidos correctamente")
-                return@addOnSuccessListener
-            }
-            .addOnFailureListener {
-                Log.e("Backup", "Error al subir backup", it)
-                return@addOnFailureListener
-            }
-
-        return true
+        return firebaseRepository.createBackup(notesMap)
     }
 
 }

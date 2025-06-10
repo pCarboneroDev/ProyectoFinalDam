@@ -1,10 +1,12 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.data.firebase
 
+import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +56,38 @@ class FirebaseDatasource {
         _auth.signInWithEmailAndPassword(email, password).await()
         user = getCurrentUser()
         return user
+    }
+
+    /**
+     * Metodo que se encarga de subir a firebase una copia de la bbdd local serializada
+     * @param data los datos serialziados
+     * @return si ha sido un éxito o no
+     */
+    suspend fun createBackUp(data: Map<String, Any>): Boolean{
+        val success = false
+        val user = getCurrentUser()
+
+        if (user != null){
+            _db.collection("backups")
+                .document(user.uid)
+                .set(data).await()
+            return true
+        }
+        return success
+    }
+
+    /**
+     * Metodo que descarga los datos guardados en la bbdd de firebase
+     */
+    suspend fun downloadBackup(): DocumentSnapshot? {
+        val user = getCurrentUser()
+        var doc: DocumentSnapshot? = null
+        if(user != null)
+            doc = _db.collection("backups")
+                .document(user.uid)
+                .get().await()
+
+        return doc
     }
 
     /**

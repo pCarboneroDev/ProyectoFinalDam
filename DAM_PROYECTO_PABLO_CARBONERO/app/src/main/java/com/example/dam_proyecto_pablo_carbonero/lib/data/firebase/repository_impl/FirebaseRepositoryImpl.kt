@@ -3,6 +3,7 @@ package com.example.dam_proyecto_pablo_carbonero.lib.data.firebase.repository_im
 import com.example.dam_proyecto_pablo_carbonero.lib.data.firebase.FirebaseDatasource
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.FirebaseRepository
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentSnapshot
 import javax.inject.Inject
 
 class FirebaseRepositoryImpl @Inject constructor(
@@ -41,5 +42,13 @@ class FirebaseRepositoryImpl @Inject constructor(
 
     override suspend fun deleteAccount(password: String): Boolean {
         return firebase.deleteAccount(password)
+    }
+
+    override suspend fun createBackup(map: Map<String, Any>): Boolean {
+        return firebase.createBackUp(map)
+    }
+
+    override suspend fun downloadBackup(): DocumentSnapshot? {
+        return firebase.downloadBackup()
     }
 }

@@ -119,16 +119,18 @@ class SettingsVM @Inject constructor(
      * Se encarga de iniciar
      */
     suspend fun uploadData(): Boolean {
+        var success = false
         try {
             _isLoading.value = true
-            val value = createBackupUseCase.call(Unit)
+            success = createBackupUseCase.call(Unit)
             _isLoading.value = false
-
-            return value
+            if(!success){
+                _messageManager.value = MessageManager(false)
+            }
         } catch (e: Exception) {
             _messageManager.value = MessageManager(false)
-            return false
         }
+        return success
     }
 
     /**
@@ -136,15 +138,17 @@ class SettingsVM @Inject constructor(
      * @return boolean indicando si la operación ha sido exitosa
      */
     suspend fun downloadData(): Boolean {
+        var success = false
         try {
             _isLoading.value = true
-            val value = downloadBackupUseCase.call(Unit)
+            success = downloadBackupUseCase.call(Unit)
             _isLoading.value = false
-            return value
+            if(!success) _messageManager.value = MessageManager(false)
         } catch (e: Exception) {
             _messageManager.value = MessageManager(false)
             return false
         }
+        return success
     }
 
     suspend fun deleteData(): Boolean{
