@@ -48,10 +48,10 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
     val songName by vm.songName.collectAsState("")
     val bandName by vm.bandName.collectAsState("")
     val bmp by vm.bpm.collectAsState("")
-    val key by vm.tabs.collectAsState("")
+    val tabs by vm.tabs.collectAsState("")
 
     var expanded by remember { mutableStateOf(false) }
-    var tabs by remember { mutableStateOf(false) }
+    var tabsModal by remember { mutableStateOf(false) }
 
     val maxChars = 25
 
@@ -144,14 +144,20 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                tabs = true
+                tabsModal = true
             }
         ) {
             Text("Add tabs")
         }
 
-        if (tabs) {
-            AddTabsModal(saveMethod = { vm.setKey(it) }, dismissFunction = { tabs = false }, currentTabs = key, context)
+        if (tabsModal) {
+            AddTabsModal(
+                saveMethod = {
+                    vm.setKey(it)
+                    tabsModal = false
+                },
+                dismissFunction = { tabsModal = false },
+                currentTabs = tabs, context)
         }
     }
 }

@@ -50,6 +50,8 @@ import kotlinx.coroutines.launch
 fun ResetPasswordView(navController: NavHostController, vm: ResetPasswordVM = hiltViewModel()){
     val email by vm.email.collectAsState()
     val wrongEmail by vm.wrongEmail.collectAsState()
+    val isLoading by vm.isLoading.collectAsState()
+    val mailSent by vm.mailSent.collectAsState()
 
     Column(
         modifier = Modifier
@@ -82,7 +84,11 @@ fun ResetPasswordView(navController: NavHostController, vm: ResetPasswordVM = hi
 
         // subtititulo
         Text(
-            text = "Enter email and we will send you an email to reset your password",
+            text =
+                if (!mailSent)
+                    "Enter email and we will send you an email to reset your password"
+                else
+                    "Check your email inbox and spam section",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
             modifier = Modifier.padding(bottom = 32.dp)
@@ -116,7 +122,9 @@ fun ResetPasswordView(navController: NavHostController, vm: ResetPasswordVM = hi
             shape = RoundedCornerShape(12.dp),
 
             ) {
-            Text("Send email", style = MaterialTheme.typography.labelLarge)
+            Text(
+                text = if (mailSent) "Re-send again" else "Send email",
+                style = MaterialTheme.typography.labelLarge)
         }
     }
 }

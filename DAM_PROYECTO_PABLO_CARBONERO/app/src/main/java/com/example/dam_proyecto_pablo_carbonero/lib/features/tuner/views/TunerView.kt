@@ -64,6 +64,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNot
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.BottomNavBar
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.composables.TuningAnimation
+import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.composables.TuningNotesSelector
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.composables.TuningSelector
 import com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.viewmodels.TunerVM
 import kotlinx.coroutines.CoroutineScope
@@ -92,7 +93,6 @@ fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
 
         if (selectedTuning == null) {
             vm.setSelectedTuning(tunings.find { it.tuning.id == 1.toLong() } ?: tunings[0])
-            // todo poner objeto vacío o algo si no se cumple
         }
 
         //val vm = vm
@@ -211,56 +211,6 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
         latinNotes = latinNotes,
         selectedNote = selectedNote
     )
-}
-
-@Composable
-fun TuningNotesSelector(
-    selectedTuning: TuningWithNotesModel?,
-    onNoteSelected: (MusicNote) -> Unit,
-    latinNotes: Boolean,
-    selectedNote: MusicNote?
-){
-
-    Column {
-        selectedTuning?.noteList?.forEachIndexed { index, note ->
-            val isSelected = note == selectedNote
-            val guitarString = (5 - index * 0.5).toInt()
-
-            Row(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .clickable { onNoteSelected(note) },
-                //horizontalAlignment = Alignment.CenterHorizontally
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .aspectRatio(1f)//.size(60.dp) // Tamaño circular fijo
-                        .background(
-                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-                            shape = CircleShape
-                        ),
-                        //.clickable { onNoteSelected(note); i = index },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = if (latinNotes == true) note.latinName else note.englishName,
-                        color = MaterialTheme.colorScheme.onSecondary
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        //.fillMaxWidth()
-                        .weight(5f)
-                        .height(guitarString.dp)
-                        .background(color = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSecondary)
-                )
-            }
-        }
-    }
 }
 
 

@@ -78,16 +78,13 @@ import kotlinx.coroutines.launch
 fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltViewModel()){
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
     val songListPaged = vm.songListPaged.collectAsLazyPagingItems()
     val currentSortOption by vm.selectedSortOption.collectAsState()
-    val deleteModal by vm.deleteModal.collectAsState()
-
-   // var searchQuery by remember { mutableStateOf("") }
-    var isActive by remember { mutableStateOf(false) }
-    var openAlertDialog by remember { mutableStateOf(false) }
-    val searchQuery by vm.query.collectAsState() //vm.searchQuery.collectAsState()
-    val searchResult = vm.searchResultsPaged.collectAsLazyPagingItems() //vm.searchResults.collectAsState()
-
+    val sortModal by vm.sortModal.collectAsState()
+    val searchBarOpen by vm.isSearchBarOpen.collectAsState()
+    val searchQuery by vm.query.collectAsState()
+    val searchResult = vm.searchResultsPaged.collectAsLazyPagingItems()
     val message by vm.messageManager.collectAsState()
 
 
@@ -116,10 +113,10 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
             horizontalAlignment = Alignment.CenterHorizontally,
             // = Arrangement.Center
         ) {
-            if (openAlertDialog){
+            if (sortModal){
                 SortSelectorModal(
                     currentSortOption = currentSortOption,
-                    dismissFunction = {openAlertDialog = false},
+                    dismissFunction = { vm.setSortModal(false) },
                     sortOptionSelected = { vm.sortList(it) }
                 )
             }
@@ -133,7 +130,7 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                     }
 
                     Spacer(Modifier.weight(1f))
-                    IconButton(onClick = {openAlertDialog = true}) {
+                    IconButton(onClick = { vm.setSortModal(true) }) {
                         Icon(Icons.Default.Menu, "order", tint = MaterialTheme.colorScheme.primary)
                     }
                 }
@@ -153,9 +150,9 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                         onSearch = { query ->
 
                         },
-                        active = isActive,
+                        active = searchBarOpen,
                         onActiveChange = { active ->
-                            isActive = active
+                            vm.setSearchbar(active)
                         },
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                         trailingIcon = {
@@ -164,14 +161,17 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                             ) { Icon(Icons.Default.Clear, "clear") }
                         },
 
-                        //leadingIcon = @Composable (() -> Unit)? = { Icon(Icons.Default.Search, contentDescription = "Search") }
                     ){
                         LazyColumn {
                             if (searchResult.itemCount > 0){
                                 items(searchResult.itemCount) { index ->
                                     val item = searchResult[index]
                                     item?.let {
-                                        SongRow(it, navController, { vm.setDeleteModal(true) })
+                                        SongRow(it, navController, {
+                                            coroutineScope.launch {
+                                                vm.deleteSong(it)
+                                            }
+                                        })
                                     }
                                 }
                             }

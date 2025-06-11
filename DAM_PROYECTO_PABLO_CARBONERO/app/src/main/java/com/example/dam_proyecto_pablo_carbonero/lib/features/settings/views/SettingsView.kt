@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,6 +43,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,35 +61,31 @@ import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.composables.BackupWarningModal
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.composables.DeleteAccountModal
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels.SettingsVM
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewModel()) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     val latinNotes by vm.latinNotes.collectAsState()
     val loggedIn by vm.loggedIn.collectAsState()
     val isLoading by vm.isLoading.collectAsState()
     val localDate by vm.localDate.collectAsState()
     val cloudDate by vm.cloudDate.collectAsState()
-
     var notations by remember { mutableStateOf(false) }
-
-
-    var saveModal by remember { mutableStateOf(false) }
-    var loadModal by remember { mutableStateOf(false) }
-    var deleteModal by remember { mutableStateOf(false) }
-    var deleteAccountModal by remember { mutableStateOf(false) }
-
+    val saveModal by vm.saveModal.collectAsState()
+    val loadModal by vm.loadModal.collectAsState()
+    val deleteModal by vm.deleteModal.collectAsState()
+    val deleteAccountModal by vm.deleteAccountModal.collectAsState()
     val message by vm.messageManager.collectAsState()
 
 
     LaunchedEffect(message) {
         if (message.isSuccess == false){
             Toast.makeText(context, message.message, Toast.LENGTH_SHORT).show()
+            vm.resetMessageManager()
         }
     }
 
@@ -225,9 +221,9 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                                     )
                                 },
                                 {
-                                    CoroutineScope(Dispatchers.IO).launch {
+                                    coroutineScope.launch {
                                         vm.loadBackUpInfo()
-                                        saveModal = true
+                                        vm.setSaveModal(true)
                                     }
                                 }
                             )
@@ -241,9 +237,9 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                                     )
                                 },
                                 {
-                                    CoroutineScope(Dispatchers.IO).launch {
+                                    coroutineScope.launch {
                                         vm.loadBackUpInfo()
-                                        loadModal = true
+                                        vm.setLoadModal(true)
                                     }
                                 }
                             )
@@ -252,10 +248,9 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                                 "Delete data",
                                 { Icon(imageVector = Icons.Default.CloudOff, contentDescription = "") },
                                 {
-                                    CoroutineScope(Dispatchers.IO).launch {
+                                    coroutineScope.launch {
                                         vm.loadBackUpInfo()
-
-                                        deleteModal = true
+                                        vm.setDeleteModal(true)
                                     }
                                 }
                             )
@@ -270,7 +265,7 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                                 title = "Delete Account",
                                 composable = { Icons.Default.Delete },
                                 onClick = {
-                                    deleteAccountModal = true
+                                    vm.setDeleteAccountModal(true)
                                 }
                             )
 
@@ -304,15 +299,15 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                     cloudDate,
                     Icons.Default.CloudUpload,
                     onSubmit = {
-                        CoroutineScope(Dispatchers.Main).launch {
+                        coroutineScope.launch {
                             val result = vm.uploadData()
                             if (!result)
                                 Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
 
-                            saveModal = false
+                            vm.setSaveModal(false)
                         }
                     },
-                    onDismiss = { saveModal = false }
+                    onDismiss = { vm.setSaveModal(false) }
                 )
             if (loadModal)
                 BackupWarningModal(
@@ -322,15 +317,13 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                     cloudDate,
                     Icons.Default.CloudDownload,
                     onSubmit = {
-                        CoroutineScope(Dispatchers.Main).launch {
+                        coroutineScope.launch {
                             val result = vm.downloadData()
-                            if (!result)
-                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-
-                            loadModal = false
+                            if(result)
+                                vm.setLoadModal(false)
                         }
                     },
-                    onDismiss = { loadModal = false }
+                    onDismiss = { vm.setLoadModal(false) }
                 )
             if (deleteModal)
                 BackupWarningModal(
@@ -340,27 +333,25 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                     cloudDate,
                     Icons.Default.CloudOff,
                     onSubmit = {
-                        CoroutineScope(Dispatchers.Main).launch {
+                        coroutineScope.launch {
                             val result = vm.deleteData()
-                            if (!result)
-                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-
-                            deleteModal = false
+                            if(result)
+                                vm.setDeleteModal(false)
                         }
                     },
-                    onDismiss = { deleteModal = false }
+                    onDismiss = { vm.setDeleteModal(false) }
                 )
 
             if(deleteAccountModal)
                 DeleteAccountModal(
                     title = "Delete Account",
                     body = "You cannot undo this action",
-                    onDismiss = { deleteAccountModal = false },
+                    onDismiss = { vm.setDeleteAccountModal(false) },
                     onSubmit = {
-                        CoroutineScope(Dispatchers.Main).launch {
+                        coroutineScope.launch {
                             val result = vm.deleteAccount(it)
                             if (result){
-                                deleteModal = false
+                                vm.setDeleteAccountModal(false)
                                 navController.navigate("Load"){
                                     popUpTo("Tuner"){ inclusive = true }
                                 }

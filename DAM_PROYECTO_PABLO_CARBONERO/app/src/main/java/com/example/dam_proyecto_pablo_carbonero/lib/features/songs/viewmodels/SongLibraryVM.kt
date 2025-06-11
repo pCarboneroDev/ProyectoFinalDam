@@ -8,12 +8,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
 import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
-import com.example.dam_proyecto_pablo_carbonero.lib.extensions.sortByOption
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.DeleteSongUseCase
-import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetAllSongsUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetPagedSongsUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.SearchSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetTuningByIdUseCase
@@ -22,20 +19,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -47,14 +38,8 @@ class SongLibraryVM @Inject constructor(
     private val deleteSongUseCase: DeleteSongUseCase
 ): ViewModel() {
 
-    private val _songList = MutableStateFlow<List<SongWithTuning>>(emptyList())
-    val songList: StateFlow<List<SongWithTuning>> = _songList
-
     private val _selectedSortOption = MutableStateFlow<SortOption>(SortOption.DATE_ASCENDING)
     val selectedSortOption: StateFlow<SortOption> = _selectedSortOption
-
-    private val _searchQuery = MutableStateFlow<String>("")
-    val searchQuery: StateFlow<String> = _searchQuery
 
     private val _query = MutableStateFlow<String>("")
     val query: StateFlow<String> = _query
@@ -65,11 +50,16 @@ class SongLibraryVM @Inject constructor(
     private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true, ""))
     val messageManager: StateFlow<MessageManager> = _messageManager
 
-    private val _deleteModal = MutableStateFlow<Boolean>(false)
-    val deleteModal: StateFlow<Boolean> = _deleteModal
+    private val _sortModal = MutableStateFlow<Boolean>(false)
+    val sortModal: StateFlow<Boolean> = _sortModal
 
-    fun setDeleteModal(value: Boolean){
-        _deleteModal.value = value
+
+    fun setSortModal(value: Boolean){
+        _sortModal.value = value
+    }
+
+    fun setSearchbar(value: Boolean){
+        _isSearchBarOpen.value = value
     }
 
 

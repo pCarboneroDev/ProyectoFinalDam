@@ -34,6 +34,11 @@ class DownloadBackupUseCase @Inject constructor(
     private val prefsRepository: UserPreferencesRepository,
     private val firebaseRepository: FirebaseRepository
 ) : UseCase<Unit, Boolean> {
+
+    /**
+     * caso de uso para realizar la descarga de datos de firebase y cargarlos en el dispositivo
+     * @return true si ha realizado laa acción exitosamente, false si no hay datos en la nube
+     */
     override suspend fun call(param: Unit): Boolean {
 
         val doc = firebaseRepository.downloadBackup()

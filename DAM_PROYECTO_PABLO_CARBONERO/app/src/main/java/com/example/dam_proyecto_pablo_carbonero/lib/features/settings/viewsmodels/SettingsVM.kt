@@ -1,6 +1,10 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.repositories_impl.UserPreferencesRepositoryImpl
@@ -18,6 +22,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,7 +43,6 @@ class SettingsVM @Inject constructor(
     private val _loggedIn = MutableStateFlow<Boolean>(false)
     val loggedIn: StateFlow<Boolean> = _loggedIn
 
-
     private val _isLoading = MutableStateFlow<Boolean>(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -48,9 +52,39 @@ class SettingsVM @Inject constructor(
     private val _cloudDate = MutableStateFlow<String>("")
     val cloudDate: StateFlow<String> = _cloudDate
 
-
     private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true, ""))
     val messageManager: StateFlow<MessageManager> = _messageManager
+
+    private val _saveModal = MutableStateFlow<Boolean>(false)
+    val saveModal: StateFlow<Boolean> = _saveModal.asStateFlow()
+
+    private val _loadModal = MutableStateFlow<Boolean>(false)
+    val loadModal: StateFlow<Boolean> = _loadModal
+
+    private val _deleteModal = MutableStateFlow<Boolean>(false)
+    val deleteModal: StateFlow<Boolean> = _deleteModal
+
+    private val _deleteAccountModal = MutableStateFlow<Boolean>(false)
+    val deleteAccountModal: StateFlow<Boolean> = _deleteAccountModal
+
+
+
+    fun setSaveModal(value: Boolean){
+        _saveModal.value = value
+    }
+
+    fun setLoadModal(value: Boolean){
+        _loadModal.value = value
+    }
+
+    fun setDeleteModal(value: Boolean){
+        _deleteModal.value = value
+    }
+
+    fun setDeleteAccountModal(value: Boolean){
+        _deleteAccountModal.value = value
+    }
+
 
     init {
         viewModelScope.launch(Dispatchers.Main) {
@@ -66,8 +100,6 @@ class SettingsVM @Inject constructor(
         _latinNotes.value = prefRepo.getNotationPreference()
 
         var user = _auth.currentUser
-
-        Log.d("USER LOGGEDIN: ", "${user != null}")
 
         if (user != null) {
             _loggedIn.value = true
@@ -89,7 +121,6 @@ class SettingsVM @Inject constructor(
         }
         catch (e: Exception){
             _messageManager.value = MessageManager(false)
-            // todo gestionar error
         }
 
     }
@@ -143,7 +174,7 @@ class SettingsVM @Inject constructor(
             _isLoading.value = true
             success = downloadBackupUseCase.call(Unit)
             _isLoading.value = false
-            if(!success) _messageManager.value = MessageManager(false)
+            if(!success) _messageManager.value = MessageManager(false, "There is no data in the cloud")
         } catch (e: Exception) {
             _messageManager.value = MessageManager(false)
             return false
@@ -183,5 +214,9 @@ class SettingsVM @Inject constructor(
             _messageManager.value = MessageManager(false)
             return false
         }
+    }
+
+    fun resetMessageManager(){
+        _messageManager.value = MessageManager(true)
     }
 }

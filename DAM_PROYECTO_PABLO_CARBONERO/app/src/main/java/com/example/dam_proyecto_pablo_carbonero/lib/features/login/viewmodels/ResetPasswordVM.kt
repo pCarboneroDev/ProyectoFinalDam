@@ -21,11 +21,18 @@ class ResetPasswordVM @Inject constructor(
     private val _wrongEmail = MutableStateFlow<Boolean>(false)
     val wrongEmail: StateFlow<Boolean> = _wrongEmail
 
+    private val _isLoading = MutableStateFlow<Boolean>(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _mailSent = MutableStateFlow<Boolean>(false)
+    val mailSent: StateFlow<Boolean> = _mailSent
+
     fun setEmail(value:String){
         _email.value = value
     }
 
     suspend fun sendEmail(){
+        _isLoading.value = true
         try{
             if(isEmailValid()){
                 sendPasswordResetEmailUseCase.call(_email.value)
@@ -36,7 +43,10 @@ class ResetPasswordVM @Inject constructor(
         }
         catch (e: Exception){
             Log.d("ERROR", e.toString())
+            _isLoading.value = false
         }
+        _isLoading.value = false
+        _mailSent.value = true
     }
 
     private fun isEmailValid(): Boolean{

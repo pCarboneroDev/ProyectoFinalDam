@@ -53,7 +53,7 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
     val selectedNotes by vm.selectedNotes.collectAsState()
     val latinNotes by vm.latinNotes.collectAsState()
     val messageManager by vm.messageManager.collectAsState()
-    var modal by remember { mutableStateOf(false) }
+    val delteModal by vm.deleteModal.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -165,8 +165,8 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
 
         Spacer(modifier = Modifier.weight(1f))
 
-        if (modal) DeleteModal(
-            dismissFunction = { modal = false }, onDeletePressed = {
+        if (delteModal) DeleteModal(
+            dismissFunction = { vm.setDeleteModal(false) }, onDeletePressed = {
                 coroutineScope.launch {
                     val result = vm.deleteTuning()
                     if (result)
@@ -183,13 +183,7 @@ fun EditTuningView(navController: NavHostController, vm: EditTuningVM = hiltView
                 containerColor = MaterialTheme.colorScheme.error
             ),
             onClick = {
-                modal = true
-                /*CoroutineScope(Dispatchers.Main).launch {
-                    vm.borrarAfinacion()
-                }
-                navController.navigate("Tuner"){
-                    popUpTo("EditTuning") { inclusive = true }
-                }*/
+                vm.setDeleteModal(true)
             }
         ) {
             Text("Delete")

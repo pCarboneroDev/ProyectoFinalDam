@@ -50,6 +50,9 @@ class EditTuningVM @Inject constructor(
     private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true, ""))
     val messageManager: StateFlow<MessageManager> = _messageManager
 
+    private val _deleteModal = MutableStateFlow<Boolean>(false)
+    val deleteModal: StateFlow<Boolean> = _deleteModal
+
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -80,6 +83,9 @@ class EditTuningVM @Inject constructor(
         _tuningName.value = value
     }
 
+    fun setDeleteModal(value: Boolean){
+        _deleteModal.value = value
+    }
 
     // METODOS
     /**

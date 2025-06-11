@@ -49,28 +49,34 @@ fun AddTabsModal(
                     Row(Modifier.fillMaxWidth()) {
                         Text("Tabs", style = TextStyle(fontSize = 30.sp, fontWeight = FontWeight.Bold))
                         Spacer(Modifier.weight(1f))
-                        Button(onClick = {
-                            val annotatedString = clipboardManager.getText()
-                            if(isGuitarTabFormatFlexible(annotatedString.toString())){
-                                tabs = annotatedString.toString()
-                            }
-                            else{
-                                Toast.makeText(context, "El formato no es correcto", Toast.LENGTH_SHORT).show()
-                            }
 
-                        }) { Text("Paste from clipboard") }
+                        if(tabs.isEmpty())
+                            Button(onClick = {
+                                val annotatedString = clipboardManager.getText()
+                                if(isGuitarTabFormatFlexible(annotatedString.toString())){
+                                    tabs = annotatedString.toString()
+                                }
+                                else{
+                                    Toast.makeText(context, "Wrong format", Toast.LENGTH_SHORT).show()
+                                }
+
+                            }) { Text("Paste from clipboard") }
+                        else{
+                            Button(
+                                onClick = { dismissFunction() },
+                            ) {
+                                Text("Cancel")
+                            }
+                            Button(
+                                onClick = { saveMethod(tabs) },
+                            ) {
+                                Text("Save")
+                            }
+                        }
+
                     }
                     TabsBox(tabs)
                 }
-                if(tabs.isNotEmpty())
-                    Button(
-                        onClick = { saveMethod(tabs) },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(bottom = 8.dp) // Optional padding from bottom
-                    ) {
-                        Text("Save")
-                    }
             }
 
         }
