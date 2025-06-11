@@ -99,7 +99,7 @@ class EditSongVM @Inject constructor(
         if (isNumeric(value)){
             _bpm.value = value
 
-            if (_bpm.value!!.toDouble() > 400){
+            if (_bpm.value.toDouble() > 400){
                 _bpm.value = "400"
             }
         }

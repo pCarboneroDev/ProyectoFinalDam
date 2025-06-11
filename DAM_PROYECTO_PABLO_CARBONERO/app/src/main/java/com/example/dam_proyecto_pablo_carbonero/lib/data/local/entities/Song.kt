@@ -2,7 +2,9 @@ package com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 
 @Entity(
     tableName = "Songs",
