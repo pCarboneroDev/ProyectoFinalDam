@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +43,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltViewModel()){
     val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
+    val maxChars = 25
 
     val tuningList by vm.tuningList.collectAsState()
     val selectedTuning by vm.selectedTuning.collectAsState()
@@ -49,11 +52,17 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
     val bandName by vm.bandName.collectAsState("")
     val bmp by vm.bpm.collectAsState("")
     val tabs by vm.tabs.collectAsState("")
+    val tabsModal by vm.tabsModal.collectAsState()
+    val messageManager by vm.messageManager.collectAsState()
 
-    var expanded by remember { mutableStateOf(false) }
-    var tabsModal by remember { mutableStateOf(false) }
 
-    val maxChars = 25
+
+    LaunchedEffect(messageManager) {
+        if(!messageManager.isSuccess){
+            Toast.makeText(context, messageManager.message, Toast.LENGTH_SHORT).show()
+            vm.resetMessageManager()
+        }
+    }
 
     Column(
         Modifier
@@ -144,7 +153,7 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                tabsModal = true
+                vm.setTabsModal(true)
             }
         ) {
             Text("Add tabs")
@@ -153,10 +162,10 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
         if (tabsModal) {
             AddTabsModal(
                 saveMethod = {
-                    vm.setKey(it)
-                    tabsModal = false
+                    vm.setTabs(it)
+                    vm.setTabsModal(false)
                 },
-                dismissFunction = { tabsModal = false },
+                dismissFunction = { vm.setTabsModal(false) },
                 currentTabs = tabs, context)
         }
     }

@@ -13,10 +13,15 @@ import java.util.Locale
 class UpdateFavouriteUseCase(
     private val tuningRepository: TuningRepository,
     private val prefsRepo: UserPreferencesRepository
-): UseCase<Tuning, Boolean> {
+): UseCase<Tuning, Unit> {
     private val maxTuningFavs = 10
-    override suspend fun call(param: Tuning): Boolean {
 
+    /**
+     * Caso de uso que se encarga de poner o quitar una afinación como favorita aplicando la lógica de negocio necesaria,
+     * sí es el número va a superar el límite lanza una FullFavouriteTuningsException
+     * @param param objeto de Tuning que se va a poner o eliminar de favorito
+     */
+    override suspend fun call(param: Tuning) {
         val date = Timestamp.now().toDate()
         val formatter = SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault())
 
@@ -24,17 +29,13 @@ class UpdateFavouriteUseCase(
             formatter.format(date)
         )
 
-        val tuningList = tuningRepository.getAllTunings().filter { it.favourite == true}
+        val tuningList = tuningRepository.getAllTunings().filter { it.favourite == true }
 
+        // si se va a marcar como favourite = true y el límite ha sido alcanzado
         if(param.favourite && tuningList.size >= maxTuningFavs){
             throw FullFavouriteTuningsException("You've reached the limit of favourite tunings")
         }
-        try{
-            tuningRepository.updateTuningFavourite(param.id, param.favourite)
-        }catch (e: Exception){
-            throw e
-        }
 
-        return true
+        tuningRepository.updateTuningFavourite(param.id, param.favourite)
     }
 }

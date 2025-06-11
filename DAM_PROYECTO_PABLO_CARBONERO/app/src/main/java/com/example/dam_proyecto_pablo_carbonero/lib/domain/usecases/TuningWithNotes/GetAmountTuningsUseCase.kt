@@ -6,6 +6,10 @@ import javax.inject.Inject
 
 class GetAmountTuningsUseCase @Inject constructor(
     private val getAllTuningWithNotesUseCase: GetAllTuningWithNotesUseCase
+    /**
+     * Caso de uso que devuelve una determinada cantidad de afinaciones con sus notas
+     * @param param recibe un Int con la cantidad de elementos que desea recibir
+     */
 ): UseCase<Int, List<TuningWithNotesModel>> {
     override suspend fun call(param: Int): List<TuningWithNotesModel> {
         var list = getAllTuningWithNotesUseCase.call(Unit).sortedWith(

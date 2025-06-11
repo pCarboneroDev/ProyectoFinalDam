@@ -35,9 +35,7 @@ class UserTuningsVM @Inject constructor(
         }
     }
 
-    suspend fun setTuningAsFavourite(tuning: TuningWithNotesModel): Pair<Boolean, String> {
-        var updated = true
-        var message = ""
+    suspend fun setTuningAsFavourite(tuning: TuningWithNotesModel) {
         try{
             updateFavouriteUseCase.call(
                 Tuning(
@@ -49,14 +47,11 @@ class UserTuningsVM @Inject constructor(
             loadTunings()
         }
         catch (favE: FullFavouriteTuningsException){
-            updated = false
-            message = favE.message.toString()
+            _messageManager.value = MessageManager(false, favE.message.toString())
         }
         catch (e: Exception){
-            updated = false
-            message = "Unexpected error. Try again later"
+            _messageManager.value = MessageManager(false)
         }
-        return Pair(updated, message)
     }
 
     suspend fun loadTunings(){
@@ -70,7 +65,6 @@ class UserTuningsVM @Inject constructor(
             list.sort()
             val rowsDeleted = deleteTuningUseCase.call(TuningWithNotesModel(tuning.tuning, list))
             saved = rowsDeleted > 0
-            val index = _tuningList.value.indexOf(tuning)
             _tuningList.value = _tuningList.value.toMutableList().apply {
                 remove(tuning)
             }

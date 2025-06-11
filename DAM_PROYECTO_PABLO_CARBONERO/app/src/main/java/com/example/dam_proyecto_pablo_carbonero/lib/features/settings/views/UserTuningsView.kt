@@ -15,7 +15,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -41,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.DeleteModal
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.DetailsHeader
@@ -85,10 +83,7 @@ fun UserTuningsView(navController: NavHostController, vm: UserTuningsVM = hiltVi
                     },
                     onFav = {
                         CoroutineScope(Dispatchers.Main).launch() {
-                            val (result, message) =  vm.setTuningAsFavourite(it)
-                            if(!result){
-                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                            }
+                            vm.setTuningAsFavourite(it)
                         }
                     }
                 )

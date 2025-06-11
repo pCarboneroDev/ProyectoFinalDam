@@ -8,10 +8,12 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.InsertSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.GetAllTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.exceptions.InvalidFormException
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,7 +23,7 @@ class CreateSongVM @Inject constructor(
     private val insertSongUseCase: InsertSongUseCase
 ): ViewModel() {
     private val _tuningList = MutableStateFlow<List<Tuning>>(emptyList())
-    val tuningList: StateFlow<List<Tuning>> = _tuningList
+    val tuningList: StateFlow<List<Tuning>> = _tuningList.asStateFlow()
 
     private val _selectedTuning = MutableStateFlow<Tuning?>(null)
     val selectedTuning: StateFlow<Tuning?> = _selectedTuning
@@ -39,6 +41,14 @@ class CreateSongVM @Inject constructor(
     val tabs: StateFlow<String> = _tabs
 
     private lateinit var _finalSong: SongWithTuning
+
+    //Dialog
+    private val _tabsModal = MutableStateFlow<Boolean>(false)
+    val tabsModal: StateFlow<Boolean> = _tabsModal.asStateFlow()
+
+    // Message manager
+    private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true))
+    val messageManager: StateFlow<MessageManager> = _messageManager.asStateFlow()
 
 
     init {
@@ -77,8 +87,12 @@ class CreateSongVM @Inject constructor(
         if (value == "") _bpm.value = ""
     }
 
-    fun setKey(value: String) {
+    fun setTabs(value: String) {
         _tabs.value = value
+    }
+
+    fun setTabsModal(value: Boolean){
+        _tabsModal.value = value
     }
 
     /**
@@ -138,5 +152,9 @@ class CreateSongVM @Inject constructor(
      */
     fun isFormValid(): Boolean {
         return (!isSongNameValid() && !isBandNameValid() && !isBpmValid() && _selectedTuning.value != null)
+    }
+
+    fun resetMessageManager() {
+        _messageManager.value = MessageManager(true)
     }
 }

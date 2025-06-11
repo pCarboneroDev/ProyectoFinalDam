@@ -13,6 +13,11 @@ class GetAllTuningWithNotesUseCase @Inject constructor(
     private val tuningMusicNoteRepository: TuningMusicNoteRepository
 ): UseCase<Unit, List<TuningWithNotesModel>> {
 
+    /**
+     * Caso de uso que devuelve una lista con todas las Afinaciones y sus notas de la bbdd
+     * @param param es de tipo Unit, es decir, recibe nada
+     * @return lista de afinaciones con sus notas
+     */
     override suspend fun call(param: Unit): List<TuningWithNotesModel> {
         var tuningList = tuningRepository.getAllTunings()
 

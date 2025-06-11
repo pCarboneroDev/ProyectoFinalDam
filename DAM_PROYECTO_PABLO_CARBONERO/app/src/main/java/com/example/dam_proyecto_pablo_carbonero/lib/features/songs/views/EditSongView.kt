@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,11 +44,11 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewModel()){
-    val song by vm.selectedSong.collectAsState()
     var expanded by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val maxChars = 25
 
+    val song by vm.selectedSong.collectAsState()
     val tuningList by vm.tuningList.collectAsState()
     val selectedTuning by vm.selectedTuning.collectAsState()
     val songName by vm.songName.collectAsState("")
@@ -55,8 +56,18 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
     val bmp by vm.bpm.collectAsState("")
     val key by vm.tabs.collectAsState("")
 
-    var modal by remember { mutableStateOf(false) }
-    var tabs by remember { mutableStateOf(false) }
+    val tabsModal by vm.tabsModal.collectAsState()
+    val deleteModal by vm.deleteModal.collectAsState()
+    val messageManager by vm.messageManager.collectAsState()
+
+
+
+    LaunchedEffect(messageManager) {
+        if(!messageManager.isSuccess){
+            Toast.makeText(context, messageManager.message, Toast.LENGTH_SHORT).show()
+            vm.resetMessageManager()
+        }
+    }
 
     Column(Modifier
         .fillMaxSize()
@@ -68,16 +79,13 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             navController = navController,
             saveMethod = {
                 CoroutineScope(Dispatchers.Main).launch {
-                    var (saved, message) = vm.saveSong()
+                    var saved = vm.saveSong()
 
                     if (saved){
                         navController.navigate("SongDetails/${song?.id}/${song?.tuningId}"){
                             popUpTo("SongTuning"){ inclusive = false }
                             launchSingleTop = true
                         }
-                    }
-                    else{
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -155,27 +163,28 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             modifier = Modifier.fillMaxWidth(),
 
             onClick = {
-                tabs = true
+                vm.setTabsModal(true)
             }
         ) {
             Text("Add tabs")
         }
 
-        if (tabs) {
-            AddTabsModal(saveMethod = { vm.setKey(it) }, dismissFunction = { tabs = false }, currentTabs = key, context)
+        if (tabsModal) {
+            AddTabsModal(saveMethod = { vm.setKey(it) }, dismissFunction = { vm.setTabsModal(false) }, currentTabs = key, context)
         }
 
 
-        if (modal) DeleteModal(
-            dismissFunction = {modal = false}, onDeletePressed = {
-                CoroutineScope(Dispatchers.Main).launch {
-                    vm.deleteSong()
+        if (deleteModal)
+            DeleteModal(
+                dismissFunction = { vm.setDeleteModal(false) }, onDeletePressed = {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        vm.deleteSong()
+                    }
+                    navController.navigate("Tuner"){
+                        popUpTo("SongTuning") { inclusive = false }
+                    }
                 }
-                navController.navigate("Tuner"){
-                    popUpTo("SongTuning") { inclusive = false }
-                }
-            }
-        )
+            )
 
         Button(
             modifier = Modifier.fillMaxWidth(),
@@ -183,7 +192,7 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
                 containerColor = MaterialTheme.colorScheme.error
             ),
             onClick = {
-                modal = true
+                 vm.setTabsModal(true)
             }
         ) {
             Text("Delete")

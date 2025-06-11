@@ -10,10 +10,12 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.UpdateSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.GetAllTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.exceptions.InvalidFormException
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,25 +30,38 @@ class EditSongVM @Inject constructor(
     val songId = savedStateHandle.get<String>("songId") ?: ""
 
     private val _selectedSong = MutableStateFlow<Song?>(null)
-    val selectedSong: StateFlow<Song?> = _selectedSong
+    val selectedSong: StateFlow<Song?> = _selectedSong.asStateFlow()
 
     private val _selectedTuning = MutableStateFlow<Tuning?>(null)
-    val selectedTuning: StateFlow<Tuning?> = _selectedTuning
+    val selectedTuning: StateFlow<Tuning?> = _selectedTuning.asStateFlow()
 
     private val _tuningList = MutableStateFlow<List<Tuning>>(emptyList())
-    val tuningList: StateFlow<List<Tuning>> = _tuningList
+    val tuningList: StateFlow<List<Tuning>> = _tuningList.asStateFlow()
 
+    // campos de texto
     private val _songName = MutableStateFlow<String>("")
-    val songName: StateFlow<String> = _songName
+    val songName: StateFlow<String> = _songName.asStateFlow()
 
     private val _bandName = MutableStateFlow<String>("")
-    val bandName: StateFlow<String> = _bandName
+    val bandName: StateFlow<String> = _bandName.asStateFlow()
 
     private val _bpm = MutableStateFlow<String>("")
-    val bpm: StateFlow<String> = _bpm
+    val bpm: StateFlow<String> = _bpm.asStateFlow()
 
     private val _tabs = MutableStateFlow<String>("")
-    val tabs: StateFlow<String> = _tabs
+    val tabs: StateFlow<String> = _tabs.asStateFlow()
+
+    // dialogs
+    private val _deleteModal = MutableStateFlow<Boolean>(false)
+    val deleteModal: StateFlow<Boolean> = _deleteModal.asStateFlow()
+    private val _tabsModal = MutableStateFlow<Boolean>(false)
+    val tabsModal: StateFlow<Boolean> = _tabsModal.asStateFlow()
+
+    // Message manager
+    private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true))
+    val messageManager: StateFlow<MessageManager> = _messageManager.asStateFlow()
+
+
 
 
     init {
@@ -60,7 +75,7 @@ class EditSongVM @Inject constructor(
 
                 loadData(_selectedSong.value!!)
             }catch (e: Exception){
-                // todo gestionar excepción
+                _messageManager.value = MessageManager(false, "Error while loading data")
             }
         }
     }
@@ -110,13 +125,19 @@ class EditSongVM @Inject constructor(
         _tabs.value = value
     }
 
+    fun setDeleteModal(value: Boolean){
+        _deleteModal.value = value
+    }
+    fun setTabsModal(value: Boolean){
+        _tabsModal.value = value
+    }
+
     /**
      * Metodo para guardar una canción en la bbdd
      * return: true si se ha guaradado, false si hubo un error.
      */
-    suspend fun saveSong(): Pair<Boolean, String>{
+    suspend fun saveSong(): Boolean{
         var saved = true
-        var message = ""
 
         try{
             if(!isFormValid()){
@@ -134,13 +155,13 @@ class EditSongVM @Inject constructor(
         }
         catch (form: InvalidFormException){
             saved = false
-            message = form.message.toString()
+            _messageManager.value = MessageManager(false, form.message.toString())
         }
         catch (e: Exception){
-            saved = false;
-            message = "Unexpected error. Try again later"
+            saved = false
+            _messageManager.value = MessageManager(false)
         }
-        return Pair(saved, message)
+        return saved
     }
 
     /**
@@ -148,7 +169,7 @@ class EditSongVM @Inject constructor(
      */
     suspend fun updateSong(song: Song){
         try{
-            var rowsAffected = updateSongUseCase.call(song)
+            updateSongUseCase.call(song)
         }catch (e: Exception){
             throw e
         }
@@ -158,7 +179,7 @@ class EditSongVM @Inject constructor(
         try{
             deleteSongUseCase.call(songId.toLong())
         }catch (e: Exception){
-            //todo gestionar excepcion
+            _messageManager.value = MessageManager(false)
         }
     }
 
@@ -180,5 +201,9 @@ class EditSongVM @Inject constructor(
 
     fun isFormValid(): Boolean {
         return (!isSongNameValid() && !isBandNameValid() && !isBpmValid() && _selectedTuning.value != null)
+    }
+
+    fun resetMessageManager() {
+        _messageManager.value = MessageManager(true)
     }
 }

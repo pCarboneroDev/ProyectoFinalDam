@@ -14,23 +14,22 @@ class DeleteTuningUseCase @Inject constructor(
     private val tuningRepository: TuningRepository,
     private val tuningMusicNoteRepository: TuningMusicNoteRepository,
     private val prefsRepo: UserPreferencesRepository
-): UseCase<TuningWithNotesModel, Int> {
+) : UseCase<TuningWithNotesModel, Int> {
+    /**
+     * Caso de uso para borrar una afinación en la bbdd
+     * @param param recibe objeto de TuningWithNotesModel que contiene la afinación y las notas se van a borrar
+     * @return el número de filas afectadas
+     * Sí hay una excepción se captura y gestiona en el vm
+     */
     override suspend fun call(param: TuningWithNotesModel): Int {
-        try {
-            val date = Timestamp.now().toDate()
-            val formatter = SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault())
+        val date = Timestamp.now().toDate()
+        val formatter = SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault())
 
-            prefsRepo.setLastModificationDate(
-                formatter.format(date)
-            )
-
-            tuningMusicNoteRepository.deleteNoteByTuningId(param.tuning.id)
-            val rowsAffected = tuningRepository.deleteTuningById(param.tuning.id)
-            return rowsAffected
-        }
-        catch (e: Exception){
-            throw e
-        }
-        return 0
+        prefsRepo.setLastModificationDate(
+            formatter.format(date)
+        )
+        tuningMusicNoteRepository.deleteNoteByTuningId(param.tuning.id)
+        val rowsAffected = tuningRepository.deleteTuningById(param.tuning.id)
+        return rowsAffected
     }
 }

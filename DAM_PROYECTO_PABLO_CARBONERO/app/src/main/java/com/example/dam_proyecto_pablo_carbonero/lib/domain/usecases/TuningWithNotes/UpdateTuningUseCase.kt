@@ -15,7 +15,10 @@ class UpdateTuningUseCase(
     private val tuningMusicNoteRepository: TuningMusicNoteRepository,
     private val prefsRepo: UserPreferencesRepository
 ): UseCase<TuningWithNotesModel, Boolean> {
-
+    /**
+     * caso de uso que usa los repositorios para actualizar una afinación en la bbdd
+     * @param param el objeto que se va a actualizar
+     */
     override suspend fun call(param: TuningWithNotesModel): Boolean {
         var saved = true
         try{

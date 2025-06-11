@@ -13,6 +13,11 @@ class GetTuningByIdUseCase @Inject constructor(
     private val tuningMusicNoteRepository: TuningMusicNoteRepository
 ): UseCase<Long, TuningWithNotesModel> {
 
+    /**
+     * Caso de uso que devuelve una afinación con sus notas buscada por su id
+     * @param param el id del elemento buscado
+     * @return Objeto de TuningWithNotes de la bbdd con el id solicitado
+     */
     override suspend fun call(param: Long): TuningWithNotesModel {
         var tuningModel: TuningWithNotesModel
         try {

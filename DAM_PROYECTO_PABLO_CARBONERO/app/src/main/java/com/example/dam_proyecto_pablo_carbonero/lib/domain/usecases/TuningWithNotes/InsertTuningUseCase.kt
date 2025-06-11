@@ -17,6 +17,11 @@ class InsertTuningUseCase @Inject constructor(
     private val prefsRepo: UserPreferencesRepository
 ): UseCase<TuningWithNotesModel, Boolean> {
 
+    /**
+     * Caso de uso que accede a los repositorios para insertar una nueva afinación y sus notas en la bbdd
+     * @param param el objeto que se va a insertar en la bbdd
+     * @return boolean indicando si se ha insertado o no
+     */
     override suspend fun call(param: TuningWithNotesModel): Boolean {
         var saved = true
         try{
