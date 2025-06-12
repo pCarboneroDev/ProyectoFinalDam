@@ -122,7 +122,7 @@ class EditSongVM @Inject constructor(
         if (value == "") _bpm.value = ""
     }
 
-    fun setKey(value: String) {
+    fun setTabs(value: String) {
         _tabs.value = value
     }
 

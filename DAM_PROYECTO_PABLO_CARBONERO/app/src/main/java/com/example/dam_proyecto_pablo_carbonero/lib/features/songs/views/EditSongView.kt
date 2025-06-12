@@ -170,7 +170,13 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
         }
 
         if (tabsModal) {
-            AddTabsModal(saveMethod = { vm.setKey(it) }, dismissFunction = { vm.setTabsModal(false) }, currentTabs = key, context)
+            AddTabsModal(
+                saveMethod = {
+                    vm.setTabs(it)
+                    vm.setTabsModal(false)
+                },
+                dismissFunction = { vm.setTabsModal(false) },
+                currentTabs = key, context)
         }
 
 
