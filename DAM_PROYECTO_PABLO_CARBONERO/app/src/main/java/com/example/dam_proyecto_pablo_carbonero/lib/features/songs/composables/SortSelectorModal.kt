@@ -22,8 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
-import com.example.dam_proyecto_pablo_carbonero.lib.extensions.getName
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.SortOption
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.getName
 
 @Composable
 fun SortSelectorModal(

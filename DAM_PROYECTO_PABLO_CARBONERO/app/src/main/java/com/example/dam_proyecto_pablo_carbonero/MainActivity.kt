@@ -4,6 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -39,21 +44,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    /*companion object {
-        lateinit var database: TuningDatabase
-        val Context.dataStore by preferencesDataStore(name = "user_prefs")
-    }*/
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        /*database = Room.databaseBuilder(
-            applicationContext,
-            TuningDatabase::class.java,
-            "tuner-db"
-        ).fallbackToDestructiveMigration().build()*/
 
         enableEdgeToEdge()
 
@@ -65,21 +57,57 @@ class MainActivity : ComponentActivity() {
                 ) {
 
                     val navController = rememberNavController()
+
+
                     NavHost(
                         navController = navController,
-                        /*enterTransition = {
-                            slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn()
+                        startDestination = "Load",
+                        enterTransition = {
+                            when (initialState.destination.route) {
+                                "CreateTuning",
+                                "EditTuning/{selectedTuningId}",
+                                "CreateSong",
+                                "EditSong/{songId}" -> slideIntoContainer(
+                                    AnimatedContentTransitionScope.SlideDirection.Left, tween(300)
+                                )
+                                else -> fadeIn(animationSpec = tween(700))
+                            }
                         },
                         exitTransition = {
-                            slideOutHorizontally(targetOffsetX = { -1000 }) + fadeOut()
+                            when (targetState.destination.route) {
+                                "CreateTuning",
+                                "EditTuning/{selectedTuningId}",
+                                "CreateSong",
+                                "EditSong/{songId}" -> slideOutOfContainer(
+                                    AnimatedContentTransitionScope.SlideDirection.Left, tween(300)
+                                )
+                                else -> fadeOut(animationSpec = tween(700))
+                            }
                         },
+
                         popEnterTransition = {
-                            slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn()
+                            when (initialState.destination.route) {
+                                "CreateTuning",
+                                "EditTuning/{selectedTuningId}",
+                                "CreateSong",
+                                "EditSong/{songId}" -> slideIntoContainer(
+                                    AnimatedContentTransitionScope.SlideDirection.Right, tween(300)
+                                )
+                                else -> fadeIn(animationSpec = tween(700))
+                            }
                         },
                         popExitTransition = {
-                            slideOutHorizontally(targetOffsetX = { 1000 }) + fadeOut()
-                        },*/
-                        startDestination = "Load"
+                            when (targetState.destination.route) {
+                                "CreateTuning",
+                                "EditTuning/{selectedTuningId}",
+                                "CreateSong",
+                                "EditSong/{songId}" -> slideOutOfContainer(
+                                    AnimatedContentTransitionScope.SlideDirection.Left, tween(300)
+                                )
+                                else -> fadeOut(animationSpec = tween(700))
+                            }
+                        }
+
                     ){
                         composable("Load") {
                             LoadingScreen(navController)
@@ -98,7 +126,9 @@ class MainActivity : ComponentActivity() {
                             TunerView(navController)
                         }
 
-                        composable("CreateTuning") {
+                        composable(
+                            route = "CreateTuning"
+                        ) {
                             CreateTuningView(navController)
                         }
 

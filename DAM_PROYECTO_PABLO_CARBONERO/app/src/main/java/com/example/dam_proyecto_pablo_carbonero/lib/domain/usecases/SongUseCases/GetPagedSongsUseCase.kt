@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.SongRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.UseCase
-import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.SortOption
 import javax.inject.Inject
 
 class GetPagedSongsUseCase @Inject constructor(

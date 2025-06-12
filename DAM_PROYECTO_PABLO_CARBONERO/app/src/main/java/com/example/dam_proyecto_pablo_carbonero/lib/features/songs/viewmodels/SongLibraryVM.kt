@@ -8,13 +8,13 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.example.dam_proyecto_pablo_carbonero.lib.extensions.SortOption
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.DeleteSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetPagedSongsUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.SearchSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetTuningByIdUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.SortOption
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
