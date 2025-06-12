@@ -155,6 +155,7 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                             CreateSongRow(navController)
                         }
 
+
                         if (songListPaged.itemCount > 0){
                             items(songListPaged.itemCount) { index ->
                                 val item = songListPaged[index]
@@ -164,6 +165,15 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
                                             vm.deleteSong(it)
                                         }
                                     })
+                                }
+                            }
+                        }
+                        item {
+                            when {
+                                songListPaged.loadState.refresh is LoadState.Loading -> {
+                                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+                                    }
                                 }
                             }
                         }
