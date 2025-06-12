@@ -151,23 +151,6 @@ fun MainContent(vm: TunerVM, startingTuning: TuningWithNotesModel, navController
     val colorGraph by vm.colorGraph.collectAsState()
 
 
-    LaunchedEffect(Unit) {
-        activity?.let {
-            if (ActivityCompat.checkSelfPermission(it, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                vm.initializeAudioRecord()
-                if (!isRecording) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        vm.startRecordingAudio()
-                    }
-                }
-                vm.setIsRecording(!isRecording)
-            } else {
-                // Solicitar permisos si no se tienen
-                ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.RECORD_AUDIO), 1)
-            }
-        }
-    }
-
 
 
     // composable que contiene el header para seleccionar la afinación
