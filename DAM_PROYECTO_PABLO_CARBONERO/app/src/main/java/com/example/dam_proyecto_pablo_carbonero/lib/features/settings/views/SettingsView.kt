@@ -197,7 +197,8 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                                         )
                                     }
                                 }
-                            }
+                            },
+                            { notations = !notations }
                         )
                         SettingsRow(
                             "My tunings",
