@@ -56,7 +56,7 @@ class SettingsVM @Inject constructor(
     val messageManager: StateFlow<MessageManager> = _messageManager
 
     private val _saveModal = MutableStateFlow<Boolean>(false)
-    val saveModal: StateFlow<Boolean> = _saveModal.asStateFlow()
+    val saveModal: StateFlow<Boolean> = _saveModal
 
     private val _loadModal = MutableStateFlow<Boolean>(false)
     val loadModal: StateFlow<Boolean> = _loadModal

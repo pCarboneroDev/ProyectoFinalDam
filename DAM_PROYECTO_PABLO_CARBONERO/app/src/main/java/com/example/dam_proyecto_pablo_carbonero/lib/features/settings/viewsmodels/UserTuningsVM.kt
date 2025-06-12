@@ -25,10 +25,10 @@ class UserTuningsVM @Inject constructor(
 ): ViewModel() {
 
     private val _tuningList = MutableStateFlow<List<TuningWithNotesModel>>(emptyList())
-    val tuningList: StateFlow<List<TuningWithNotesModel>> = _tuningList.asStateFlow()
+    val tuningList: StateFlow<List<TuningWithNotesModel>> = _tuningList
 
     private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true, ""))
-    val messageManager: StateFlow<MessageManager> = _messageManager.asStateFlow()
+    val messageManager: StateFlow<MessageManager> = _messageManager
 
     init {
         viewModelScope.launch(Dispatchers.IO){

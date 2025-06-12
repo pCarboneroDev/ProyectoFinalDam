@@ -30,36 +30,36 @@ class EditSongVM @Inject constructor(
     val songId = savedStateHandle.get<String>("songId") ?: ""
 
     private val _selectedSong = MutableStateFlow<Song?>(null)
-    val selectedSong: StateFlow<Song?> = _selectedSong.asStateFlow()
+    val selectedSong: StateFlow<Song?> = _selectedSong
 
     private val _selectedTuning = MutableStateFlow<Tuning?>(null)
-    val selectedTuning: StateFlow<Tuning?> = _selectedTuning.asStateFlow()
+    val selectedTuning: StateFlow<Tuning?> = _selectedTuning
 
     private val _tuningList = MutableStateFlow<List<Tuning>>(emptyList())
-    val tuningList: StateFlow<List<Tuning>> = _tuningList.asStateFlow()
+    val tuningList: StateFlow<List<Tuning>> = _tuningList
 
     // campos de texto
     private val _songName = MutableStateFlow<String>("")
-    val songName: StateFlow<String> = _songName.asStateFlow()
+    val songName: StateFlow<String> = _songName
 
     private val _bandName = MutableStateFlow<String>("")
-    val bandName: StateFlow<String> = _bandName.asStateFlow()
+    val bandName: StateFlow<String> = _bandName
 
     private val _bpm = MutableStateFlow<String>("")
-    val bpm: StateFlow<String> = _bpm.asStateFlow()
+    val bpm: StateFlow<String> = _bpm
 
     private val _tabs = MutableStateFlow<String>("")
-    val tabs: StateFlow<String> = _tabs.asStateFlow()
+    val tabs: StateFlow<String> = _tabs
 
     // dialogs
     private val _deleteModal = MutableStateFlow<Boolean>(false)
-    val deleteModal: StateFlow<Boolean> = _deleteModal.asStateFlow()
+    val deleteModal: StateFlow<Boolean> = _deleteModal
     private val _tabsModal = MutableStateFlow<Boolean>(false)
-    val tabsModal: StateFlow<Boolean> = _tabsModal.asStateFlow()
+    val tabsModal: StateFlow<Boolean> = _tabsModal
 
     // Message manager
     private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true))
-    val messageManager: StateFlow<MessageManager> = _messageManager.asStateFlow()
+    val messageManager: StateFlow<MessageManager> = _messageManager
 
 
 

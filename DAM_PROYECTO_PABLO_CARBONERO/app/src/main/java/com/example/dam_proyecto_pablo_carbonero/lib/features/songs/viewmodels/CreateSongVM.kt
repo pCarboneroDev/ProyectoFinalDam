@@ -44,11 +44,11 @@ class CreateSongVM @Inject constructor(
 
     //Dialog
     private val _tabsModal = MutableStateFlow<Boolean>(false)
-    val tabsModal: StateFlow<Boolean> = _tabsModal.asStateFlow()
+    val tabsModal: StateFlow<Boolean> = _tabsModal
 
     // Message manager
     private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true))
-    val messageManager: StateFlow<MessageManager> = _messageManager.asStateFlow()
+    val messageManager: StateFlow<MessageManager> = _messageManager
 
 
     init {

@@ -12,7 +12,9 @@ enum class SortOption {
     BAND_NAME_DESCENDING
 }
 
-
+/**
+ * Función de extensión para obtener que hace cada valor del enum
+ */
 fun SortOption.getName(): String {
     return when (this) {
         SortOption.NAME_ASCENDING -> "Name (A-Z)"

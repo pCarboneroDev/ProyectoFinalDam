@@ -60,6 +60,8 @@ import androidx.navigation.NavHostController
 import com.example.dam_proyecto_pablo_carbonero.lib.features.global.composables.BottomNavBar
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.composables.BackupWarningModal
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.composables.DeleteAccountModal
+import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.composables.SettingsRow
+import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.composables.SettingsSection
 import com.example.dam_proyecto_pablo_carbonero.lib.features.settings.viewsmodels.SettingsVM
 import kotlinx.coroutines.launch
 
@@ -367,45 +369,6 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
     }
 }
 
-@Composable
-fun SettingsSection(title: String, content: @Composable () -> Unit) {
-    Card(
-        Modifier.padding(10.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        )
-    ) {
-        Column(Modifier.padding(15.dp)) {
-            Text(title, style = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.Bold))
-            content()
-        }
-    }
-}
 
-@Composable
-fun SettingsRow(
-    title: String,
-    composable: @Composable () -> Unit,
-    onClick: () -> Unit = {},
-    noDivider: Boolean = false
-) {
-    Column(Modifier.clickable(onClick = onClick)) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(title)
-            Spacer(Modifier.weight(1f))
-            composable()
-        }
-        if (!noDivider)
-            HorizontalDivider(
-                Modifier
-                    .padding(top = 12.dp)
-                    .alpha(0.1f),
-                color = MaterialTheme.colorScheme.onSecondaryContainer
-            )
-    }
-}
+
+
