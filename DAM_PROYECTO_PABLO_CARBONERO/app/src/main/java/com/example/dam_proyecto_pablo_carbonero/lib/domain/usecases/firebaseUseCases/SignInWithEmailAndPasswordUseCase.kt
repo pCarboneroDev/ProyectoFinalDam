@@ -9,6 +9,11 @@ import javax.inject.Inject
 class SignInWithEmailAndPasswordUseCase @Inject constructor(
     private val firebaseRepository: FirebaseRepository
 ): UseCase<UserParams, FirebaseUser?> {
+    /**
+     * Usecase para logear a un usuario
+     * @param param objeto de UserParams con los datos del usuario
+     * @return El usuario de firebase
+     */
     override suspend fun call(param: UserParams): FirebaseUser? {
         return firebaseRepository.signInWithEmailAndPassword(param.email, param.password)
     }

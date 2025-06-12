@@ -7,6 +7,10 @@ import javax.inject.Inject
 class DeleteCloudDataUseCase @Inject constructor(
     private val firebaseRepository: FirebaseRepository
 ): UseCase<Unit, Boolean> {
+    /**
+     * Usecase para borrar los datos del usuario en la nube
+     * @return boolean indicnado si se ha realizado correctamente
+     */
     override suspend fun call(param: Unit): Boolean {
         return firebaseRepository.deleteCloudData()
     }

@@ -8,6 +8,10 @@ import javax.inject.Inject
 class GetCurrentUserUseCase @Inject constructor(
     private val firebaseRepository: FirebaseRepository
 ): UseCase<Unit, FirebaseUser?> {
+    /**
+     * Caso de uso para obtener el usuario que tiene sesión iniciada
+     * @return el usuario de firebase, null si no hay nunguna sesión
+     */
     override suspend fun call(param: Unit): FirebaseUser? {
         return firebaseRepository.getCurrentUser()
     }

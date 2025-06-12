@@ -30,7 +30,9 @@ class CreateBackupUseCase @Inject constructor(
     private val firebaseRepository: FirebaseRepository
 ): UseCase<Unit, Boolean> {
     /**
-     * Caso de uso
+     * Caso de uso que crea una copia de los datos de la app en firebase
+     * @param param Unit
+     * @return un boolean indicando si se ha completado correctamente
      */
     override suspend fun call(param: Unit): Boolean {
         val notes = musicNoteRepository.getAllNotes()

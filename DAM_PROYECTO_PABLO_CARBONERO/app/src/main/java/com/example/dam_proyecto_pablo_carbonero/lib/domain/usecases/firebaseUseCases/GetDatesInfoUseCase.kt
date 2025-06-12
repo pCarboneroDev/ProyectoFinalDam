@@ -9,6 +9,9 @@ class GetDatesInfoUseCase @Inject constructor(
     private val prefsRepository: UserPreferencesRepository,
     private val firebaseRepository: FirebaseRepository
 ): UseCase<Unit, List<String>> {
+    /**
+     * USecase que devuelve las fechas de modificación de la bbdd y de firebase
+     */
     override suspend fun call(param: Unit): List<String> {
         var localDate = ""
         var cloudDate = ""
