@@ -70,20 +70,36 @@ class LoginVM @Inject constructor(
         return loginSuccesful
     }
 
+    /**
+     * Metodo que comprueba que el email introducido sea válido
+     * @return boolean indicando si es correcto o no
+     */
     private fun isEmailValid(): Boolean{
         val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
         return (_email.value.isNotEmpty() && _email.value.matches(emailRegex.toRegex()))
     }
+
+    /**
+     * Metodo que comprueba que la contraseña introducida
+     * @return boolean indicando si es correcto o no
+     */
     private fun isPasswordValid(): Boolean{
         return  (_password.value.isNotEmpty() && _password.value.length >= 6)
     }
 
+    /**
+     * Metodo que comprueba que todos los campos están correctamente completos
+     * @return boolean indicando si es correcto o no
+     */
     private fun isFormValid(): Boolean{
         _wrongEmail.value = !isEmailValid()
         _wrongPassword.value = !isPasswordValid()
         return (!_wrongEmail.value && !_wrongPassword.value)
     }
 
+    /**
+     * Resetea el valor del MessageManager
+     */
     fun resetMessageManager(){
         _messageManager.value = MessageManager(true)
     }

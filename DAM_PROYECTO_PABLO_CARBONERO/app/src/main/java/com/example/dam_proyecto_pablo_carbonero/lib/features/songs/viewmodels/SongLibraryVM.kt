@@ -72,7 +72,7 @@ class SongLibraryVM @Inject constructor(
             pagingSourceFactory = { getPagedSongsUseCase.synchronousCall(sortOption) }
         ).flow.map { pagingData ->
             pagingData.map { song -> // el map este permite métodos asincrónicos parece
-                //Log.d("PAGING_DEBUG", "Loaded song: ${song.name}")
+                //se convierte los objetos de SOng a SongWithTuning
                 val tuning = getTuningByIdUseCase.call(song.tuningId)
                 SongWithTuning(song = song, tuning = tuning.tuning)
             }

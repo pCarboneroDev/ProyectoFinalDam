@@ -161,6 +161,9 @@ class LoadingVM @Inject constructor (
      * ¿Por qué index - 9 y no comenzar la lista por la de forma que quedara la fórmula sin la resta?
      * Porque las octavas se forman partiendo de Do, si no se tiene en cuenta las frecuencias se calculan de forma incorrecta.
      * Se mantiene de referencia La4 como referencia por estándar internacional.
+     * @param octave la octava de la nota que se busca la frecuenciua
+     * @param index posición de la nota en la lista
+     * @return e
      */
     fun calculateSemitone(octave: Int, index: Int): Int {
         return (octave - 4) * 12 + (index - 9);

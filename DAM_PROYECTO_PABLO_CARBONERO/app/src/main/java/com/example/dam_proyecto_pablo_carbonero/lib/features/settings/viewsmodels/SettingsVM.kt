@@ -106,6 +106,9 @@ class SettingsVM @Inject constructor(
         }
     }
 
+    /**
+     * metodo que llama al caso de uso para obtener las diferenctes fechas de modificacioens de firbase y la bbdd
+     */
     suspend fun loadBackUpInfo() {
         try{
             _isLoading.value = true

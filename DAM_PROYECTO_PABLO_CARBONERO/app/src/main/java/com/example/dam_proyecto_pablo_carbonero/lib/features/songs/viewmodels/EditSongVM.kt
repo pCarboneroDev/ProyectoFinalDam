@@ -81,7 +81,9 @@ class EditSongVM @Inject constructor(
     }
 
 
-
+    /**
+     * Se cargan los datos necesarios para el viewmodel
+     */
     fun loadData(song: Song) {
         _songName.value = song.name
         _bandName.value = song.bandName
@@ -92,7 +94,6 @@ class EditSongVM @Inject constructor(
 
 
     //SETTERS
-
     fun setSelectedTuning(value: Tuning){
         _selectedTuning.value = value
     }

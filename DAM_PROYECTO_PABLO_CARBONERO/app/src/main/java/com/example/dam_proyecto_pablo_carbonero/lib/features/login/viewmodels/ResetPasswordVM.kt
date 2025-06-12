@@ -31,6 +31,9 @@ class ResetPasswordVM @Inject constructor(
         _email.value = value
     }
 
+    /**
+     * Metodo que llama al caso de uso para enviar un correo de cambiar la contraseña
+     */
     suspend fun sendEmail(){
         _isLoading.value = true
         try{
@@ -42,13 +45,17 @@ class ResetPasswordVM @Inject constructor(
             }
         }
         catch (e: Exception){
-            Log.d("ERROR", e.toString())
+            //todo ver si ponermessage
             _isLoading.value = false
         }
         _isLoading.value = false
         _mailSent.value = true
     }
 
+    /**
+     * Metodo que comprueba que el email introducido sea válido
+     * @return boolean indicando si es correcto o no
+     */
     private fun isEmailValid(): Boolean{
         val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
         return (_email.value.isNotEmpty() && _email.value.matches(emailRegex.toRegex()))
