@@ -20,22 +20,6 @@ enum class SortOption {
     BAND_NAME_DESCENDING
 }
 
-/**
- * Metodo de extensión de listas que de SongWithTuning
- * Este metodo según el tipo de SortOption que le llegue ordenará la lista de una forma
- * u otra gracias al metodo que tiene List sortedBy y sortedByDescending
- */
-fun List<SongWithTuning>.sortByOption(sortOption: SortOption): List<SongWithTuning> {
-    return when (sortOption) {
-        SortOption.NAME_ASCENDING -> sortedBy { it.song.name.lowercase() }
-        SortOption.NAME_DESCENDING -> sortedByDescending { it.song.name.lowercase() }
-        SortOption.DATE_ASCENDING -> sortedBy { it.song.id }
-        SortOption.DATE_DESCENDING -> sortedByDescending { it.song.id }
-        SortOption.BAND_NAME -> sortedBy { it.song.bandName.lowercase() }
-        SortOption.BAND_NAME_DESCENDING -> sortedByDescending { it.song.bandName.lowercase() }
-    }
-}
-
 
 fun SortOption.getName(): String {
     return when (this) {
