@@ -13,6 +13,11 @@ class UpdateSongUseCase @Inject constructor(
     private val songRepository: SongRepository,
     private val prefsRepo: UserPreferencesRepository
 ): UseCase<Song, Int> {
+    /**
+     * Usecase para actualizar una canción de la bbdd
+     * @param param canción actualzada
+     * @return nº de filas afectadas
+     */
     override suspend fun call(param: Song): Int {
         val date = Timestamp.now().toDate()
         val formatter = SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault())

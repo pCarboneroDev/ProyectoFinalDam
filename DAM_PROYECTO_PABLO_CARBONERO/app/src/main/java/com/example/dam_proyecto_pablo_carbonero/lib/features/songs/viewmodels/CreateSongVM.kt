@@ -97,11 +97,10 @@ class CreateSongVM @Inject constructor(
 
     /**
      * Metodo para guardar una canción en la bbdd
-     * return: true si se ha guaradado, false si hubo un error.
+     * @return: true si se ha guaradado, false si hubo un error.
      */
-    suspend fun saveSong(): Pair<Boolean, String>{
+    suspend fun saveSong(): Boolean{
         var saved = true
-        var message = ""
 
         try{
             if(!isFormValid()){
@@ -115,18 +114,22 @@ class CreateSongVM @Inject constructor(
                 tabs = _tabs.value
             )
             _finalSong = SongWithTuning(song = song, tuning = _selectedTuning.value!!)
-            insertSongUseCase.call(_finalSong)
+            val id = insertSongUseCase.call(_finalSong)
+            if(id == 0L) {
+                saved = false
+                MessageManager(false)
+            }
         }
         catch (form: InvalidFormException){
             saved = false
-            message = form.message.toString()
+            MessageManager(false, form.message.toString())
         }
         catch (e: Exception){
             saved = false;
-            message = "Unexpected error. Try again later"
+            _messageManager.value = MessageManager(false)
         }
 
-        return Pair(saved, message);
+        return saved
     }
 
 

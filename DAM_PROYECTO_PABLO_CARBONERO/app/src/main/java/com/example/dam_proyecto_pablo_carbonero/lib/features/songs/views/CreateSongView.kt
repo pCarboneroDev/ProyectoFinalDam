@@ -75,14 +75,11 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
             title = "Create new song",
             saveMethod = {
                 CoroutineScope(Dispatchers.Main).launch() {
-                    val (result, message) = vm.saveSong()
+                    val result = vm.saveSong()
                     if (result == true){
                         navController.navigate("SongTuning"){
                             popUpTo("CreateSong") { inclusive = true }
                         }
-                    }
-                    else{
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                     }
                 }
             },

@@ -10,6 +10,10 @@ class GetAllSongsUseCase @Inject constructor(
     private val songRepo: SongRepository,
     private val tuningRepo: TuningRepository
 ): UseCase<Unit, List<SongWithTuning>> {
+    /**
+     * Useacase que obtiene una lista de todas las canciones con afinaciones
+     * @return Lista de SongWithTuning
+     */
     override suspend fun call(param: Unit): List<SongWithTuning> {
         var list = songRepo.getAllSongs()
 

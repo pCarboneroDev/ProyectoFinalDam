@@ -15,6 +15,11 @@ class GetSongWithTuningByIdUseCase @Inject constructor(
     private val tuningMusicNoteRepository: TuningMusicNoteRepository,
     private val musicNoteRepository: MusicNoteRepository,
 ): UseCase<Long, SongWithTuning> {
+    /**
+     * Usecase que obtiene la canción con su afinación de la bbdd
+     * @param param id de la canción
+     * @return objeto de SongWithTuning con la canción y afinación correspondiente
+     */
     override suspend fun call(param: Long): SongWithTuning {
         var songTuning: SongWithTuning
         try {

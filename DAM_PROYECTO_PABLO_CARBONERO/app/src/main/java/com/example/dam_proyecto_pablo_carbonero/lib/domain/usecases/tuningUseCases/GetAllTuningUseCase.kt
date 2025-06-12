@@ -7,6 +7,10 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRe
 class GetAllTuningUseCase(
     private val repo: TuningRepository
 ) : UseCase<Unit, List<Tuning>> {
+    /**
+     * Usecase que obtiene todas las afinaciones de la bbdd
+     * @return lsita de Tuning
+     */
     override suspend fun call(param: Unit): List<Tuning> {
         return repo.getAllTunings()
     }

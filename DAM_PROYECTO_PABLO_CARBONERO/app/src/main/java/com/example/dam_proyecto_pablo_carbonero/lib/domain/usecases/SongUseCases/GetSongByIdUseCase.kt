@@ -8,6 +8,11 @@ import javax.inject.Inject
 class GetSongByIdUseCase @Inject constructor(
     private val songRepository: SongRepository
 ): UseCase<Long, Song> {
+    /**
+     * Caso de uso que obtiene una canción por un id
+     * @param param id de la canción
+     * @return la canción
+     */
     override suspend fun call(param: Long): Song {
         return songRepository.getSongById(param)
     }
