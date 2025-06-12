@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,10 +25,10 @@ class UserTuningsVM @Inject constructor(
 ): ViewModel() {
 
     private val _tuningList = MutableStateFlow<List<TuningWithNotesModel>>(emptyList())
-    val tuningList: StateFlow<List<TuningWithNotesModel>> = _tuningList
+    val tuningList: StateFlow<List<TuningWithNotesModel>> = _tuningList.asStateFlow()
 
     private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true, ""))
-    val messageManager: StateFlow<MessageManager> = _messageManager
+    val messageManager: StateFlow<MessageManager> = _messageManager.asStateFlow()
 
     init {
         viewModelScope.launch(Dispatchers.IO){
@@ -35,6 +36,10 @@ class UserTuningsVM @Inject constructor(
         }
     }
 
+    /**
+     * metodo que llama al usecase para cambiar el estado de favorito de una afinación
+     * @param tuning la afinación que se actualiza
+     */
     suspend fun setTuningAsFavourite(tuning: TuningWithNotesModel) {
         try{
             updateFavouriteUseCase.call(
@@ -54,10 +59,16 @@ class UserTuningsVM @Inject constructor(
         }
     }
 
+    /**
+     * llama al caso de uso para cargar la lista de afinaciones
+     */
     suspend fun loadTunings(){
         _tuningList.value = getAllTuningWithNotesUseCase.call(Unit)
     }
 
+    /**
+     * Llama al usecase para borrar una afinación
+     */
     suspend fun deleteTuning(tuning: TuningWithNotesModel): Boolean{
         var saved = false
         try {
@@ -75,6 +86,9 @@ class UserTuningsVM @Inject constructor(
         return saved
     }
 
+    /**
+     * reseta el valor del MessageManager para su funcionamiento
+     */
     fun resetMessageManager(){
         _messageManager.value = MessageManager(true)
     }

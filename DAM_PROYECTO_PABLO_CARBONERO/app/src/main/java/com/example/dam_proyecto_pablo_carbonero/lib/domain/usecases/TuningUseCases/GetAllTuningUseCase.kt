@@ -9,16 +9,9 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class GetAllTuningUseCase(
-    private val repo: TuningRepository,
-    private val prefsRepo: UserPreferencesRepository
+    private val repo: TuningRepository
 ) : UseCase<Unit, List<Tuning>> {
     override suspend fun call(param: Unit): List<Tuning> {
-       /* val date = Timestamp.now().toDate()
-        val formatter = SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss", Locale.getDefault())
-
-        prefsRepo.setLastModificationDate(
-            formatter.format(date)
-        )*/
         return repo.getAllTunings()
     }
 }
