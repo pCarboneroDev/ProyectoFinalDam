@@ -189,8 +189,7 @@ class SettingsVM @Inject constructor(
             _isLoading.value = false
             return value
         } catch (e: Exception) {
-            // todo gestionar esto
-            Log.d("EL ERROR", e.toString())
+            _messageManager.value = MessageManager(false)
             return false
         }
     }

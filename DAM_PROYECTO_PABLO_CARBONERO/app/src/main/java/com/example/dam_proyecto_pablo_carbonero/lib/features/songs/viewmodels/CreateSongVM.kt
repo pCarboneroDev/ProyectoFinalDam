@@ -117,12 +117,12 @@ class CreateSongVM @Inject constructor(
             val id = insertSongUseCase.call(_finalSong)
             if(id == 0L) {
                 saved = false
-                MessageManager(false)
+                _messageManager.value = MessageManager(false)
             }
         }
         catch (form: InvalidFormException){
             saved = false
-            MessageManager(false, form.message.toString())
+            _messageManager.value = MessageManager(false, form.message.toString())
         }
         catch (e: Exception){
             saved = false;

@@ -38,15 +38,26 @@ class SongDetailsVM @Inject constructor(
     private val _latinNotes = MutableStateFlow<Boolean>(false)
     val latinNotes: StateFlow<Boolean> = _latinNotes
 
+    private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true, ""))
+    val messageManager: StateFlow<MessageManager> = _messageManager
+
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 _selectedSong.value = getSongByIdUseCase.call(songId.toLong())
                 _latinNotes.value = userPreferencesRepository.getNotationPreference()
             }catch (e: Exception){
-                // todo algo yea
+                _messageManager.value = MessageManager(false)
             }
         }
+    }
+
+
+    /**
+     * Metodo que resetea el valor del messagemanager
+     */
+    fun resetMessageManager(){
+        _messageManager.value = MessageManager(true)
     }
 }
