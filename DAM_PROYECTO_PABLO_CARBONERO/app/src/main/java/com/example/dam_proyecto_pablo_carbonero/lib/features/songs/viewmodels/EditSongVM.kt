@@ -8,7 +8,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.DeleteSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongByIdUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.UpdateSongUseCase
-import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.GetAllTuningUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.tuningUseCases.GetAllTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.exceptions.InvalidFormException
 import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel

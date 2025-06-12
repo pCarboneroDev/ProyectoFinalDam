@@ -1,4 +1,4 @@
-package com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases
+package com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.tuningUseCases
 
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.UseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository

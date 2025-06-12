@@ -4,14 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Tuning
-import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.TuningMusicNote
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotesModel
-import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.MusicNoteRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningMusicNoteRepository
-import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.TuningRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAllNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.InsertAllMusicNotesUseCase
-import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.GetAllTuningUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.tuningUseCases.GetAllTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.InsertTuningUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

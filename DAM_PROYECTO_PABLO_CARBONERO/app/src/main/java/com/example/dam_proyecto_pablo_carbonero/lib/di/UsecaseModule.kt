@@ -1,16 +1,12 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.di
 
-import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.MusicNoteDao
-import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.SongDao
-import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningDao
-import com.example.dam_proyecto_pablo_carbonero.lib.data.local.dao.TuningMusicNoteDao
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.FirebaseRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.MusicNoteUseCases.GetAllNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetAllSongsUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.GetSongByIdUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.InsertSongUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases.UpdateSongUseCase
-import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningUseCases.GetAllTuningUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.tuningUseCases.GetAllTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.DeleteTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.InsertTuningUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetAllTuningWithNotesUseCase
@@ -148,12 +144,10 @@ object UsecaseModule {
     @Provides
     @Singleton
     fun provideGetAllTunings(
-        tuningRepository: TuningRepository,
-        prefsRepo: UserPreferencesRepository
+        tuningRepository: TuningRepository
     ): GetAllTuningUseCase{
         return GetAllTuningUseCase(
-            tuningRepository,
-            prefsRepo
+            tuningRepository
         )
     }
 
