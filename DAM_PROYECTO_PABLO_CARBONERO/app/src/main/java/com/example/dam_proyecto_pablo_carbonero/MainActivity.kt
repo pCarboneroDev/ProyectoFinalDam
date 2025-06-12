@@ -67,7 +67,8 @@ class MainActivity : ComponentActivity() {
                                 "CreateTuning",
                                 "EditTuning/{selectedTuningId}",
                                 "CreateSong",
-                                "EditSong/{songId}" -> slideIntoContainer(
+                                "EditSong/{songId}",
+                                "SongDetails/{songId}/{tuningId}" -> slideIntoContainer(
                                     AnimatedContentTransitionScope.SlideDirection.Left, tween(300)
                                 )
                                 else -> fadeIn(animationSpec = tween(700))
@@ -78,7 +79,8 @@ class MainActivity : ComponentActivity() {
                                 "CreateTuning",
                                 "EditTuning/{selectedTuningId}",
                                 "CreateSong",
-                                "EditSong/{songId}" -> slideOutOfContainer(
+                                "EditSong/{songId}",
+                                "SongDetails/{songId}/{tuningId}" -> slideOutOfContainer(
                                     AnimatedContentTransitionScope.SlideDirection.Left, tween(300)
                                 )
                                 else -> fadeOut(animationSpec = tween(700))
@@ -90,7 +92,8 @@ class MainActivity : ComponentActivity() {
                                 "CreateTuning",
                                 "EditTuning/{selectedTuningId}",
                                 "CreateSong",
-                                "EditSong/{songId}" -> slideIntoContainer(
+                                "EditSong/{songId}",
+                                "SongDetails/{songId}/{tuningId}" -> slideIntoContainer(
                                     AnimatedContentTransitionScope.SlideDirection.Right, tween(300)
                                 )
                                 else -> fadeIn(animationSpec = tween(700))
@@ -101,7 +104,8 @@ class MainActivity : ComponentActivity() {
                                 "CreateTuning",
                                 "EditTuning/{selectedTuningId}",
                                 "CreateSong",
-                                "EditSong/{songId}" -> slideOutOfContainer(
+                                "EditSong/{songId}",
+                                "SongDetails/{songId}/{tuningId}" -> slideOutOfContainer(
                                     AnimatedContentTransitionScope.SlideDirection.Left, tween(300)
                                 )
                                 else -> fadeOut(animationSpec = tween(700))
