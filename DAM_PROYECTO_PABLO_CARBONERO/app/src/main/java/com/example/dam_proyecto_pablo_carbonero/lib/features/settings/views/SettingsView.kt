@@ -354,11 +354,13 @@ fun SettingsView(navController: NavHostController, vm: SettingsVM = hiltViewMode
                             if (result){
                                 vm.setDeleteAccountModal(false)
                                 navController.navigate("Load"){
+                                    vm.setDeleteAccountModal(false)
                                     popUpTo("Tuner"){ inclusive = true }
                                 }
                             }
                         }
-                    }
+                    },
+                    onForgotPassword = { navController.navigate("ResetPassword") }
                 )
 
         }

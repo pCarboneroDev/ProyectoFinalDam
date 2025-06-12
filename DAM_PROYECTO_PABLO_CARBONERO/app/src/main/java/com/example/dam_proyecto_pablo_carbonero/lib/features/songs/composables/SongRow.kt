@@ -57,6 +57,7 @@ fun SongRow(
                 DeleteModal(
                     dismissFunction = { deleteModal = false },
                     onDeletePressed = {
+                        expanded = false
                         onDelete(song.song.id)
                     }
                 )
@@ -71,6 +72,7 @@ fun SongRow(
                         text = { Text(text = "Load in tuner") },
                         leadingIcon = {Icon(Icons.Default.Tune, "Load in tuner")},
                         onClick = {
+                            expanded = false
                             navController.navigate("Tuner?selectedTuningId=${song.tuning.id}"){
                                 popUpTo("Tuner") { inclusive = true }
                             }
@@ -79,7 +81,10 @@ fun SongRow(
                     DropdownMenuItem(
                         text = { Text("Edit") },
                         leadingIcon = {Icon(Icons.Default.MusicNote, "Edit song")},
-                        onClick = { navController.navigate("EditSong/${song.song.id}")}
+                        onClick = {
+                            expanded = false
+                            navController.navigate("EditSong/${song.song.id}")
+                        }
                     )
                     DropdownMenuItem(
                         text = {Text("Delete")},

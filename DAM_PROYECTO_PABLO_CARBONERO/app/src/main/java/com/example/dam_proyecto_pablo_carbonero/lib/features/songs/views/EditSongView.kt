@@ -180,8 +180,8 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
                     CoroutineScope(Dispatchers.Main).launch {
                         vm.deleteSong()
                     }
-                    navController.navigate("Tuner"){
-                        popUpTo("SongTuning") { inclusive = false }
+                    navController.navigate("SongTuning"){
+                        popUpTo("Tuner") { inclusive = false }
                     }
                 }
             )
@@ -192,7 +192,7 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
                 containerColor = MaterialTheme.colorScheme.error
             ),
             onClick = {
-                 vm.setTabsModal(true)
+                 vm.setDeleteModal(true)
             }
         ) {
             Text("Delete")

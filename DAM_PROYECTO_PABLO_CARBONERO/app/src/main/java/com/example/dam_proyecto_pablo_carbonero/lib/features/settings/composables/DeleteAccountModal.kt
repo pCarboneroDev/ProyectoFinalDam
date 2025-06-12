@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +28,8 @@ fun DeleteAccountModal(
     title: String,
     body: String,
     onSubmit: (String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onForgotPassword: () -> Unit
 ) {
     var password by remember { mutableStateOf("") }
     AlertDialog(
@@ -57,6 +59,16 @@ fun DeleteAccountModal(
                     label = { Text("Enter your password") },
                     onValueChange = { password = it }
                 )
+
+                TextButton(
+                    onClick = { onForgotPassword() },
+                    modifier = Modifier.padding(top = 16.dp),
+                ) {
+                    Text(
+                        "Forgot Password?",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         },
         onDismissRequest = onDismiss,
