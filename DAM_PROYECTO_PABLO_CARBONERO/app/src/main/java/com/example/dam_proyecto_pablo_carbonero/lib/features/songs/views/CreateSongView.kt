@@ -5,8 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -100,8 +102,7 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
 
                 DropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    Modifier.background(color = MaterialTheme.colorScheme.secondary)
+                    onDismissRequest = { expanded = false }
                 ) {
                     tuningList.forEach { tuning ->
                         DropdownMenuItem(
@@ -117,6 +118,8 @@ fun CreateSongView(navController: NavHostController, vm: CreateSongVM = hiltView
             }
 
         }
+
+        Spacer(Modifier.height(10.dp))
 
 
         TransparentTextField(

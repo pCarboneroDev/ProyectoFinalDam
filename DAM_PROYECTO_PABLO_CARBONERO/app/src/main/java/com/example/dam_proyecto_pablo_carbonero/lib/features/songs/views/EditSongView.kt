@@ -4,8 +4,10 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -103,8 +105,7 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
 
                 DropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    Modifier.background(color = MaterialTheme.colorScheme.secondary)
+                    onDismissRequest = { expanded = false }
                 ) {
                     tuningList.forEach { tuning ->
                         DropdownMenuItem(
@@ -120,6 +121,8 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
             }
 
         }
+
+        Spacer(Modifier.height(10.dp))
 
 
         TransparentTextField(
@@ -178,6 +181,8 @@ fun EditSongView(navController: NavHostController, vm: EditSongVM = hiltViewMode
                 dismissFunction = { vm.setTabsModal(false) },
                 currentTabs = key, context)
         }
+
+        Spacer(Modifier.height(10.dp))
 
 
         if (deleteModal)
