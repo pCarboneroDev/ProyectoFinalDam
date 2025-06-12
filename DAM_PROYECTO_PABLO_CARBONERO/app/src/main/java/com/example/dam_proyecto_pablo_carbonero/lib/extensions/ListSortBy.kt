@@ -1,12 +1,5 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.extensions
 
-import androidx.compose.ui.text.toLowerCase
-import androidx.compose.ui.text.toUpperCase
-import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
-import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.SongWithTuning
-import java.util.Locale
-import kotlin.collections.sortedBy
-import kotlin.collections.sortedByDescending
 
 /**
  * enum que representa las distintas formas de ordenar la lista de canciones

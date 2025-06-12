@@ -29,9 +29,9 @@ class LoadingVM @Inject constructor (
     private val _loadComplete = MutableStateFlow(false)
     val loadComplete: StateFlow<Boolean> = _loadComplete
 
+    private val _criticalError = MutableStateFlow(false)
+    val criticalError: StateFlow<Boolean> = _criticalError
 
-    private val _txtPlaceholder = MutableStateFlow<String>("")
-    val txtPlaceholder: StateFlow<String> = _txtPlaceholder
 
     // esto se ejecuta al instanciar el viewModel
     init {
@@ -47,8 +47,8 @@ class LoadingVM @Inject constructor (
                     generateStandardTuning(notes)
                 }
                 _loadComplete.value = true
-            }catch (e: Exception){
-                //TODO gestionar excepción
+            } catch (e: Exception){
+                _criticalError.value = false
             }
         }
     }
@@ -57,7 +57,7 @@ class LoadingVM @Inject constructor (
      * Metodo que se encarga de generar todas las notas musicales y de añadirlas a la base de datos local
      */
     private suspend fun generateMusicNotes(): List<MusicNote>{
-        val notesListToInsert = getFreqAccordingOnA4();
+        val notesListToInsert = getFreqAccordingOnA4()
 
         insertAllMusicNotesUseCase.call(notesListToInsert)
         return getAllNotesUseCase.call(Unit)
@@ -72,12 +72,12 @@ class LoadingVM @Inject constructor (
         // Notas estándar para una guitarra de 6 cuerdas
         val standardTuning = listOf("E2", "A2", "D3", "G3", "B3", "E4")
 
-        for (TuningNote in standardTuning) {
-            val noteFound = notes.find { it.englishName == TuningNote }
+        for (tuningNote in standardTuning) {
+            val noteFound = notes.find { it.englishName == tuningNote }
             if (noteFound != null) {
                 list.add(noteFound)
             } else {
-                println("Nota $TuningNote no encontrada en la lista de notas")
+                println("Nota $tuningNote no encontrada en la lista de notas")
             }
         }
 
@@ -85,7 +85,7 @@ class LoadingVM @Inject constructor (
 
         val tuningwithNotes = TuningWithNotesModel(tuning = standardTunning, noteList = list)
 
-        var standardId = insertTuningUseCase.call(tuningwithNotes)//tuningRepo.insertTuning(standardTunning)
+        var standardId = insertTuningUseCase.call(tuningwithNotes)
     }
 
 
@@ -108,13 +108,13 @@ class LoadingVM @Inject constructor (
             "A#" to "Bb"
         )
 
-        var musicNoteList = mutableListOf<MusicNote>();
+        var musicNoteList = mutableListOf<MusicNote>()
 
         for (note in noteList){
             for (i in 1..4){
-                var octave = i;
+                var octave = i
                 var semitone = calculateSemitone(octave, noteList.indexOf(note))
-                var freqWanted = calculateFreq(freqRef, semitone);
+                var freqWanted = calculateFreq(freqRef, semitone)
                 var indexN = englishNames.indexOf(note[0].toString())
 
                 val sharp = if (note.contains("#")) "#" else null
@@ -136,11 +136,11 @@ class LoadingVM @Inject constructor (
                     sharpIndicator = sharp,
                     alternativeName = bemol
                 )
-                musicNoteList.add(nota);
+                musicNoteList.add(nota)
             }
             index++
         }
-        return musicNoteList;
+        return musicNoteList
     }
 
     /**
@@ -166,6 +166,6 @@ class LoadingVM @Inject constructor (
      * @return e
      */
     fun calculateSemitone(octave: Int, index: Int): Int {
-        return (octave - 4) * 12 + (index - 9);
+        return (octave - 4) * 12 + (index - 9)
     }
 }

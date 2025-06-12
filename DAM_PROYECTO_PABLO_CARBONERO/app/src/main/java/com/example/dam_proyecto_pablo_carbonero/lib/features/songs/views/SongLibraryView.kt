@@ -69,9 +69,6 @@ fun SongLibraryView(navController: NavHostController, vm: SongLibraryVM = hiltVi
             vm.resetMessageManager()
         }
     }
-    LaunchedEffect(Unit) {
-        vm.loadViewModel()
-    }
 
 
     Scaffold(

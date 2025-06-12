@@ -16,7 +16,6 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.SongUseCases
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetTuningByIdUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +26,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -103,10 +101,6 @@ class SongLibraryVM @Inject constructor(
         }
 
 
-    init {
-        loadViewModel()
-    }
-
     /**
      * metodo que se encarga de cambiar como se ordena la lista
      */
@@ -118,20 +112,6 @@ class SongLibraryVM @Inject constructor(
         Log.d("SortOption: ", "${_selectedSortOption.value}")
     }
 
-    /**
-     * Metodo que carga los datos necesarios para el viewmodel.
-     * Se separa en una función independiente ya que se tendrá que llamar desde la vista en algunos momentos
-     */
-    fun loadViewModel(){
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-            }
-            catch (e: Exception){
-                //TODO gestionar excepcion
-                Log.d("AA", e.message.toString())
-            }
-        }
-    }
 
     /**
      * Limpia la barra de búsqueda

@@ -1,5 +1,6 @@
 package com.example.dam_proyecto_pablo_carbonero.lib.features.login.views
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -48,10 +51,19 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ResetPasswordView(navController: NavHostController, vm: ResetPasswordVM = hiltViewModel()){
+    val context = LocalContext.current
     val email by vm.email.collectAsState()
     val wrongEmail by vm.wrongEmail.collectAsState()
     val isLoading by vm.isLoading.collectAsState()
     val mailSent by vm.mailSent.collectAsState()
+    val messageManager by vm.messageManager.collectAsState()
+
+    LaunchedEffect(messageManager) {
+        if(!messageManager.isSuccess){
+            Toast.makeText(context, messageManager.message, Toast.LENGTH_SHORT).show()
+            vm.resetMessageManager()
+        }
+    }
 
     Column(
         modifier = Modifier

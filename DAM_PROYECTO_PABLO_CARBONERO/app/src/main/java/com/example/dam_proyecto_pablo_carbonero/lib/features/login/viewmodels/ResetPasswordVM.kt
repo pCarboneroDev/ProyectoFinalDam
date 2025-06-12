@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.params.UserParams
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.firebaseUseCases.SendPasswordResetEmailUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +28,9 @@ class ResetPasswordVM @Inject constructor(
     private val _mailSent = MutableStateFlow<Boolean>(false)
     val mailSent: StateFlow<Boolean> = _mailSent
 
+    private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true, ""))
+    val messageManager: StateFlow<MessageManager> = _messageManager
+
     fun setEmail(value:String){
         _email.value = value
     }
@@ -45,7 +49,7 @@ class ResetPasswordVM @Inject constructor(
             }
         }
         catch (e: Exception){
-            //todo ver si ponermessage
+            _messageManager.value = MessageManager(false)
             _isLoading.value = false
         }
         _isLoading.value = false
@@ -59,5 +63,13 @@ class ResetPasswordVM @Inject constructor(
     private fun isEmailValid(): Boolean{
         val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})"
         return (_email.value.isNotEmpty() && _email.value.matches(emailRegex.toRegex()))
+    }
+
+
+    /**
+     * Resetea el valor del gestor de toasts
+     */
+    fun resetMessageManager(){
+        _messageManager.value = MessageManager(true)
     }
 }

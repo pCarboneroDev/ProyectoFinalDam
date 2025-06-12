@@ -16,6 +16,7 @@ import com.example.dam_proyecto_pablo_carbonero.lib.domain.model.TuningWithNotes
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetAllTuningWithNotesUseCase
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories.UserPreferencesRepository
 import com.example.dam_proyecto_pablo_carbonero.lib.domain.usecases.TuningWithNotes.GetAmountTuningsUseCase
+import com.example.dam_proyecto_pablo_carbonero.lib.utils.MessageManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,10 +52,12 @@ class TunerVM @Inject constructor(
     private  val _guideText = MutableStateFlow<String>("")
     val guideText: StateFlow<String> = _guideText
 
+    // para detectar audio
     private val sampleRate = 44100
     private val bufferSize = 16384
     private lateinit var audioRecord: AudioRecord
 
+    //
     private val _latinNotes = MutableStateFlow<Boolean>(false)
     val latinNotes: StateFlow<Boolean> = _latinNotes
 
@@ -63,6 +66,9 @@ class TunerVM @Inject constructor(
 
     private val _colorGraph = MutableStateFlow<Color>(Color(0xFF18120C))
     val colorGraph: StateFlow<Color> = _colorGraph
+
+    private val _messageManager = MutableStateFlow<MessageManager>(MessageManager(true, ""))
+    val messageManager: StateFlow<MessageManager> = _messageManager
 
 
 
@@ -84,15 +90,15 @@ class TunerVM @Inject constructor(
     // ALGO ASI COMO EL CONSTRUCTOR
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            loadTunings()
-            loadPreferences()
-
             try {
+                loadTunings()
+                loadPreferences()
+
                 if(!startingTuning.isNullOrEmpty()){
                     _selectedTuning.value = _tunings.value.find { (x) -> x.id == startingTuning.toLong() }
                 }
             }catch (e: Exception){
-                //todo gestionar :(
+                _messageManager.value = MessageManager(false)
             }
         }
     }
@@ -172,7 +178,7 @@ class TunerVM @Inject constructor(
      * y da un valor a la frecuencia encontrada entre 0 y 1 para ubicar el círculo que muestra
      * la afinación de la nota seleccionada
      */
-    fun sigmoidNormalizedBetween(freq: Double, minHz: Double, maxHz: Double, kFactor: Double = 0.02): Double {
+    private fun sigmoidNormalizedBetween(freq: Double, minHz: Double, maxHz: Double, kFactor: Double = 0.02): Double {
         if (freq == 0.0) return 0.5
 
         val center = (minHz + maxHz) / 2.0
@@ -191,7 +197,7 @@ class TunerVM @Inject constructor(
      * @param sampleRate: cantidad de muestras de audio que se toman por segundo
      * Return: valor de la frecuencia detectada, 0 si no detecta nada.
      */
-    fun processYIN(audioRecord: AudioRecord, bufferSize: Int, sampleRate: Int): Double {
+    private fun processYIN(audioRecord: AudioRecord, bufferSize: Int, sampleRate: Int): Double {
         // se crea un array de shorts del tamaño del número de muestras que se pueden capturar
         val buffer = ShortArray(bufferSize)
         // se comprueba si audio record tiene muestras capturadas, si no devuelkve 0
@@ -261,5 +267,13 @@ class TunerVM @Inject constructor(
         }
 
         return f
+    }
+
+
+    /**
+     * Resetea el valor del gestor de toasts
+     */
+    fun resetMessageManager(){
+        _messageManager.value = MessageManager(true)
     }
 }

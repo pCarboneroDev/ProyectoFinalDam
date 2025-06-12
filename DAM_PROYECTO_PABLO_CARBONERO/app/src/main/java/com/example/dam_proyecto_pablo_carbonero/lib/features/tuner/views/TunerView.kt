@@ -3,6 +3,7 @@ package com.example.dam_proyecto_pablo_carbonero.lib.features.tuner.views
 import android.Manifest
 import android.content.pm.PackageManager
 import android.widget.GridView
+import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -50,6 +51,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -75,7 +77,17 @@ import kotlin.math.roundToInt
 
 @Composable
 fun TunerView(navController: NavHostController, vm: TunerVM = hiltViewModel()){
-    val tunings by vm.tunings.collectAsState();
+    val context = LocalContext.current
+    val tunings by vm.tunings.collectAsState()
+
+    val messageManager by vm.messageManager.collectAsState()
+
+    LaunchedEffect(messageManager) {
+        if(!messageManager.isSuccess){
+            Toast.makeText(context, messageManager.message, Toast.LENGTH_SHORT).show()
+            vm.resetMessageManager()
+        }
+    }
 
     LaunchedEffect(Unit) {
         vm.loadTunings()
