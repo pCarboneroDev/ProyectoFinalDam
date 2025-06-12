@@ -8,7 +8,9 @@ import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.MusicNot
  * es respetar la arquitectura "Clean architecture". Si en el futuro se quiere cambiar el tipo de fuente de
  * datos es más fácil
  *
- * El objetivo de
+ *
+ *  Interfaz que define todas las posibles acciones que se pueden realizar con las notas
+ *
  */
 interface MusicNoteRepository {
     suspend fun getAllNotes():List<MusicNote>

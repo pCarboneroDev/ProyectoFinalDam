@@ -3,6 +3,9 @@ package com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories
 import androidx.paging.PagingSource
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.Song
 
+/**
+ * Interfaz que define todas las posibles acciones que se pueden realizar con las canciones
+ */
 interface SongRepository {
     suspend fun getAllSongs(): List<Song>
     suspend fun getSongById(id: Long): Song

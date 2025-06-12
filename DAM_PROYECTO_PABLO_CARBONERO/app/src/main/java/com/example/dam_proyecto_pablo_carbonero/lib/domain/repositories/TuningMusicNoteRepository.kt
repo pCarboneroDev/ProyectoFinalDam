@@ -2,6 +2,10 @@ package com.example.dam_proyecto_pablo_carbonero.lib.domain.repositories
 
 import com.example.dam_proyecto_pablo_carbonero.lib.data.local.entities.TuningMusicNote
 
+/**
+ * Interfaz que define todas las posibles acciones que se pueden realizar con la tabla intermedia
+ * entre las notas y las afinaciones
+ */
 interface TuningMusicNoteRepository {
     suspend fun getAllTuningMusicNote():List<TuningMusicNote>
 
