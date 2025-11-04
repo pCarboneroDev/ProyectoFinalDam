@@ -4,7 +4,7 @@ App for real-time audio analysis for pitch detection. Built with Kotlin and Jetp
 
 ---
 
-Architecture
+# Architecture
 The app is built with MVVM and Clean Architecture principles
 
 ## ⚙️ Technologies used
