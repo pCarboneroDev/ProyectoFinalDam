@@ -9,6 +9,9 @@ The app is built with MVVM and Clean Architecture principles
 
 ## ⚙️ Technologies used
 
-- [Flutter](https://flutter.dev/)
-- [Python](https://www.python.org/)
-- [Flask](https://flask.palletsprojects.com/en/stable/)
+- [Kotlin](https://kotlinlang.org/)
+- [Jetpack Compose](https://developer.android.com/compose)
+- [SQLite](https://sqlite.org/)
+- [Hilt](https://developer.android.com/training/dependency-injection/hilt-android?hl=es-419) (For dependency injection)
+- [Room](https://sqlite.org/) (For local database management)
+  
