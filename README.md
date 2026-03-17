@@ -2,6 +2,9 @@
 
 App for real-time audio analysis for pitch detection. Built with Kotlin and Jetpack Compose
 
+## ▶ Main features demo (soon better demo with all of the functionalities)
+https://youtube.com/shorts/nd6FCp1thpU?feature=share
+
 ---
 
 # Architecture
